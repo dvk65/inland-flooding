@@ -9,7 +9,7 @@ import time
 # track the runtime
 start = time.time()
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'utils/inundation-be3333e5941b.json'
+ee.Authenticate()
 ee.Initialize(project='inundation')
 
 # parameters

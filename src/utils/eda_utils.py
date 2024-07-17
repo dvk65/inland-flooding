@@ -2,9 +2,10 @@ from shapely.geometry import Point, shape
 import pandas as pd
 import matplotlib.pyplot as plt
 import geopandas as gpd
-import folium
 import seaborn as sns
 import requests
+import os
+import re
 
 # describe dataset
 def desc_data(df):
@@ -109,27 +110,41 @@ def map_event(df):
         plt.tight_layout()
         plt.savefig(f'figs/{state}_flood_event_map.png')
 
-def create_marker(row):
-    if row['category'] == 'stn':
-        marker_color = 'blue'
-    else:
-        marker_color = 'green'
-    
-    marker = folium.Marker(
-        location=[row['latitude'], row['longitude']],
-        popup=f"{row['event']}, ID: {row['id']}",
-        icon=folium.Icon(color=marker_color)
-    )
-    
-    return marker
+# TODO - Incomplete
+def check_satellite(event_list_mod):
+    id_images = {}
 
-def create_interactive_map_event(df):
-    gdf = gpd.GeoDataFrame(df, geometry=gpd.points_from_xy(df['longitude'], df['latitude']))
+    for event in event_list_mod:
+        event_dir = f'/content/drive/MyDrive/{event}/'
+        if os.path.exists(event_dir):
+            for filename in os.listdir(event_dir):
+                parts = filename.split('_')
+                id = parts[0]
+                check_pattern = r'_(\d{8})T'
+                match = re.findall(check_pattern, filename)
+                if match:
+                    date = match[0]
+                if id not in id_images:
+                    id_images[id] = {
+                        'id': id,
+                        'images': [],
+                        'dates': [],
+                        'dir': event
+                    }
+                id_images[id]['images'].append(filename)
+                id_images[id]['dates'].append(date)
+                id_images[id]['dir'].append(event)
     
-    m = folium.Map(location=[gdf['latitude'].mean(), gdf['longitude'].mean()], zoom_start=10)
-    
-    for idx, row in gdf.iterrows():
-        marker = create_marker(row)
-        marker.add_to(m)
-    
-    m.save('figs/interactive_map_event.html')
+    event_images_data = list(id_images.values())
+    event_images_df = pd.DataFrame(event_images_data)
+    print('Dataset Overview:\n', event_images_df.head())
+    return event_images_df
+
+# TODO 
+def prep_satellite(df):
+
+    # delete the event with 1 image 
+    df_mod = df[df['date'].apply(len) > 1].copy()
+
+    return df_mod
+

@@ -1,5 +1,4 @@
 import pandas as pd
-import matplotlib.pyplot as plt
 from utils import eda_utils
 
 print('\nSTN FLOOD EVENTS EDA')
@@ -47,8 +46,5 @@ stn_mod = stn[['id', 'state', 'county', 'latitude', 'longitude', 'event']].copy(
 stn_mod['category'] = 'stn'
 df = pd.concat([gauge_select_mod, stn_mod])
 eda_utils.map_event(df)
-
-# create an interactive map
-eda_utils.create_interactive_map_event(df)
 
 

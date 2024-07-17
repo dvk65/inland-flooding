@@ -1,0 +1,17 @@
+name: flood_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - scikit-learn
+  - seaborn
+  - matplotlib
+  - make
+  - git
+  - missingno
+  - jupyter
+  - geopandas
+  - earthengine-api
+  - pandas
+prefix: /home/qyin/miniconda3/envs/flood_env

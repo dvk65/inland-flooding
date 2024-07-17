@@ -16,7 +16,7 @@ To collect and preprocess gauge water levels above [moderate flood stage](https:
 make gauge_flood_event
 ```
 
-The datasets are also available [here](https://drive.google.com/drive/folders/1m8dKBEbzPUuHp1urUjmGc0xb7KmVK_Ri?usp=sharing). 
+The datasets are available [here](https://drive.google.com/drive/folders/1m8dKBEbzPUuHp1urUjmGc0xb7KmVK_Ri?usp=sharing). 
 
 ### Step 2: EDA on flood event data
 In this section, I implemented data visualization methods (countplot and map) to better understand the collected flood event data. To The following command will visualize the flood event. 
@@ -32,6 +32,8 @@ The following command will collect Sentinel 2 imagery from Google Earth Engine b
 ```
 make stn_sentinel2
 ```
+
+The example dataset is available [here](https://drive.google.com/drive/folders/1Wi1jZaMuj0jafAVQy-QCnsFBnVFRr9eW?usp=sharing).
 
 ### Step 4: EDA on Sentinel 2 imagery
 Before applying the KMeans Clustering algorithm, we need to analyze the collected satellite images.

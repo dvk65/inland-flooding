@@ -15,7 +15,7 @@ latitude     863
 longitude    860
 ```
 
-As we can see, there're five events. They're `2023 July MA NY VT Flood`, `2018 March Extratropical Cyclone`, `2018 January Extratropical Cyclone`, `2023 December East Coast Cyclone`, and `2021 Henri`. Below is the number of flood events in each category. `2023 July MA NY VT Flood` has the largest number of flood events.
+As we can see, there're five unique events. They're `2023 July MA NY VT Flood`, `2018 March Extratropical Cyclone`, `2018 January Extratropical Cyclone`, `2023 December East Coast Cyclone`, and `2021 Henri`. Below is the number of flood events in each category. `2023 July MA NY VT Flood` has the largest number of flood events.
 ```
 Flood Events Group By event:
                                      total_count

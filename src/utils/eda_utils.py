@@ -115,7 +115,7 @@ def check_satellite(event_list_mod):
     id_images = {}
 
     for event in event_list_mod:
-        event_dir = f'/content/drive/MyDrive/{event}/'
+        event_dir = f'data/{event}/'
         if os.path.exists(event_dir):
             for filename in os.listdir(event_dir):
                 parts = filename.split('_')

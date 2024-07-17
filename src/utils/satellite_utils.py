@@ -1,5 +1,7 @@
 import ee 
 import time
+import os
+import requests
 
 def map_color(image, select_vis):
   return image.visualize(**select_vis)
@@ -78,52 +80,55 @@ def add_cld_shdw_mask(img):
 
 # export satellite image visualization
 def export_image_vis(image, dir, scale, region, key):
+    url = image.getDownloadUrl({
+        'region': region,
+        'scale': scale,
+        'format': 'GEO_TIFF'
+    })
     file_name = f'{key}_{image.id().getInfo()}_VIS'
-    task = ee.batch.Export.image.toDrive(
-        image=image,
-        description='VIS',
-        folder=dir,
-        fileNamePrefix=file_name,
-        region=region,
-        scale=scale
-    )
-    task.start()
+    file_path = os.path.join(dir, f'{file_name}.tif')
+
+    res = requests.get(url)
+    with open(file_path, 'wb') as fd:
+        fd.write(res.content)
+
 
 # export ndwi 
 def export_image_ndwi(image, dir, scale, region, key, satellite):
-  if satellite == 'sentinel2':
-      water_indices = image.select(['B3', 'B8'])
-      water_mask = water_indices.normalizedDifference(['B3', 'B8']).gt(-0.25)
-  elif satellite == 'landsat8':
-      water_indices = image.select(['SR_B5', 'SR_B4'])
-      water_mask = water_indices.normalizedDifference(['SR_B5', 'SR_B4']).gt(-0.25)
+    if satellite == 'sentinel2':
+        water_indices = image.select(['B3', 'B8'])
+        water_mask = water_indices.normalizedDifference(['B3', 'B8']).gt(-0.25)
+    elif satellite == 'landsat8':
+        water_indices = image.select(['SR_B5', 'SR_B4'])
+        water_mask = water_indices.normalizedDifference(['SR_B5', 'SR_B4']).gt(-0.25)
 
-  task = ee.batch.Export.image.toDrive(
-      image=water_mask,
-      description='NDWI',
-      folder=dir,
-      fileNamePrefix=f'{key}_{image.id().getInfo()}_NDWI',
-      scale=scale,
-      region=region,
-      fileFormat='GeoTIFF',
-      maxPixels=1e9
-  )
-  task.start()
+    url = water_mask.getDownloadUrl({
+        'region': region,
+        'scale': scale,
+        'format': 'GEO_TIFF'
+    })
+    file_name = f'{key}_{image.id().getInfo()}_NDWI'
+    file_path = os.path.join(dir, f'{file_name}.tif')
+
+    res = requests.get(url)
+    with open(file_path, 'wb') as fd:
+        fd.write(res.content)
 
 # export cloud and shadow mask
 def export_image_cloud(image, dir, scale, region, key, satellite):
   if satellite == 'sentinel2':
-    task = ee.batch.Export.image.toDrive(
-      image = image.select('cloudmask'),
-      description = 'CLOUD',
-      folder = dir,
-      fileNamePrefix =  f'{key}_{image.id().getInfo()}_CLOUD',
-      scale = scale,
-      region = region,
-      fileFormat = 'GeoTIFF'
-    )
+    image = image.select('cloudmask')
+    url = image.getDownloadUrl({
+        'region': region,
+        'scale': scale,
+        'format': 'GEO_TIFF'
+    })
+    file_name = f'{key}_{image.id().getInfo()}_CLOUD'
+    file_path = os.path.join(dir, f'{file_name}.tif')
 
-    task.start()
+    res = requests.get(url)
+    with open(file_path, 'wb') as fd:
+        fd.write(res.content)
 
 # collect sentinel 2 imagery
 def collect_sentinel2(dir_vis, dir_ndwi, dir_cloud, data, buffer_dis, overlap_threshold, pixel_threshold, satellite, scale):
@@ -166,9 +171,12 @@ def collect_sentinel2_by_event(df, wait_time, buffer_dis, overlap_threshold, pix
        event_df['end_day'] = date_range[event][1]
        print(f'{event} has {len(event_df)} events.')
        dir_event = event.replace(' ', '_')
-       dir_vis = dir_event
-       dir_ndwi = f'{dir_event}_NDWI'
-       dir_cloud = f'{dir_event}_ClOUD'
+       dir_vis = f'data/{dir_event}/'
+       dir_ndwi = f'data/{dir_event}_NDWI/'
+       dir_cloud = f'data/{dir_event}_ClOUD/'
+       os.makedirs(dir_vis, exist_ok=True)
+       os.makedirs(dir_ndwi, exist_ok=True)
+       os.makedirs(dir_cloud, exist_ok=True)
        collect_sentinel2(dir_vis, dir_ndwi, dir_cloud, event_df, buffer_dis, overlap_threshold, pixel_threshold, satellite, scale)
     #    time.sleep(wait_time)
        print(f"Finished processing for event: {event}")

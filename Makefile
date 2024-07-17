@@ -20,3 +20,7 @@ stn_sentinel2:
 # conduct EDA on the corresponding sentinel 2 imagery
 # eda_stn_sentinel2:
 # 	python -B src/eda_stn_sentinel2.py
+
+# test
+test:
+	python -B src/test.py

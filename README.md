@@ -1,49 +1,64 @@
 # Flood Event Assessment and Visualization in New England Region
 
 ## Description
-This project aims to assess and visualize flood events in the New England region. It utilizes the STN flood event database, gauge water level datasets, and the corresponding satellite imagery to provide insights into flood events and their impacts. 
+This project aims to assess and visualize flood events in the New England region (CT, ME, MA, NH, RI, VT). It primarily utilizes the STN flood event data (high water marks), gauge real-time water level data (high water levels), and the corresponding satellite imagery to provide insights into flood events and their impacts. 
 
 ## Instruction
 ### Step 1: Flood event data collection
-In this project, [STN flood event database](https://stn.wim.usgs.gov/STNDataPortal/) is the primary source for flood events.To collect and preprocess flood event data from the STN database, use the following command. The estimated runtime is less than 1 minute. 
+[STN flood event database](https://stn.wim.usgs.gov/STNDataPortal/) is the primary source for flood events that documents some of the important information about the [high-water marks](https://www.usgs.gov/special-topics/water-science-school/science/high-water-marks-and-flooding) during flood events. The original dataset includes 53 attributes. For this project, the selected attributes are `eventName`, `stateName`, `countyName`, `hwm_id`, `latitude`, `longitude`, and `hwm_locationdescription`. 
+To collect and preprocess flood event data from the STN database, use the following command (estimated runtime: < 1 minute):
 ```
-make stn_flood_event
+make collect_stn
 ```
 
-Another approach to explore the flood events is by checking the water levels of gauges from [USGS National Water Information System](https://waterdata.usgs.gov/nwis).
-To collect and preprocess gauge water levels above [moderate flood stage](https://www.weather.gov/aprfc/terminology#:~:text=Moderate%20Flooding%20is%20defined%20to%20have%20some,if%20moderate%20flooding%20is%20expected%20during%20the), use the following command. The estimated runtime is 30-40 minutes. 
+The real-time water levels of gauges from [USGS National Water Information System] (https://waterdata.usgs.gov/nwis) is another source for flood events. In this project,  when the water level of a gauge is above the moderate flood stage, it's considered as a flood event. To increase the area of interests, high water levels are also collected. 
+To collect and preprocess gauge water levels above the [moderate flood stage](https://www.weather.gov/aprfc/terminology#:~:text=Moderate%20Flooding), use the following command (estimated runtime: 30-40 minutes):
 ```
-make gauge_flood_event
+make collect_gauge
 ```
 
 The datasets are available [here](https://drive.google.com/drive/folders/1m8dKBEbzPUuHp1urUjmGc0xb7KmVK_Ri?usp=sharing). 
 
-### Step 2: EDA on flood event data
-In this section, I implemented data visualization methods (countplot and map) to better understand the collected flood event data. To The following command will visualize the flood event. 
+### Step 2: Analysis of flood event data
+After collecting STN high water mark data and gauge high water level data, an analysis is conducted to:
+- obtain the flood event dates based on flood event reports;
+- examine the distribution of flood events based on charts and maps;
+- identify the common flood events based on the overlap between STN and gauge data.
+
+The following command will visualize the flood event. 
 ```
-make eda_flood_event
+make analyze_stn_gauge
 ```
 
 ### Step 3: Sentinel 2 imagery collection
-Before collecting Sentinel 2 imagery from [Google Earth Engine](https://developers.google.com/earth-engine/datasets/catalog/sentinel-2), we need to set up our own Google Cloud Platform project and authenticate using either our personal Google account or a service account. [Set up Cloud Project](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup) and [Python Installation](https://developers.google.com/earth-engine/guides/python_install) can be helpful. (A tutorial will be added later.)
+Before collecting Sentinel 2 imagery from [Google Earth Engine](https://developers.google.com/earth-engine/datasets/catalog/sentinel-2), we need to set up our own Google Cloud Platform project and authenticate using either our personal Google account or a service account. 
 
-The following command will collect Sentinel 2 imagery from Google Earth Engine based on STN flood event data. The estimated runtime is 80-90 minutes.
+The sections `Create a Cloud project` and `Enable the Earth Engine API` in [Set up your Earth Engine enabled Cloud Project](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup) should be completed. (A tutorial will be added later.)
 
+To collect Sentinel 2 imagery from Google Earth Engine based on STN flood event data, use the following command (estimated runtime: 120 minutes): 
 ```
-make stn_sentinel2
+make collect_sentinel2
 ```
 
-The example dataset is available [here](https://drive.google.com/drive/folders/1Wi1jZaMuj0jafAVQy-QCnsFBnVFRr9eW?usp=sharing).
+The example dataset is available [here](https://drive.google.com/drive/folders/1m8dKBEbzPUuHp1urUjmGc0xb7KmVK_Ri?usp=sharing).
 
-### Step 4: EDA on Sentinel 2 imagery
+### Step 4: Analysis on Sentinel 2 imagery
 Before applying the KMeans Clustering algorithm, we need to analyze the collected satellite images.
+
+```
+make analyze_image
+```
+
 ### Step 5: Imagery segmentation using KMeans Clustering
+
+```
+make run_kmeans
+```
 
 ## Todo
 - Finish the instruction part
-- Export environment.yml (yml incomplete)
-- Improve flood event analysis report
-- Upload sentinel 2 analysis report
+- Improve Report.md (flood event/image/kmeans analysis)
 - Optimize KMeans clustering algorithm
+- Add the evaluation part
 
 ## Reference

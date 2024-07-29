@@ -11,7 +11,7 @@ To collect and preprocess flood event data from the STN database, use the follow
 make collect_stn
 ```
 
-The real-time water levels of gauges from [USGS National Water Information System] (https://waterdata.usgs.gov/nwis) is another source for flood events. In this project,  when the water level of a gauge is above the moderate flood stage, it's considered as a flood event. To increase the area of interests, high water levels are also collected. 
+The real-time water levels of gauges from [USGS National Water Information System] (https://waterdata.usgs.gov/nwis) is another source for flood events. In this project,  when the water level of a gauge is above the moderate flood stage, it's considered as a flood event. To increase the number of flood event instances, high water levels are also collected. 
 To collect and preprocess gauge water levels above the [moderate flood stage](https://www.weather.gov/aprfc/terminology#:~:text=Moderate%20Flooding), use the following command (estimated runtime: 30-40 minutes):
 ```
 make collect_gauge

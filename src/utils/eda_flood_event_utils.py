@@ -95,7 +95,7 @@ def plot_bar(df, var, filename, order):
     ax.legend(title='Event', bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0, fontsize='small')
     plt.tight_layout()
 
-    plt.savefig(f'figs/stn_gauge/countplot_{filename}.png', bbox_inches='tight')
+    plt.savefig(f'figs/flood_event/countplot_{filename}.png', bbox_inches='tight')
     plt.close()
     
 def collect_nhd(layers):

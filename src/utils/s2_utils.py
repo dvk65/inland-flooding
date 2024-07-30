@@ -21,6 +21,22 @@ This file can be imported as a module and contains the following functions:
 import ee 
 import os
 import requests
+import pandas as pd
+
+def map_dates(event, date_range):
+    """
+    Add the formed and dissipated dates for the events
+ 
+    Args:
+        event (str): The event name for which the dates need to be mapped.
+        date_range (dict): A dictionary representing the date ranges for each event.
+
+    Returns:
+        pd.Series: A pandas Series representing the 'formed' and 'dissipated' dates for the event.
+    """
+    if event in date_range:
+        formed, dissipated = date_range[event]
+        return pd.Series([formed, dissipated], index=['formed', 'dissipated'])
 
 # visualize an image with specific parameters
 def map_color(image, select_vis):
@@ -224,9 +240,9 @@ def collect_sentinel2_by_event(df, buffer_dis, overlap_threshold, pixel_threshol
         event_df = df[df['event'] == event].reset_index(drop=True)
         print(f'{event} has {len(event_df)} events.')
         dir_event = event.replace(' ', '_')
-        dir_vis = f'data/img_sentinel2/{dir_event}/'
-        dir_ndwi = f'data/img_sentinel2/{dir_event}_NDWI/'
-        dir_cloud = f'data/img_sentinel2/{dir_event}_ClOUD/'
+        dir_vis = f'data/img_s2/{dir_event}/'
+        dir_ndwi = f'data/img_s2/{dir_event}_NDWI/'
+        dir_cloud = f'data/img_s2/{dir_event}_ClOUD/'
         os.makedirs(dir_vis, exist_ok=True)
         os.makedirs(dir_ndwi, exist_ok=True)
         os.makedirs(dir_cloud, exist_ok=True)

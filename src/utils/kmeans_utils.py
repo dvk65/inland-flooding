@@ -13,7 +13,9 @@ import rasterio
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.cluster import KMeans
+
 from matplotlib.colors import Normalize, ListedColormap
+
 
 def read_tif(file_path):
     """
@@ -106,7 +108,7 @@ def kmeans_clustering(image, n_clusters, init_centroids):
 
     # run KMeans
     kmeans = KMeans(n_clusters=n_clusters, init=init_centroids, n_init='auto', max_iter=300, random_state=42).fit(valid_data)
-    
+    inertia = kmeans.inertia_
     # initialize an array for labeling the pixels
     labels = np.full(reshaped_image.shape[0], -1)
 
@@ -115,16 +117,16 @@ def kmeans_clustering(image, n_clusters, init_centroids):
 
     # reshape the labels back to the original image dimensions
     clustered_image = labels.reshape(image.shape[1], image.shape[2])
-    return clustered_image
+    return clustered_image, inertia
 
-def kmeans_clustering_all(df, n_clusters, optimize_bool):
+def kmeans_clustering_all(df, n_clusters, condition):
     """
-    Perform KMeans clustering on the image datasets
+    Perform KMeans clustering on the image datasets.
 
     Args:
-        df (pd.DataFrame): The dataset with file paths and other metadata for images
-        n_clusters (int): The number of clusters for KMeans clustering
-        optimize_bool (bool): Flag to determine whether to optimize 
+        df (pd.DataFrame): The dataset with file paths and other metadata for images.
+        n_clusters (int): The number of clusters for KMeans clustering.
+        condition (str): Condition to determine the clustering approach ('default', 'optimized', 'optimizing').
     """
     periods = ['before', 'during', 'after']
     all_images = {period: [] for period in periods}
@@ -148,9 +150,26 @@ def kmeans_clustering_all(df, n_clusters, optimize_bool):
             all_cloud_masks[period].append(masked_image) 
             all_ndwi_masks[period].append(ndwi_mask)
 
-    if optimize_bool:
-        # To be added
-        print('TO be added')
+    if condition == 'optimizing':
+        cluster_list = [2, 3, 4, 5, 6]
+        inertia_result = []
+
+        all_images_combined = all_cloud_masks['before'] + all_cloud_masks['during'] + all_cloud_masks['after']
+        for i in cluster_list:
+            centroids = initialize_centroids(all_images_combined, i)
+            _, inertia = kmeans_clustering(all_images_combined[0], i, centroids)
+            inertia_result.append(inertia)
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(cluster_list, inertia_result, marker='o', linestyle='--')
+        plt.title('Elbow Method')
+        plt.xlabel('Number of Clusters')
+        plt.ylabel('Inertia')
+        plt.grid(True)
+        plt.savefig(f'figs/kmeans_optimizing/elbow_plot.png')
+        plt.close()
+        return
+
     else:
         all_images_combined = all_cloud_masks['before'] + all_cloud_masks['during'] + all_cloud_masks['after']
         centroids = initialize_centroids(all_images_combined, n_clusters)
@@ -160,7 +179,7 @@ def kmeans_clustering_all(df, n_clusters, optimize_bool):
         
         for period in periods:
             masked_image = all_cloud_masks[period][index]
-            clustered_image = kmeans_clustering(masked_image, n_clusters, init_centroids=centroids)
+            clustered_image, _ = kmeans_clustering(masked_image, n_clusters, init_centroids=centroids)
             clustered_results[period] = clustered_image
 
         fig, axes = plt.subplots(3, 3 + n_clusters, figsize=(18, 18))
@@ -193,11 +212,9 @@ def kmeans_clustering_all(df, n_clusters, optimize_bool):
 
         plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 
-        if optimize_bool:
+        if condition == 'optimized':
             plt.savefig(f"figs/kmeans_optimized/{row['id']}_sentinel2_kmeans_optimized.png")
             plt.close(fig)
-        else:
+        elif condition == 'default':
             plt.savefig(f"figs/kmeans_default/{row['id']}_sentinel2_kmeans_default.png")
             plt.close(fig)
-
-

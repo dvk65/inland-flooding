@@ -21,9 +21,12 @@ df = pd.read_csv('data/image_kmeans.csv')
 n_clusters = 3
 
 # step 3 - run default KMeans (Currently testing on the first 5 ids)
-kmeans_utils.kmeans_clustering_all(df[:5], n_clusters, False)
+kmeans_utils.kmeans_clustering_all(df[:5], n_clusters, 'default')
 
-# step 4 - run optimized KMeans but function incomplete (TO BE ADDED - Currently testing on the first 5 ids)
-# kmeans_utils.kmeans_clustering_all(df[:5], n_clusters, True)
+# step 4 - optimize KMeans
+kmeans_utils.kmeans_clustering_all(df[:5], n_clusters, 'optimizing')
 
-# step 5 - evaluate the result (TO BE ADDED)
+# step 5 - run optimized KMeans but function incomplete (TO BE ADDED - Currently testing on the first 5 ids)
+# kmeans_utils.kmeans_clustering_all(df[:5], n_clusters, 'Optimized)
+
+# step 6 - evaluate the result (TO BE ADDED)

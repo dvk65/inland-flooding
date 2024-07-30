@@ -1,9 +1,10 @@
 """
-This script collects and preprocess flood events (high water marks) documented in STN Data Portal.
+This script is used to collect and preprocess flood event observations (high-water marks) 
+documented in STN Flood Event Data Portal(https://stn.wim.usgs.gov/STNDataPortal/).
 
 This script includes the following steps:
-    * step 1 - download high water marks from STN Data Portal.
-    * step 2 - preprocess the collected high water mark data.
+    * step 1 - download high-water marks from STN Flood Event Data Portal.
+    * step 2 - preprocess the collected high-water marks.
 """
 
 # import libraries
@@ -16,15 +17,19 @@ start = time.time()
 print('\nSTART - STN FLOOD EVENT DATA COLLECTION AND PREPROCESSING\n')
 
 # set variables
-new_england_list = ["CT", "ME", "MA", "NH", "RI", "VT"]
+area_list = ["CT", "ME", "MA", "NH", "RI", "VT"]
 attr_list = ['id', 'event', 'state', 'county', 'latitude', 'longitude', 'note']
-duplicate_check = ['event', 'latitude', 'longitude']
+check_list = ['event', 'latitude', 'longitude']
+date_threshold = 2015
 
-# step 1 - collect high water mark data from STN database
-stn_raw = stn_utils.collect_stn(new_england_list)
+stn_raw_file = 'df_stn_raw'
+stn_mod_file = 'df_stn_mod'
 
-# step 2 - preprocess high water mark data 
-stn_mod = stn_utils.preprocess_stn(stn_raw, attr_list, duplicate_check)
+# step 1 - collect high-water marks from STN database
+stn_raw = stn_utils.collect_stn(area_list, stn_raw_file)
+
+# step 2 - preprocess high-water marks
+stn_mod = stn_utils.preprocess_stn(stn_raw, attr_list, check_list, date_threshold, stn_mod_file)
 
 print('\nCOMPLETE - STN FLOOD EVENT DATA COLLECTION AND PREPROCESSING')
 

@@ -44,7 +44,7 @@ def organize_satellite(df):
     for event in df:
 
         # construct the path to the image directory
-        event_dir = f'data/img_sentinel2/{event}/'
+        event_dir = f'data/img_s2/{event}/'
         if os.path.exists(event_dir):
 
             # iterate over files in the directory
@@ -81,7 +81,7 @@ def organize_satellite(df):
     print('observations (flood event ids with images):\n', images_df['id'].values)
 
     # save to a CSV file
-    images_df.to_csv('data/df_sentinel2/images_df.csv', index=False)
+    images_df.to_csv('data/df_s2/images_df.csv', index=False)
     return images_df 
 
 def plot_satellite(df):
@@ -127,7 +127,7 @@ def plot_satellite(df):
                 else:
                     axes[i].axis('off')
             plt.tight_layout()
-            plt.savefig(f"figs/image_group_by_id/{event_name}_{row['id']}_sentinel2.png")
+            plt.savefig(f"figs/s2_group_by_id/{event_name}_{row['id']}_sentinel2.png")
             plt.close(fig)
         print(f"complete - event: {event}")
   
@@ -166,7 +166,7 @@ def plot_filter_satellite(df):
             axes[2].set_title('After')
 
         plt.tight_layout()
-        plt.savefig(f"figs/image_selected/{row['id']}_sentinel2_filter.png")
+        plt.savefig(f"figs/s2_filtered/{row['id']}_sentinel2_filter.png")
         plt.close(fig)  
 
 def read_tif(file_path):
@@ -248,6 +248,6 @@ def calculate_change(df):
         plt.imshow(image3.transpose(1, 2, 0))
 
         plt.tight_layout()
-        plt.savefig(f"figs/image_before_during_after_abs_diff/{row['id']}_sentinel2_abs_diff.png")
+        plt.savefig(f"figs/s2_period_abs_diff/{row['id']}_sentinel2_abs_diff.png")
         plt.close(fig)
 

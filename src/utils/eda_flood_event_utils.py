@@ -2,7 +2,6 @@
 This script includes the functions used to analyze STN and Gauge dataframes.
 
 This file can be imported as a module and contains the following functions:
-    * desc_data - print an overview of the specified dataset.
     * map_dates - returns the pandas Series representing the 'formed' and 'dissipated' dates for the event.
     * count_by_group - print the number of flood events group by a specified column.
     * plot_bar - visualize the dataset using a countplot.
@@ -16,25 +15,32 @@ This file can be imported as a module and contains the following functions:
 import folium
 import requests
 import pandas as pd
+import numpy as np
 import seaborn as sns
 import geopandas as gpd
 import matplotlib.pyplot as plt
 from folium.plugins import MarkerCluster
 from shapely.geometry import Point, shape
+from utils import global_utils
 
-def desc_data(df):
-    """
-    Print an overview of the specified dataset
- 
-    Args:
-        df (pd.DataFrame): The specified DataFrame
-    """
-    print('--------------------------------------------------------------')
-    print(f'Dataset overview:')
-    df.info()
+def run_eda(df, var, area_list):
+    print('***************************************************************************')
+    print(f'ANALYZE {var.upper()} FLOOD EVENTS')
+    title = f'{var} flood event observations'
 
-    unique_count = df.nunique()
-    print('\nnumber of unique values in each attribute:\n', unique_count)
+    if var == 'stn' or var == 'gauge':
+        global_utils.describe_df(df, var)
+        # count by event
+        count_by_group(df, 'event')
+
+        # count by state
+        count_by_group(df, 'state')
+
+        # visualize by state
+        plot_bar(df, title, var, area_list)
+    elif var == 'stn and gauge':
+        map_event(df, var)
+        map_event_interactive(df)
 
 def map_dates(event, date_range):
     """
@@ -49,21 +55,19 @@ def map_dates(event, date_range):
     """
     if event in date_range:
         formed, dissipated = date_range[event]
-        print('--------------------------------------------------------------')
-        print('More precise data ranges for STN high-water mark data added\n')
         return pd.Series([formed, dissipated], index=['formed', 'dissipated'])
 
 def count_by_group(df, var):
     """
-    Print the number of flood events group by a specified column in descending order
+    Print the count of flood events group by a specified column in descending order
 
     Args:
         df (pd.DataFrame): The DataFrame containing the data.
         var (str): The column name used to group data.
     """
-    print('--------------------------------------------------------------')
+    global_utils.print_func_header(f'count flood event observations group by {var}')
     var_group = df.groupby(by=[var]).size().sort_values(ascending=False).to_frame(name='total_count')
-    print(f'Table - Flood events group by {var}:\n', var_group)
+    print(var_group)
 
 def plot_bar(df, var, filename, order):
     """
@@ -78,6 +82,7 @@ def plot_bar(df, var, filename, order):
     Note:
         The plot is saved as a PNG file in the 'figs/stn_gauge' directory
     """
+    global_utils.print_func_header(f'visualize {var} dataset using a countplot')
     plt.figure(figsize=(14, 10))
     plt.title(f'{var} by state')
     plt.xlabel('State')
@@ -92,43 +97,6 @@ def plot_bar(df, var, filename, order):
 
     plt.savefig(f'figs/stn_gauge/countplot_{filename}.png', bbox_inches='tight')
     plt.close()
-    print('--------------------------------------------------------------')
-    print(f'{filename} countplot created')
-
-def convert_date(stn):
-    """
-    Convert the 'event' column to a standardized date format
-
-    Args:
-        stn (pd.DataFrame): The DataFrame with the 'event' column
-    
-    Returns:
-        pd.Series: A pandas Series with the converted dates in the format 'YYYY-MM'
-    """
-    print('--------------------------------------------------------------')
-    print('Date converted (e.g., 2018 March Extratropical Cyclone -> 2018-03)\n')
-    date_stn = stn['event'].str.extract(r'(\d{4}) (\w+)')
-    date_stn_mod = pd.to_datetime(date_stn.apply(lambda x: f"{x[0]} {x[1]}", axis=1), format='%Y %B', errors='coerce')
-    date_stn_mod = date_stn_mod.dt.strftime('%Y-%m')
-    print('Flood Event Date in STN (modified):\n', date_stn_mod.unique())
-    return date_stn_mod
-
-def check_overlap(stn_list, gauge):
-    """
-    Check for overlap between STN and gauge data
-
-    Args:
-        stn_list (list): A list of flood event names from the STN dataset
-        gauge (pd.DataFrame): The DataFrame representing the gauge data
-    
-    Returns:
-        pd.DataFrame: A DataFrame representing the gauge data for events that overlap with the STN data
-    """
-    print('--------------------------------------------------------------')
-    gauge_select = gauge[gauge['event'].isin(stn_list)].sort_values(by='event').copy()
-    print('Flood Events Possibly Documented by Both Sources:\n', gauge_select['event'].unique())
-    print('\nexact day in gauge for further inspection:\n', gauge_select['event_day'].unique())
-    return gauge_select
     
 def collect_nhd(layers):
     """
@@ -140,7 +108,7 @@ def collect_nhd(layers):
     Returns:
         list: A list of GeoDataFrames, each representing an NHD layer.  
     """
-    print('NHD dataset added on map\n')
+    print('complete - NHD layer created\n')
     root_url = 'https://hydro.nationalmap.gov/arcgis/rest/services/nhd/MapServer/{}/query'
     gdfs = []
     for layer in layers:
@@ -160,21 +128,27 @@ def collect_nhd(layers):
         gdfs.append(gdf)
     return gdfs
 
-def map_event(df):
+def map_event(df, var):
     """
-    Visualize flood events on a map
+    Visualize flood events on a map.
 
     Args:
-        df (pd.DataFrame): The DataFrame representing the flood event data
+        df (pd.DataFrame): The DataFrame representing the flood event data.
     
     Note:
-        The plot is saved as a PNG file in the 'figs/stn_gauge' directory
+        The plot is saved as a PNG file in the 'figs/flood_event' directory.
     """
-    print('--------------------------------------------------------------')
-    print('Visualize flood events on map...\n')
+    global_utils.print_func_header(f'visualizing {var} on map using GeoPandas')
     world = gpd.read_file("https://www2.census.gov/geo/tiger/TIGER2022/STATE/tl_2022_us_state.zip")
-    unique_events = df[['event', 'category']].drop_duplicates()
-    colors = plt.cm.tab10(range(len(unique_events)))
+    unique_events = df['event'].drop_duplicates().reset_index(drop=True)
+    num_unique_events = len(unique_events)
+
+    # Generate a set of distinct colors
+    palette = sns.color_palette("hsv", num_unique_events)  # Using seaborn's color palette for distinct colors
+    colors = np.array(palette)
+
+    # Map each unique event to a color
+    event_color_mapping = {event: colors[idx] for idx, event in enumerate(unique_events)}
 
     nhd_layers = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     nhd_gdfs = collect_nhd(nhd_layers)
@@ -191,11 +165,12 @@ def map_event(df):
         for nhd_gdf in nhd_gdfs:
             nhd_gdf.plot(ax=ax, color='gray', alpha=0.5)
         
-        for idx, (event, category) in enumerate(unique_events.itertuples(index=False)):
-            event_data = gdf[(gdf['event'] == event) & (gdf['category'] == category)]
+        for event in unique_events:
+            event_data = gdf[gdf['event'] == event]
             if not event_data.empty:
+                category = event_data['category'].iloc[0]
                 marker = 'o' if category == 'gauge' else '^'
-                event_data.plot(ax=ax, color=colors[idx], markersize=50, label=f'{event} ({category})', marker=marker)
+                event_data.plot(ax=ax, color=event_color_mapping[event], markersize=50, label=f'{event} ({category})', marker=marker)
         
         ax.set_title(f'Events in {state}')
         ax.set_xlabel('Longitude')
@@ -208,7 +183,7 @@ def map_event(df):
         ax.legend(loc='upper left', title='Events', bbox_to_anchor=(1.02, 1), borderaxespad=0)
         
         plt.tight_layout()
-        plt.savefig(f'figs/stn_gauge/map_{state}.png')
+        plt.savefig(f'figs/flood_event/map_{state}.png')
         plt.close()
 
         print(f'complete - {state} flood event map created')
@@ -220,8 +195,6 @@ def map_event_interactive(df):
     Args:
         df (pd.DataFrame): The DataFrame representing the flood event data
     """
-    print('--------------------------------------------------------------')
-    print('Create an interactive map for flood events...\n')
     map_center = [df['latitude'].mean(), df['longitude'].mean()]
     m = folium.Map(location=map_center, zoom_start=8)
     marker_cluster = MarkerCluster().add_to(m)
@@ -252,4 +225,4 @@ def map_event_interactive(df):
             icon=folium.Icon(color='blue')
         ).add_to(marker_cluster)
 
-    m.save('figs/stn_gauge/map_interactive.html')
+    m.save('figs/flood_event/map_interactive.html')

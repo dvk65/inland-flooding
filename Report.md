@@ -107,14 +107,7 @@ latitude      75
 longitude     75
 ```
 
-### STN and Gauge Overlap
-I checked on the flood events documented by both sources. They are:
-```
-['2018-01' '2021-08' '2023-07' '2023-12']
-```
-
-The figure below illustrates the distribution of gauge flood events. Vermont (2023-07) has the largest number of flood events.
-![Gauge Flood Event Distribution](./figs/flood_event/countplot_stn_and_gauge.png)
+### STN and Gauge
 
 To understand the locations of flood events, I created a map for each state. Below is the flood events in Vermont.
 ![Vermont Flood Event Map](./figs/flood_event/map_VT.png)

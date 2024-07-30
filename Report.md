@@ -92,7 +92,7 @@ This dataset doesn't specify the exact dates of these flood event. However, to c
  </table>
 
 The figure below illustrates the distribution of STN flood events. Vermont (2023 July MA NY VT Flood) has the largest number of flood events.
-![STN Flood Event Distribution](./figs/stn_gauge/countplot_stn.png)
+![STN Flood Event Distribution](./figs/flood_event/countplot_stn.png)
 
 ### Gauge
 In this project, I also collected the gauge water level data. Combining this dataset with STN dataset might help us better analyze and understand the flood events. Below is an overview of the cleaned dataset.
@@ -114,9 +114,9 @@ I checked on the flood events documented by both sources. They are:
 ```
 
 The figure below illustrates the distribution of gauge flood events. Vermont (2023-07) has the largest number of flood events.
-![Gauge Flood Event Distribution](./figs/stn_gauge/countplot_stn_and_gauge.png)
+![Gauge Flood Event Distribution](./figs/flood_event/countplot_stn_and_gauge.png)
 
 To understand the locations of flood events, I created a map for each state. Below is the flood events in Vermont.
-![Vermont Flood Event Map](./figs/stn_gauge/map_VT.png)
+![Vermont Flood Event Map](./figs/flood_event/map_VT.png)
 
 ## Satellite Imagery Data (Sentinel 2)

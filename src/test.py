@@ -2,72 +2,43 @@
 This script currently tests NHD dataset layer on satellite imagery
 """
 import os
-import requests
 import rasterio
 import geopandas as gpd
 import matplotlib.pyplot as plt
 from rasterio.plot import show
-from shapely.geometry import shape
 
-# reference - https://hydro.nationalmap.gov/arcgis/services/nhd/MapServer/WMSServer?request=GetCapabilities&service=WMS
-def collect_nhd(layers, default_crs='EPSG:4326'):
-    root_url = 'https://hydro.nationalmap.gov/arcgis/rest/services/nhd/MapServer/{}/query'
-    gdfs = []
-    for layer in layers:
-        url = root_url.format(layer)
-        params = {
-            'where': '1=1',
-            'outFields': '*',
-            'returnGeometry': 'true',
-            'f': 'geojson'
-        }
-        res = requests.get(url, params=params)
-        data = res.json()
-        features = data['features']
-        geo = [shape(feature['geometry']) for feature in features]
-        properties = [feature['properties'] for feature in features]
-        gdf = gpd.GeoDataFrame(properties, geometry=geo)
+# data downloading from https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/State/Shape/NHD_H_Vermont_State_Shape.zip (will neeed to be added in the project)
+shp_path = 'data/nhd/NHD_H_Vermont_State_Shape/Shape/NHDFlowline.shp'
+gdf = gpd.read_file(shp_path)
 
-        if gdf.crs is None:
-            gdf.set_crs(default_crs, inplace=True)
+tif_paths = [
+    'data/img_s2/2023-07/45326_20230726T153819_20230726T153828_T18TXQ_VIS.tif',
+    'data/img_s2/2023-07/44929_20230706T153819_20230706T155055_T18TXN_VIS.tif',
+    'data/img_s2/2023-07/44909_20230706T153819_20230706T155055_T18TXP_VIS.tif'
+]
 
-        gdfs.append(gdf)
-    return gdfs
+# convert gdf CRS to EPSG:4326 seems to be unnecessary?
+# gdf = gdf.to_crs(epsg=4326)
 
-# work when EPSG:4326 in collect_nhd function
-tif_dir = 'data/img_s2/2023-07/45326_20230726T153819_20230726T153828_T18TXQ_VIS.tif'
+count = 1
+for tif_path in tif_paths:
+    print(f"Processing: {tif_path}")
+    with rasterio.open(tif_path) as src:
+        tiff_crs = src.crs
+        bounds = src.bounds
 
-# work when EPSG:4326 in collect_nhd function
-tif_dir_1 = 'data/img_s2/2023-07/44929_20230706T153819_20230706T155055_T18TXN_VIS.tif'
+        fig, ax = plt.subplots(figsize=(10, 10))
+        show(src, ax=ax)
 
-# doesn't work when EPSG:4326 in collect_nhd function
-tif_dir_2 = 'data/img_s2/2023-07/44909_20230706T153819_20230706T155055_T18TXP_VIS.tif'
+        if gdf.crs != tiff_crs:
+            gdf = gdf.to_crs(tiff_crs)
 
-tif_path = tif_dir_2
-print(f"current - {tif_path}")
+        gdf.plot(ax=ax, color='blue', linewidth=1.5)
 
-with rasterio.open(tif_path) as src:
-    tiff_crs = src.crs
-    bounds = src.bounds  
-    
-    fig, ax = plt.subplots(figsize=(10, 10))
-    show(src, ax=ax)
+        ax.set_xlim(bounds.left, bounds.right)
+        ax.set_ylim(bounds.bottom, bounds.top)
+        plt.title(f'NHD Over S2: {os.path.basename(tif_path)}')
 
-    # nhd flowline - 4, 5, 6 (currently test all for debugging)
-    nhd_layers = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    nhd_gdfs = collect_nhd(nhd_layers)
-
-    for i, gdf in enumerate(nhd_gdfs):
-        if not gdf.empty:
-            nhd_crs = gdf.crs
-            if nhd_crs != tiff_crs:
-                gdf = gdf.to_crs(tiff_crs)
-            gdf.plot(ax=ax, color='blue', linewidth=1.5)
-
-    ax.set_xlim(bounds.left, bounds.right)
-    ax.set_ylim(bounds.bottom, bounds.top)
-    plt.title(f' NHD Layers Over Sentinel-2 Imagery')
-
-    # if testiing on tif_dir_1, save as test_1 (tif_dir_2, test_2)
-    plt.savefig(f'figs/test/test_2.png')
-    plt.close()  
+        plt.savefig(f'figs/test/test_{count}.png')
+        plt.close()
+        count += 1

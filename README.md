@@ -25,7 +25,7 @@ To collect and preprocess gauge water levels above the [moderate flood stage](ht
 make gauge
 ```
 
-The datasets are available [here](https://drive.google.com/drive/folders/1m8dKBEbzPUuHp1urUjmGc0xb7KmVK_Ri?usp=sharing). 
+The datasets are available [here](https://drive.google.com/drive/folders/19j-iKtgLMrEziFKQfxYVosNz-1zFDA7T?usp=sharing). 
 
 ### Step 2: Analysis of flood event data
 After collecting STN high water mark data and gauge high water level data, an analysis is conducted to:
@@ -48,7 +48,7 @@ To collect Sentinel 2 imagery from Google Earth Engine based on STN flood event 
 make s2
 ```
 
-The example dataset is available [here](https://drive.google.com/drive/folders/1m8dKBEbzPUuHp1urUjmGc0xb7KmVK_Ri?usp=sharing).
+The example dataset is available [here](https://drive.google.com/drive/folders/19j-iKtgLMrEziFKQfxYVosNz-1zFDA7T?usp=sharing).
 
 ### Step 4: Analysis of Sentinel 2 imagery
 Before applying the KMeans Clustering algorithm, we need to analyze the collected satellite images.
@@ -71,7 +71,7 @@ make evaluation
 ## Todo
 - Finish the instruction part
 - Improve Report.md (flood event/image/kmeans analysis)
-- Optimize KMeans clustering algorithm
+- Optimize KMeans clustering algorithm and classification part
 - Add the evaluation part
 
 ## Reference

@@ -14,26 +14,25 @@ import pandas as pd
 from utils import eda_s2_utils
 
 # load the dataset
-df = pd.read_csv('data/flood_events.csv')
+df = pd.read_csv('data/flood_event.csv')
+stn = pd.read_csv('data/df_stn/df_stn_mod.csv')
+gauge = pd.read_csv('data/df_gauge/df_gauge_mod.csv')
 
-# step 1 - create a dataframe to check the stored images
-event_list = df['event'].unique()
-event_images_df = eda_s2_utils.organize_satellite(event_list)
+# step 1 - delete empty folders
+eda_s2_utils.check_s2_folder(df)
 
-# plot the images to identify the ideal events and dates
-eda_s2_utils.plot_satellite(event_images_df)
+# step 2 - create a dataframe to store the image filename and its metadata
+df_s2 = eda_s2_utils.create_s2_df(df)
 
-# # select images for the kmeans clustering
-event_202307 = event_images_df[event_images_df['event'] == '2023-07']
-event_202307_mod = eda_s2_utils.filter_satellite(event_202307)
+# step 3 - add necessary info to df_s2 
+attr_list = ['id', 'state', 'county', 'latitude', 'longitude', 'note', 'category', 'event_day']
+df_s2_mod = eda_s2_utils.add_metadata_flood_event(df, df_s2, attr_list)
 
-# # plot the filtered dataframe
-eda_s2_utils.plot_filter_satellite(event_202307_mod)
+# step 4 - filter df_s2
+df_s2_filtered = eda_s2_utils.filter_df_s2(df_s2_mod)
 
-# # drop the low-quality image (cloud cover during the flood event)
-drop_list = ['44972']
-image_kmeans = event_202307_mod[~event_202307_mod['id'].isin(drop_list)]
-image_kmeans.to_csv('data/image_kmeans.csv', index=False)
+# step 5 - plot the images to identify the ideal events and dates
+eda_s2_utils.plot_satellite(df_s2_filtered)
 
-# # check the difference
-eda_s2_utils.calculate_change(image_kmeans)
+# step 6 - drop images based on step 5
+df_selected = eda_s2_utils.filter_satellite(df_s2_filtered)

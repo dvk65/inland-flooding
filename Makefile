@@ -20,7 +20,7 @@ s2:
 
 # conduct EDA on the corresponding sentinel 2 imagery
 eda_s2:
-	mkdir -p data/df_s2 figs/s2_group_by_id figs/s2_filtered figs/s2_period_abs_diff
+	mkdir -p data/df_s2 figs/s2_vis_inspect 
 	python -B src/eda_s2.py
 
 # run KMeans algorithm
@@ -30,3 +30,8 @@ kmeans:
 
 # evaluation
 evaluation:
+
+# run test
+test:
+	mkdir -p figs/test
+	python -B src/test.py

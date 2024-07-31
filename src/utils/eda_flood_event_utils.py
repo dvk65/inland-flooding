@@ -97,36 +97,6 @@ def plot_bar(df, var, filename, order):
 
     plt.savefig(f'figs/flood_event/countplot_{filename}.png', bbox_inches='tight')
     plt.close()
-    
-def collect_nhd(layers):
-    """
-    Collect and return NHD (National Hydrography Dataset) layers as GeoDataFrames
-
-    Args:
-        layers (list): A list of layer IDs to be collected from the NHD dataset
-    
-    Returns:
-        list: A list of GeoDataFrames, each representing an NHD layer.  
-    """
-    print('complete - NHD layer created\n')
-    root_url = 'https://hydro.nationalmap.gov/arcgis/rest/services/nhd/MapServer/{}/query'
-    gdfs = []
-    for layer in layers:
-        url = root_url.format(layer)
-        params = {
-            'where': '1=1',
-            'outFields': '*',
-            'returnGeometry': 'true',
-            'f': 'geojson'
-        }
-        res = requests.get(url, params=params)
-        data = res.json()
-        features = data['features']
-        geo = [shape(feature['geometry']) for feature in features]
-        properties = [feature['properties'] for feature in features]
-        gdf = gpd.GeoDataFrame(properties, geometry=geo)
-        gdfs.append(gdf)
-    return gdfs
 
 def map_event(df, var):
     """
@@ -151,7 +121,7 @@ def map_event(df, var):
     event_color_mapping = {event: colors[idx] for idx, event in enumerate(unique_events)}
 
     nhd_layers = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    nhd_gdfs = collect_nhd(nhd_layers)
+    nhd_gdfs = global_utils.collect_nhd(nhd_layers)
     
     for state, data in df.groupby('state'):
         geometry = [Point(xy) for xy in zip(data['longitude'], data['latitude'])]

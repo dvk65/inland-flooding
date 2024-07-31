@@ -9,18 +9,8 @@ import matplotlib.pyplot as plt
 from rasterio.plot import show
 from shapely.geometry import shape
 
-def collect_nhd(layers, default_crs='EPSG:32618'):
-    """
-    Collect and return NHD (National Hydrography Dataset) layers as GeoDataFrames (https://hydro.nationalmap.gov/arcgis/rest/services/nhd/MapServer)
-
-    Alternative approach: https://apps.nationalmap.gov/downloader/
-    Args:
-        layers (list): A list of layers to be collected from the NHD dataset.
-        default_crs (str): The CRS to set
-    
-    Returns:
-        list: A list of GeoDataFrames, each representing an NHD layer.  
-    """
+# reference - https://hydro.nationalmap.gov/arcgis/services/nhd/MapServer/WMSServer?request=GetCapabilities&service=WMS
+def collect_nhd(layers, default_crs='EPSG:4326'):
     root_url = 'https://hydro.nationalmap.gov/arcgis/rest/services/nhd/MapServer/{}/query'
     gdfs = []
     for layer in layers:
@@ -38,34 +28,46 @@ def collect_nhd(layers, default_crs='EPSG:32618'):
         properties = [feature['properties'] for feature in features]
         gdf = gpd.GeoDataFrame(properties, geometry=geo)
 
-        gdf.set_crs(default_crs, inplace=True)
+        if gdf.crs is None:
+            gdf.set_crs(default_crs, inplace=True)
 
         gdfs.append(gdf)
     return gdfs
 
-tif_dir = 'data/img_s2/2023-07/'
+# work when EPSG:4326 in collect_nhd function
+tif_dir = 'data/img_s2/2023-07/45326_20230726T153819_20230726T153828_T18TXQ_VIS.tif'
 
-for file_name in os.listdir(tif_dir)[:10]:
-    tif_path = os.path.join(tif_dir, file_name)
-    print(f"current - {tif_path}")
+# work when EPSG:4326 in collect_nhd function
+tif_dir_1 = 'data/img_s2/2023-07/44929_20230706T153819_20230706T155055_T18TXN_VIS.tif'
 
-    with rasterio.open(tif_path) as src:
-        tiff_crs = src.crs
-        bounds = src.bounds  
-        
-        fig, ax = plt.subplots(figsize=(10, 10))
-        show(src, ax=ax)
+# doesn't work when EPSG:4326 in collect_nhd function
+tif_dir_2 = 'data/img_s2/2023-07/44909_20230706T153819_20230706T155055_T18TXP_VIS.tif'
 
-        # nhd flowline - 4, 5, 6 (currently test all for debugging)
-        nhd_layers = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-        nhd_gdfs = collect_nhd(nhd_layers)
+tif_path = tif_dir_2
+print(f"current - {tif_path}")
 
-        for i, gdf in enumerate(nhd_gdfs):
-            gdf.plot(ax=ax, color='blue', linewidth=2.0)
+with rasterio.open(tif_path) as src:
+    tiff_crs = src.crs
+    bounds = src.bounds  
+    
+    fig, ax = plt.subplots(figsize=(10, 10))
+    show(src, ax=ax)
 
-        ax.set_xlim(bounds.left, bounds.right)
-        ax.set_ylim(bounds.bottom, bounds.top)
-        plt.title(f'{file_name} NHD Layers Over Sentinel-2 Imagery')
+    # nhd flowline - 4, 5, 6 (currently test all for debugging)
+    nhd_layers = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    nhd_gdfs = collect_nhd(nhd_layers)
 
-        plt.savefig(f'figs/test/{file_name}.png')
-        plt.close()  
+    for i, gdf in enumerate(nhd_gdfs):
+        if not gdf.empty:
+            nhd_crs = gdf.crs
+            if nhd_crs != tiff_crs:
+                gdf = gdf.to_crs(tiff_crs)
+            gdf.plot(ax=ax, color='blue', linewidth=1.5)
+
+    ax.set_xlim(bounds.left, bounds.right)
+    ax.set_ylim(bounds.bottom, bounds.top)
+    plt.title(f' NHD Layers Over Sentinel-2 Imagery')
+
+    # if testiing on tif_dir_1, save as test_1 (tif_dir_2, test_2)
+    plt.savefig(f'figs/test/test_2.png')
+    plt.close()  

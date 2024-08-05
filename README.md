@@ -58,12 +58,12 @@ The command will:
 - print out summaries for both the STN high-water mark data and the gauge high-water level data;
 - use `countplot` to show the number of observations in each unique flood events;
 - create both static and interactive maps to show the distribution of flood event observations. 
-- The detailed analysis can be found in [REPORT.md](REPORT.md#flood-event-data).
+- The detailed analysis can be found in [REPORT.md](REPORT.md).
 
 ### Step 3: Collect Sentinel 2 imagery associated with the flood event data
 Before collecting Sentinel 2 imagery from [Google Earth Engine](https://developers.google.com/earth-engine/datasets/catalog/sentinel-2), we need to set up our own Google Cloud Platform project and authenticate using either our personal Google account or a service account. 
 
-The sections `Create a Cloud project` and `Enable the Earth Engine API` in [Set up your Earth Engine enabled Cloud Project](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup) should be completed. A step-by-step demonstration can be found in [GUIDE.md](GUIDE.md#google-earth-engine-setup). 
+The sections `Create a Cloud project` and `Enable the Earth Engine API` in [Set up your Earth Engine enabled Cloud Project](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup) should be completed. A step-by-step demonstration can be found in [GUIDE.md](GUIDE.md). 
 
 To collect Sentinel 2 imagery from Google Earth Engine based on STN flood event data, use the following command (estimated runtime: 180 minutes): 
 ```
@@ -91,7 +91,7 @@ make eda_s2
     - selecting images from the ideal flood events
     - dropping Sentinel-2 images where more than 50% of the area is covered by clouds or shadows
     - dropping images token on the unwanted dates
-- The detailed analysis can be found in [REPORT.md](REPORT.md#satellite-imagery-data-sentinel-2).
+- The detailed analysis can be found in [REPORT.md](REPORT.md).
 
 
 ### Step 5: Download and plot the specified National Hydrography Dataset

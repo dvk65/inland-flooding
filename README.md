@@ -7,7 +7,7 @@ This project aims to assess and visualize flood events in the New England region
 - [Step 2: Analyze and prepare the collected flood event data](#step-2-analyze-and-prepare-the-collected-flood-event-data)
 - [Step 3: Collect Sentinel 2 imagery associated with the flood event data](#step-3-collect-sentinel-2-imagery-associated-with-the-flood-event-data)
 - [Step 4: Analyze and prepare the Sentinel-2 imagery](#step-4-analyze-and-prepare-sentinel-2-imagery)
-- [Step 5: Download and plot the specified National Hydrography Dataset](#step-5-download-and-plot-the-specified-national-hydrography-dataset)
+- [Step 5: Download and plot the specified National Hydrography Dataset (DONE)](#step-5-download-and-plot-the-specified-national-hydrography-dataset)
 - [Step 6: Use KMeans clustering algorithm to segment Sentinel-2 imagery](#step-6-use-kmeans-clustering-algorithm-to-segment-sentinel-2-imagery)
 - [Step 7: Evaluate the performance](#step-7-evaluate-the-performance)
 

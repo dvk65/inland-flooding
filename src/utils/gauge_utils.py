@@ -58,7 +58,7 @@ def collect_gauge_list(area, filename):
     df = df.reset_index(drop=True)
     df = df.drop_duplicates()
 
-    global_utils.describe_df(df, 'Gauge list')
+    global_utils.describe_df(df, 'gauge list')
 
     # save to a CSV file
     df.to_csv(f'data/df_gauge/{filename}.csv', index=False)
@@ -143,7 +143,8 @@ def collect_gauge_info(df, filename):
 
 def collect_water_level(df, date_threshold, filename):
     """
-    Collect and preprocess real-time water level above moderate flood stage value for specified gauges from USGS Water Data Services (e.g., https://waterdata.usgs.gov/monitoring-location/01049320/#parameterCode=00065&period=P7D&showMedian=false).
+    Collect and preprocess real-time water level above moderate flood stage value for specified gauges from USGS Water Data Services 
+    (e.g., https://waterdata.usgs.gov/monitoring-location/01049320/#parameterCode=00065&period=P7D&showMedian=false)
     
     Args:
         df (pd.DataFrame): The DataFrame representing flood-related information for gauges from NOAA
@@ -199,7 +200,7 @@ def collect_water_level(df, date_threshold, filename):
     df_raw = pd.merge(df_water[['usgsid', 'datetime', 'tz_cd', 'elev_ft']], df[['usgsid', 'latitude', 'longitude', 'nwsli', 'note', 'state', 'county']], on='usgsid', how='left')
     df_raw['id'] = df_raw['nwsli'] + '_' + df_raw.index.astype(str) 
 
-    global_utils.describe_df(df_raw, 'Gauge high-water levels')
+    global_utils.describe_df(df_raw, 'gauge high-water levels')
 
     # save to a CSV file
     df_raw.to_csv(f'data/df_gauge/{filename}.csv', index=False)
@@ -211,8 +212,8 @@ def preprocess_water_level(df, attr_list, check_list, filename):
     
     Args:
         df (pd.DataFrame): The DataFrame representing the high water levels (above moderate flood stage)
-        attr_list (list of str): A list of column names to be selected.
-        duplicate_check (list of str): A list of column names to identify duplicate rows.
+        attr_list (list of str): A list of column names to be selected
+        duplicate_check (list of str): A list of column names to identify duplicate rows
     
     Returns:
         pd.DataFrame: A DataFrame representing the cleaned high water levels above moderate flood stage
@@ -224,11 +225,12 @@ def preprocess_water_level(df, attr_list, check_list, filename):
     df_mod['event_day'] = df_mod['datetime'].dt.strftime('%Y-%m-%d')
     df_mod['event'] = df_mod['datetime'].dt.to_period('M').astype(str)
 
-    # select the specified attributes
-    df_mod = df_mod[attr_list]
-
     # drop the instances with the same location and event name
     df_mod = df_mod.drop_duplicates(subset=check_list, keep='first').reset_index(drop=True)
+
+    # select the specified attributes
+    df_mod = df_mod[attr_list]
+    df_mod['source'] = 'gauge'
 
     print('modified dataset overview:')
     df_mod.info()

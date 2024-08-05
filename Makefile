@@ -20,8 +20,13 @@ s2:
 
 # conduct EDA on the corresponding sentinel 2 imagery
 eda_s2:
-	mkdir -p data/df_s2 figs/s2_vis_inspect 
+	mkdir -p data/df_s2 figs/s2_vis_inspect figs/s2_selected figs/s2_ready
 	python -B src/eda_s2.py
+
+# collect National Hydrography Dataset
+nhd:
+	mkdir -p data/nhd figs/s2_nhd
+	python -B src/nhd.py
 
 # run KMeans algorithm
 kmeans:
@@ -33,5 +38,4 @@ evaluation:
 
 # run test
 test:
-	mkdir -p figs/test
 	python -B src/test.py

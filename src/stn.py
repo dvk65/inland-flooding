@@ -3,7 +3,7 @@ This script is used to collect and preprocess flood event observations (high-wat
 documented in STN Flood Event Data Portal(https://stn.wim.usgs.gov/STNDataPortal/).
 
 This script includes the following steps:
-    * step 1 - download high-water marks from STN Flood Event Data Portal.
+    * step 1 - download high-water marks from STN Flood Event Data Portal;
     * step 2 - preprocess the collected high-water marks.
 """
 
@@ -11,9 +11,8 @@ This script includes the following steps:
 import time
 from utils import stn_utils
 
-# track the runtime
+# start and track the runtime
 start = time.time()
-
 print('\nSTART - STN FLOOD EVENT DATA COLLECTION AND PREPROCESSING\n')
 
 # set variables
@@ -31,9 +30,8 @@ stn_raw = stn_utils.collect_stn(area_list, stn_raw_file)
 # step 2 - preprocess high-water marks
 stn_mod = stn_utils.preprocess_stn(stn_raw, attr_list, check_list, date_threshold, stn_mod_file)
 
+# complete and calculate the runtime
 print('\nCOMPLETE - STN FLOOD EVENT DATA COLLECTION AND PREPROCESSING')
-
-# calculate the runtime
 end = time.time()
 print(f'\nRUNTIME: {round((end - start) / 60, 2)} minutes')
 

@@ -10,13 +10,10 @@ dependencies:
   - make
   - git
   - missingno
-  - jupyter
   - geopandas
   - beautifulsoup4
   - earthengine-api
   - pandas
-  - google-api-python-client
-  - google-auth
-  - google-auth-httplib2
   - rasterio
+  - google-cloud-sdk
 prefix: /home/qyin/miniconda3/envs/flood_env

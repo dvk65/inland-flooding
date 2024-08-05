@@ -2,14 +2,13 @@
 This script includes the functions used to analyze STN and Gauge dataframes.
 
 This file can be imported as a module and contains the following functions:
-    * map_dates - returns the pandas Series representing the 'formed' and 'dissipated' dates for the event.
-    * count_by_group - print the number of flood events group by a specified column.
-    * plot_bar - visualize the dataset using a countplot.
-    * convert_date - returns a pandas Series with the converted dates in the format 'YYYY-MM'.
-    * check_overlap - returns a DataFrame representing the gauge data for events that overlap with the STN data.
-    * collect_nhd - returns a list of GeoDataFrames, each representing an NHD layer.
-    * map_event - creates a map for the flood events in each state
-    * map_event_interactive - create an interactive map for flood events
+    * run_eda - run an Exploratory Data Analysis (EDA) on the specified flood event data;
+    * map_dates - returns the pandas Series representing the 'formed' and 'dissipated' dates for the event;
+    * count_by_group - print the number of flood event observations group by a specified column;
+    * plot_bar - visualize the dataset using a countplot;
+    * collect_nhd - returns a list of GeoDataFrames, each representing an NHD layer;
+    * map_event - creates a map for the flood event observations in each state;
+    * map_event_interactive - create an interactive map for flood event observations.
 """
 # import libraries
 import folium
@@ -24,8 +23,16 @@ from shapely.geometry import Point, shape
 from utils import global_utils
 
 def run_eda(df, var, area_list):
+    '''
+    Run an Exploratory Data Analysis (EDA) on the specified flood event data
+
+    Args:
+        df (pd.DataFrame): The specified DataFrame to be analyzed
+        var (str): The specified flood event data
+        area_list (list of str): The specified area list
+    '''
     print('***************************************************************************')
-    print(f'ANALYZE {var.upper()} FLOOD EVENTS')
+    print(f'ANALYZE {var.upper()} FLOOD EVENT OBSERVATIONS')
     title = f'{var} flood event observations'
 
     if var == 'stn' or var == 'gauge':
@@ -98,6 +105,36 @@ def plot_bar(df, var, filename, order):
     plt.savefig(f'figs/flood_event/countplot_{filename}.png', bbox_inches='tight')
     plt.close()
 
+def collect_nhd(layers):
+    """
+    Collect and return NHD (National Hydrography Dataset) layers as GeoDataFrames
+
+    Args:
+        layers (list): A list of layer IDs to be collected from the NHD dataset
+    
+    Returns:
+        list: A list of GeoDataFrames, each representing an NHD layer.  
+    """
+    print('complete - NHD layer created\n')
+    root_url = 'https://hydro.nationalmap.gov/arcgis/rest/services/nhd/MapServer/{}/query'
+    gdfs = []
+    for layer in layers:
+        url = root_url.format(layer)
+        params = {
+            'where': '1=1',
+            'outFields': '*',
+            'returnGeometry': 'true',
+            'f': 'geojson'
+        }
+        res = requests.get(url, params=params)
+        data = res.json()
+        features = data['features']
+        geo = [shape(feature['geometry']) for feature in features]
+        properties = [feature['properties'] for feature in features]
+        gdf = gpd.GeoDataFrame(properties, geometry=geo)
+        gdfs.append(gdf)
+    return gdfs
+
 def map_event(df, var):
     """
     Visualize flood events on a map.
@@ -107,6 +144,7 @@ def map_event(df, var):
     
     Note:
         The plot is saved as a PNG file in the 'figs/flood_event' directory.
+        Scale - smaller scale based on this approach (less detail)
     """
     global_utils.print_func_header(f'visualizing {var} on map using GeoPandas')
     world = gpd.read_file("https://www2.census.gov/geo/tiger/TIGER2022/STATE/tl_2022_us_state.zip")
@@ -121,7 +159,7 @@ def map_event(df, var):
     event_color_mapping = {event: colors[idx] for idx, event in enumerate(unique_events)}
 
     nhd_layers = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    nhd_gdfs = global_utils.collect_nhd(nhd_layers)
+    nhd_gdfs = collect_nhd(nhd_layers)
     
     for state, data in df.groupby('state'):
         geometry = [Point(xy) for xy in zip(data['longitude'], data['latitude'])]
@@ -138,9 +176,9 @@ def map_event(df, var):
         for event in unique_events:
             event_data = gdf[gdf['event'] == event]
             if not event_data.empty:
-                category = event_data['category'].iloc[0]
-                marker = 'o' if category == 'gauge' else '^'
-                event_data.plot(ax=ax, color=event_color_mapping[event], markersize=50, label=f'{event} ({category})', marker=marker)
+                source = event_data['source'].iloc[0]
+                marker = 'o' if source == 'gauge' else '^'
+                event_data.plot(ax=ax, color=event_color_mapping[event], markersize=50, label=f'{event} ({source})', marker=marker)
         
         ax.set_title(f'Events in {state}')
         ax.set_xlabel('Longitude')
@@ -160,16 +198,26 @@ def map_event(df, var):
 
 def map_event_interactive(df):
     """
-    Create an interactive map for flood events using Folium
+    Create an interactive map for flood event observations using Folium
 
     Args:
         df (pd.DataFrame): The DataFrame representing the flood event data
     """
+    global_utils.print_func_header('create an interactive map for flood event observations')
     map_center = [df['latitude'].mean(), df['longitude'].mean()]
     m = folium.Map(location=map_center, zoom_start=8)
+
+    folium.TileLayer(
+        tiles='https://basemap.nationalmap.gov/arcgis/rest/services/USGSHydroCached/MapServer/tile/{z}/{y}/{x}',
+        attr='USGS National Map',
+        name='USGS Hydro Cached',
+        overlay=True,
+        control=True
+    ).add_to(m)
+
     marker_cluster = MarkerCluster().add_to(m)
 
-    for i, row in df[df['category'] == 'gauge'].iterrows():
+    for i, row in df[df['source'] == 'gauge'].iterrows():
         popup_content = f"""
         <b>Event:</b> {row['event']}<br>
         <b>ID:</b> {row['id']}<br>
@@ -182,7 +230,7 @@ def map_event_interactive(df):
             icon=folium.Icon(color='red')  
         ).add_to(m)
 
-    for i, row in df[df['category'] != 'gauge'].iterrows():
+    for i, row in df[df['source'] != 'gauge'].iterrows():
         popup_content = f"""
         <b>Event:</b> {row['event']}<br>
         <b>ID:</b> {row['id']}<br>

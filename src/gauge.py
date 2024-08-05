@@ -12,9 +12,8 @@ This script includes the following steps:
 # import libraries
 import time
 from utils import gauge_utils
-
-
 import pandas as pd
+
 # track the runtime
 start = time.time()
 
@@ -38,7 +37,7 @@ df_gauge_list = gauge_utils.collect_gauge_list(area_list, gauge_list_file)
 df_gauge_info = gauge_utils.collect_gauge_info(df_gauge_list, gauge_info_file)
 
 # step 3 - collect high-water levels (water level above moderate flood stage) for the gauges using their usgsids 
-# df_gauge_info = pd.read_csv('data/df_gauge/df_gauge_info.csv')
+# df_gauge_info = pd.read_csv('data/df_gauge/df_gauge_info.csv', dtype=str)
 df_gauge_raw = gauge_utils.collect_water_level(df_gauge_info, date_threshold, gauge_raw_file)
 
 # step 4 - preprocess the collected high-water levels (water level above moderate flood stage).

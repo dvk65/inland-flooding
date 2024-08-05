@@ -2,7 +2,7 @@
 This script includes the functions used to collect and preprocess flood event observations (high-water marks).
 
 This file can be imported as a module and includes the following functions:
-    * collect_stn - returns a DataFrame representing the collected high-water marks;
+    * collect_stn - returns a DataFrame representing the collected high-water marks from URL;
     * preprocess_stn - returns a DataFrame representing the preprocessed high-water marks.
 """
 
@@ -17,10 +17,10 @@ def collect_stn(area, filename):
  
     Args:
         area (list of str): A list of names representing the areas of interest (e.g., ["ME", "VT"])
-        filename (str): The filename of the file to be saved
+        filename (str): The file to be saved
  
     Returns:
-        pd.DataFrame: A DataFrame containing the collected high-water marks
+        pd.DataFrame: A DataFrame containing the original high-water marks in the specified area
     """
     global_utils.print_func_header('step 1 - download high-water marks from STN flood event database')
 
@@ -51,14 +51,14 @@ def collect_stn(area, filename):
 
 def preprocess_stn(df, attr_list, check_list, date_threshold, filename):
     """
-    Preprocess the collected high-water marks.
+    Preprocess the collected high-water marks 
  
     Args:
         df (pd.DataFrame): The original DataFrame representing high-water marks
         attr_list (list of str): A list of attributes to be selected
         check_list (list of str): A list of attributes used to identify unwanted observations
         date_threshold (int): The date used to filter the high-water marks
-        filename (str): The filename of the file to be saved
+        filename (str): The file to be saved
 
     Returns:
         pd.DataFrame: A DataFrame representing the preprocessed high-water marks
@@ -86,7 +86,7 @@ def preprocess_stn(df, attr_list, check_list, date_threshold, filename):
 
     # select the specified attributes
     df_mod = df_mod[attr_list].reset_index(drop=True)
-
+    df_mod['source'] = 'stn'
     global_utils.describe_df(df_mod, 'preprocessed high-water marks')
     print(f'\nflood events in STN database ({date_threshold} - now):\n', df_mod['event'].unique())
 

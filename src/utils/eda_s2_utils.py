@@ -1,12 +1,17 @@
 """
-This script includes the functions used to analyze the collected Sentinel 2 imagery.
+This script includes the functions used to organize and analyze the collected Sentinel 2 image dataset.
 
 This file can be imported as a module and contains the following functions:
-    * organize_satellite - returns a DataFrame containing organized image information with columns 'id', 
-                           'images', 'date', 'dir', and 'event'.
-    * plot_satellite - plots and save the images for visual inspection
-    * filter_satellite - clean the dataset and identify the ideal images
-    * TODO
+    * check_s2_folder - delete empty folders;
+    * create_s2_df - returns a DataFrame containing organized image information;
+    * assign_period_label - returns a label indicating whether it was taken before, during, or after a flood event;
+    * add_metadata_flood_event - returns a DataFrame with additional flood-related information;
+    * check_during_period_label - returns True if any observation within the specified group is labeled as 'during flood';
+    * filter_df_s2 - return the filtered dataset;
+    * plot_helper - plot images by ids;
+    * plot_s2 - plots the image grouped by ids for visual inspection;
+    * check_cloud_cover - returns the percentage of cloud and shadow coverage;
+    * select_s2 - decide the ideal dataset;
 """
 
 # import libraries
@@ -14,6 +19,7 @@ import os
 import re
 import rasterio
 import pandas as pd
+import numpy as np
 from rasterio.plot import show
 import matplotlib.pyplot as plt
 from utils import global_utils
@@ -36,7 +42,7 @@ def check_s2_folder(df):
         # construct the paths to the image directories
         event_dir = f'data/img_s2/{event}/'
         event_ndwi_dir = f'data/img_s2/{event}_NDWI/'
-        event_cloud_dir = f'data/img_s2/{event}_ClOUD/'
+        event_cloud_dir = f'data/img_s2/{event}_CLOUD/'
 
         # check folders and delete if empty
         dirs_to_check = [event_dir, event_ndwi_dir, event_cloud_dir]
@@ -96,7 +102,7 @@ def create_s2_df(df):
                     filename_ndwi = filename.replace('VIS', 'NDWI')
                     filename_cloud = filename.replace('VIS', 'CLOUD')
                     dir_ndwi = f'data/img_s2/{event}_NDWI/'
-                    dir_cloud = f'data/img_s2/{event}_ClOUD/'
+                    dir_cloud = f'data/img_s2/{event}_CLOUD/'
 
                     # check if the id is already stored
                     if filename not in image_data:
@@ -122,10 +128,19 @@ def create_s2_df(df):
     return df_s2 
 
 def assign_period_label(row):
+    """
+    Assign labels to the image indicating whether it was taken before, during, or after a flood event
+
+    Args:
+        row (pd.Series): A row of data containing information about the image and the event
+
+    Returns:
+        str: A label indicating whether it was taken before, during, or after a flood event
+    """
     date = datetime.strptime(row['date'], '%Y%m%d')
     
     # category 'gauge'
-    if row['category'] == 'gauge':
+    if row['source'] == 'gauge':
         event_start = datetime.strptime(row['event_day'], '%Y-%m-%d') - timedelta(days=1)
         event_end = datetime.strptime(row['event_day'], '%Y-%m-%d') + timedelta(days=1)
         if date < event_start:
@@ -136,7 +151,7 @@ def assign_period_label(row):
             return 'after flood'
     
     # category 'stn'
-    elif row['category'] == 'stn':
+    elif row['source'] == 'stn':
         event_start, event_end = row['event_day'].split(' to ')
         start_day = datetime.strptime(event_start, '%Y-%m-%d')
         end_day = datetime.strptime(event_end, '%Y-%m-%d')
@@ -148,6 +163,17 @@ def assign_period_label(row):
             return 'after flood'
 
 def add_metadata_flood_event(flood_event, s2, attr_list):
+    """
+    Add additional information to the image dataframe
+
+    Args:
+        flood_event (pd.DataFrame): The DataFrame with high-water marks and high-water levels
+        s2 (pd.DataFrame): The DataFrame with image information
+        attr_list (list of str): The specified attributes to be selected
+
+    Returns:
+        pd.DataFrame: The DataFrame with additional information added
+    """
     global_utils.print_func_header('merge additional information from the flood event dataframe')
     df_s2_mod = s2.copy()
     df_s2_mod = pd.merge(s2, flood_event[attr_list], on='id', how='left')
@@ -157,6 +183,15 @@ def add_metadata_flood_event(flood_event, s2, attr_list):
     return df_s2_mod
 
 def check_during_period_label(i):
+    """
+    Check if any image is labeled as 'during flood'
+
+    Args:
+        i (pd.Series): A Series representing a group of observations to be checked
+
+    Returns:
+        bool: True if any observation within the group has a period label of during flood; otherwise, False    
+    """
     return (i['period'] == 'during flood').any()
 
 def filter_df_s2(df):
@@ -164,6 +199,12 @@ def filter_df_s2(df):
     Filter the image dataframe by:
         * dropping duplicate combinations of 'id' and 'date' (overlapping coverage of Sentinel-2 tiles - example: )
         * dropping events without any 'during flood' period label
+
+    Args:
+        df (pd.DataFrame): The specified DataFrame to be filtered
+
+    Returns:
+        pd.DataFrame: The filtered dataset
     '''
     global_utils.print_func_header('filter the image dataframe')
     df_mod = df.copy()
@@ -176,7 +217,45 @@ def filter_df_s2(df):
     print('flood events possibly with Sentinel-2 imagery during flood:\n', df_mod['event'].unique())
     return df_mod
 
-def plot_satellite(df):
+def plot_helper(ids, df, event, dir, var):
+    """
+    Call this function to plot Sentinel-2 images grouped by id
+
+    Args:
+        ids : a list of ids
+        df: The DataFrame selected
+        dir: The directory to save plots
+        var: part of plot name
+    """
+    for current_id in ids:
+        # filter the data for the current id
+        id_group = df[df['id'] == current_id]
+        num_images = len(id_group)
+        event_day = id_group['event_day'].iloc[0]
+        
+        # create a figure for the current id
+        fig, axes = plt.subplots(1, num_images, figsize=(15, 5))
+        fig.suptitle(f"Event: {event}, ID: {current_id}, Event Day: {event_day}", fontsize=16)
+
+        if num_images == 1:
+            axes = [axes]
+
+        for j, (index, row) in enumerate(id_group.iterrows()):
+            image_path = os.path.join(row['dir'], row['filename'])
+            if os.path.exists(image_path):
+                with rasterio.open(image_path) as src:
+                    show(src, ax=axes[j])
+                    axes[j].set_title(f"Date: {row['date']}")
+                    axes[j].set_xlim(axes[0].get_xlim())
+                    axes[j].set_ylim(axes[0].get_ylim())
+            else:
+                axes[j].axis('off')
+
+        plt.tight_layout()
+        plt.savefig(f"figs/{dir}/{event}_{current_id}_{var}.png")
+        plt.close(fig)
+
+def plot_s2(df):
     """
     Plot the first 5 images (VIS) for each flood event for visual inspection
 
@@ -186,7 +265,6 @@ def plot_satellite(df):
     global_utils.print_func_header('plot the first 5 images for each flood event for visual inspection')
 
     # check the number of rows with the same combination of 'id' and 'period' (indicating that for the same location, there're multiple image during the same period -> identify the best)
-
     id_period = df.groupby(['id', 'period'])
     duplicate_id_period = id_period.filter(lambda x: len(x) > 1)
     print('number of rows with the same combination of id and period:', len(duplicate_id_period))
@@ -196,52 +274,69 @@ def plot_satellite(df):
         # select the first five unique ids for the event
         first_five_ids = event_group['id'].unique()[:5]
 
-        for current_id in first_five_ids:
-            # filter the data for the current id
-            id_group = event_group[event_group['id'] == current_id]
-            num_images = len(id_group)
-            
-            # create a figure for the current id
-            fig, axes = plt.subplots(1, num_images, figsize=(15, 5))
-            fig.suptitle(f'Event: {event}, ID: {current_id}', fontsize=16)
-
-            if num_images == 1:
-                axes = [axes]
-
-            for j, (index, row) in enumerate(id_group.iterrows()):
-                image_path = os.path.join(row['dir'], row['filename'])
-                if os.path.exists(image_path):
-                    with rasterio.open(image_path) as src:
-                        show(src, ax=axes[j])
-                        axes[j].set_title(f"Date: {row['date']}")
-                        axes[j].set_xlim(axes[0].get_xlim())
-                        axes[j].set_ylim(axes[0].get_ylim())
-                else:
-                    axes[j].axis('off')
-
-            plt.tight_layout()
-            plt.savefig(f"figs/s2_vis_inspect/{event}_{current_id}_s2.png")
-            plt.close(fig)
+        plot_helper(first_five_ids, event_group, event, 's2_vis_inspect', 's2')
 
         print(f"complete - event: {event}")
-  
-# select the ideal dataset based on plots
-def filter_satellite(df):
+
+def check_cloud_cover(path):
+    """
+    Calculate the percentage of cloud and shadow cover in the image
+
+    Args:
+        path (str): The path of cloud maks
+    
+    Returns:
+        float: The percentage of cloud and shadow mask
+    """
+    with rasterio.open(path) as src:
+        cloud_mask = src.read(1)
+        cloud_percentage = np.mean(cloud_mask == 1) * 100
+        return cloud_percentage
+
+def select_s2(df, event_selection, cloud_threshold, date_drop, explore=None):
     '''
+    Select the ideal image datasets based on plots
+
+    Args:
+        df (pd.DataFrame): The specified DataFrame to be selected
+
+    Returns:
+        pd.DataFrame: The ready-to-use dataset for KMeans clustering
+
     Notes:
-        event 2019-11 - date(20191102) during flood identified, date(20191013) less cloud compared to date(20191015) -> drop date(20191015)
-        event 2021-09 - not ideal (the change not notable) -> drop event
-        event 2023-07 - date(20230711) during flood identified, date(20230726) more frequent compared to date(20230719) -> drop date(20230719)
-        event 2023-12 - date(20231220) during flood identified
-        event 2024-01 - TODO
+        event 2019-11 - date(20191102) during flood identified (land color close to the flooding river)
+        event 2021-09 - not ideal (the change not notable)
+        event 2023-07 - date(20230711) during flood identified
+        event 2023-12 - date(20231220) during flood identified (snow cover on the image before flood and land color close to the flooding river)
+        event 2024-01 - not ideal (the change not notable)
         (event 2023-07 is the best event currently - if enough time, consider other events as well)
     '''
-    global_utils.print_func_header('select the ideal dataset based on plots')
-    df_mod = df.copy()
-    df_mod = df[df['event'] == '2023-07']
-    df_mod = df_mod[df_mod['date'] != '20230719']
-
+    global_utils.print_func_header('select the ideal event based on plots')
+    df_mod = df[df['event'].isin(event_selection)].copy()
+    df_mod = df_mod.reset_index(drop=True)
+    unique_ids = df_mod['id'].unique()
     global_utils.describe_df(df_mod, 'selected image dataset')
 
-    df_mod.to_csv('data/s2_selected.csv', index=False)
+    print(f'\nplot the selected images for further inspection')
+    plot_helper(unique_ids, df_mod, '2023-07', 's2_selected', 's2_selected')
+
+    if explore == 'complete':
+        df_ready = df_mod[~df_mod['date'].isin(date_drop)].copy()
+        drop_list = []
+        for index, row in df_ready.iterrows():
+            cloud_mask_path = os.path.join(row['dir_cloud'], row['filename_cloud'])
+            cloud_percentage = check_cloud_cover(cloud_mask_path)
+            if cloud_percentage > cloud_threshold:
+                drop_list.append(index)
+        
+        df_ready.drop(drop_list, inplace=True)
+        df_ready.reset_index(drop=True, inplace=True)
+        unique_ids = df_ready['id'].unique()
+        global_utils.describe_df(df_ready, 'ready-to-use image dataset')
+
+        print(f'\nplot the ready-to-use images for verification')
+        plot_helper(unique_ids, df_ready, '2023-07', 's2_ready', 's2_ready')
+
+        df_ready.to_csv('data/s2.csv', index=False)
+
     return df_mod

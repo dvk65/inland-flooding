@@ -58,7 +58,7 @@ The command will:
 - print out summaries for both the STN high-water mark data and the gauge high-water level data;
 - use `countplot` to show the number of observations in each unique flood events;
 - create both static and interactive maps to show the distribution of flood event observations. 
-- The detailed analysis can be found in [REPORT.md](REPORT.md).
+- The detailed analysis can be found in [REPORT.md](REPORT.md#flood-event-data).
 
 ### Step 3: Collect Sentinel 2 imagery associated with the flood event data
 Before collecting Sentinel 2 imagery from [Google Earth Engine](https://developers.google.com/earth-engine/datasets/catalog/sentinel-2), we need to set up our own Google Cloud Platform project and authenticate using either our personal Google account or a service account. 
@@ -91,7 +91,7 @@ make eda_s2
     - selecting images from the ideal flood events
     - dropping Sentinel-2 images where more than 50% of the area is covered by clouds or shadows
     - dropping images token on the unwanted dates
-- The detailed analysis can be found in [REPORT.md](REPORT.md).
+- The detailed analysis can be found in [REPORT.md](REPORT.md#satellite-imagery-data-sentinel-2).
 
 
 ### Step 5: Download and plot the specified National Hydrography Dataset
@@ -110,7 +110,7 @@ This commands will:
 
 **Note**: 
 - A detailed description about the downloaded NHD datsets can be found in [GUIDE.md](GUIDE.md#dataset-documentation);
-- An analysis of the plots can be found in [REPORT.md](REPORT.md);
+- An analysis of the plots can be found in [REPORT.md](REPORT.md#national-hydrography-dataset);
 - Plotted figures can be found in [figs/s2_nhd](figs/s2_nhd);
 - It's possible receiving the following UserWarning when runing `gpd.read_file()`but it won't affect the analysis in this project:
 ```

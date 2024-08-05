@@ -63,6 +63,6 @@ list all contents within the ZIP file for Vermont
 
 The selected contents for this project are 'Shape/NHDFlowline.shp', 'Shape/NHDFlowline.shx', 'Shape/NHDFlowline.dbf', 'Shape/NHDFlowline.prj', 'Shape/NHDFlowlineVAA.dbf'. Below is an brief description of each content. As for the detailed documentation, users can visit the [NHD documentation](https://d9-wret.s3.us-west-2.amazonaws.com/assets/palladium/production/s3fs-public/atoms/files/NHD%20v2.3%20Model%20Poster%2006012020.pdf).
 - 'Shape/NHDFlowline.shp': represents the geometries;
-- 'Shape/NHDFlowline.shx': links .dbf with .shp using index data
-- 'Shape/NHDFlowline.dbf': represents the attribute data about the geometries
-- 'Shape/NHDFlowline.prj': represents the coordinate system and projection information;
+- 'Shape/NHDFlowline.shx': links .dbf with .shp using index data;
+- 'Shape/NHDFlowline.dbf': represents the attribute data about the geometries;
+- 'Shape/NHDFlowline.prj': represents the coordinate system and projection information.

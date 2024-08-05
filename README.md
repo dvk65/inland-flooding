@@ -94,7 +94,7 @@ make eda_s2
 - The detailed analysis can be found in [REPORT.md](REPORT.md).
 
 
-### Step 5: Download and plot the specified National Hydrography Dataset (DONE)
+### Step 5: Download and plot the specified National Hydrography Dataset
 This section collects National Hydrography Dataset for the DataFrame saved after Step 4. [The National Hydrography Dataset](https://www.usgs.gov/national-hydrography/access-national-hydrography-products) is one part of the datasets that represent the surface water of the United States. This project utilizes the flowline shapefiles from NHD to enhance the analysis of flooding areas in Sentinel-2 images. 
 
 The National Hydrography Dataset is downloaded from the [National Map Downloader](https://apps.nationalmap.gov/downloader/). This platform allows users to download the NHD as a shapefile by Hydrologic Unit, by state, or nationally. In this project, the NHD shapefile is downloaded by state. 

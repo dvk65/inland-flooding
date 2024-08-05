@@ -106,13 +106,13 @@ make nhd
 - Based on the layer on the Sentinel-2 images during flood, we can easily see the flooding area. 
 - The dataset will be used in Step 6. 
 
-### Step 6: Use KMeans clustering algorithm to segment Sentinel-2 imagery
+### Step 6: Use KMeans clustering algorithm to segment Sentinel-2 imagery (Ongoing)
 This section runs the KMeans clustering algorithm on the cleaned image dataset. 
 ```
 make kmeans
 ```
 
-### Step 7: Evaluate the performance
+### Step 7: Evaluate the performance (Onging)
 ```
 make evaluation
 ```

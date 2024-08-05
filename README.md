@@ -94,17 +94,29 @@ make eda_s2
 - The detailed analysis can be found in [REPORT.md](REPORT.md).
 
 
-### Step 5: Download and plot the specified National Hydrography Dataset
-This section collects National Hydrography Dataset for the DataFrame we saved after Step 4. 
+### Step 5: Download and plot the specified National Hydrography Dataset (DONE)
+This section collects National Hydrography Dataset for the DataFrame saved after Step 4. [The National Hydrography Dataset](https://www.usgs.gov/national-hydrography/access-national-hydrography-products) is one part of the datasets that represent the surface water of the United States. This project utilizes the flowline shapefiles from NHD to enhance the analysis of flooding areas in Sentinel-2 images. 
 
-To download and plot NHD, use the following command (estimated runtime: 6 minute):
+The National Hydrography Dataset is downloaded from the [National Map Downloader](https://apps.nationalmap.gov/downloader/). This platform allows users to download the NHD as a shapefile by Hydrologic Unit, by state, or nationally. In this project, the NHD shapefile is downloaded by state. 
+
+To download and plot the NHD, use the following command (estimated runtime: 7 minute):
 ```
 make nhd
 ```
 
-- NHDs for CT, MA, and VT are downloaded. 
-- Based on the layer on the Sentinel-2 images during flood, we can easily see the flooding area. 
-- The dataset will be used in Step 6. 
+This commands will:
+- download NHD datasets for CT, MA, and VT;
+- plot the NHD flowlines on top of Sentinel-2 images during flood events for visual inspection.
+
+**Note**: 
+- A detailed description about the downloaded NHD datsets can be found in [GUIDE.md](GUIDE.md#dataset-documentation);
+- An analysis of the plots can be found in [REPORT.md](REPORT.md);
+- Plotted figures can be found in [figs/s2_nhd](figs/s2_nhd);
+- It's possible receiving the following UserWarning when runing `gpd.read_file()`but it won't affect the analysis in this project:
+```
+lib/python3.9/site-packages/pyogrio/raw.py:196: UserWarning: Measured (M) geometry types are not supported. Original type 'Measured 3D LineString' is converted to 'LineString Z'
+  return ogr_read(
+```
 
 ### Step 6: Use KMeans clustering algorithm to segment Sentinel-2 imagery (Ongoing)
 This section runs the KMeans clustering algorithm on the cleaned image dataset. 

@@ -41,7 +41,7 @@ make gauge
 - For clarity, the dataset detailing gauge water levels above the moderate flood stage is referred to as the "high-water level" dataset.
 - The high-water level dataset includes 218 observations and 9 attributes.
 
-The ready-to-use datasets are available [here](https://drive.google.com/drive/folders/19j-iKtgLMrEziFKQfxYVosNz-1zFDA7T?usp=sharing). 
+The ready-to-use datasets are available [here](https://drive.google.com/drive/folders/1QHi26bRnB58R46VIkkpXLiby3xe0nm_W?usp=sharing). 
 
 ### Step 2: Analyze and prepare the collected flood event data
 After collecting STN high-water mark data and gauge high-water level data, an analysis is conducted to:
@@ -73,7 +73,7 @@ make s2
 - This command downloads three types of .tiff images including the satellite image (True Color), the water mask using NDWI, and the cloud/shadow mask using [s2cloudless](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless).
 - To ensure that we can collect high-quality images before/during/after images, the `start_day` and `end_day` used to collect images is between event start day - 25 and event end day + 25. 
 
-The ready-to-use dataset is available [here](https://drive.google.com/drive/folders/19j-iKtgLMrEziFKQfxYVosNz-1zFDA7T?usp=sharing).
+The ready-to-use dataset is available [here](https://drive.google.com/drive/folders/1QHi26bRnB58R46VIkkpXLiby3xe0nm_W?usp=sharing).
 
 
 ### Step 4: Analyze and prepare Sentinel-2 imagery

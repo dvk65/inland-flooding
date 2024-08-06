@@ -149,8 +149,7 @@ make test
 - Finish the instruction part (almost)
 - Improve Report.md (flood event/image/kmeans analysis) (almost)
 - Improve KMeans clustering (almost)
-    - TODO: consistency among images
-    - TODO: batch processing to avoid being killed (normalizing using /255 not ideal)
+    - TODO: check consistency among images
 - Add the evaluation part
 
 ## Reference

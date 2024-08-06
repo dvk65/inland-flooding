@@ -209,6 +209,7 @@ def kmeans_clustering_i(image, init, n_clusters):
     return labels, inertia
 
 def plot_clustered_result(cluster_image, valid_pixels, original_shape, n_clusters, file):
+    name = file.split('/')[-1]
     _, height, width = original_shape
     full_image = np.full(height * width, -1)
     full_image[valid_pixels] = cluster_image
@@ -221,7 +222,7 @@ def plot_clustered_result(cluster_image, valid_pixels, original_shape, n_cluster
     full_image_masked = np.ma.masked_where(full_image == -1, full_image)
     fig, axes = plt.subplots(1, n_clusters + 1, figsize=(20, 8))
 
-    fig.suptitle(f'KMeans result - {file}')
+    fig.suptitle(f'KMeans result - {name}')
     
     axes[0].set_title(f'Clustered Image')
     im = axes[0].imshow(full_image_masked, cmap=cmap_clustered, interpolation='nearest')
@@ -262,10 +263,10 @@ def kmeans_clustering(df, init, n_clusters, condition):
         valid_pixels = row['valid_pixels']
 
         if condition == 'default':
-            file = f"figs/kmeans_default/{row['filename']}_s2_default.png"
+            file = f"figs/kmeans_default/{row['id']}_{row['date']}_{row['period']}_s2_default.png"
             clustered_image, _ = kmeans_clustering_i(scaled_image, init, n_clusters)
         elif condition == 'optimize':
-            file = f"figs/kmeans_optimized/{row['filename']}_s2_optimized.png"
+            file = f"figs/kmeans_optimized/{row['id']}_{row['date']}_{row['period']}_s2_optimized.png"
             pca_image = row['pca_image']
             clustered_image, _ = kmeans_clustering_i(pca_image, init, n_clusters)
 
@@ -305,33 +306,27 @@ def preprocess_image_features(df):
     for _, row in df_mod.iterrows():
 
         # load the image data and features to be used
-        image = row['masked_image']
+        scaled_image = row['scaled_image']
         ndwi_mask = row['ndwi_mask']
         flowline_mask = row['gdf_mask']
         period_encoded = row['period_encoded']
         valid_pixels = row['valid_pixels']
-        # expand dimensions if necessary
-        if flowline_mask.ndim == 2:
-            flowline_mask = np.expand_dims(flowline_mask, axis=0)
+        
+        ndwi_mask_flat = ndwi_mask.flatten()[valid_pixels]
+        flowline_mask_flat = flowline_mask.flatten()[valid_pixels]
+        period_channel_flat = np.full(valid_pixels.sum(), period_encoded, dtype=np.float32)
 
-        # todo
-        period_channel = np.full(image.shape[1:], period_encoded, dtype=np.float32)
-        period_channel = np.expand_dims(period_channel, axis=0)
-
-        # combine data with features
-        combined_data = np.concatenate([image, ndwi_mask, flowline_mask, period_channel], axis=0)
-
-        # reshape data
-        reshaped_data = combined_data.transpose(1, 2, 0).reshape(-1, combined_data.shape[0])
-        valid_data = reshaped_data[valid_pixels]
-
-        # standardize the data
+        # standardize non-image features
+        non_image_features = np.column_stack([ndwi_mask_flat, flowline_mask_flat, period_channel_flat])
         scaler = StandardScaler()
-        scaled_data = scaler.fit_transform(valid_data)
+        non_image_features_scaled = scaler.fit_transform(non_image_features)
+
+        # combine the standardized features with the scaled image
+        combined_data = np.column_stack([scaled_image, non_image_features_scaled])
 
         # determine the optimal number of components for PCA
         pca_test = PCA()
-        pca_test.fit(scaled_data)
+        pca_test.fit(combined_data)
         explained_variance = np.cumsum(pca_test.explained_variance_ratio_)
 
         # select the number of components
@@ -340,13 +335,10 @@ def preprocess_image_features(df):
 
         # apply PCA with selected n_components
         pca = PCA(n_components=n_components)
-        scaled_data_pca = pca.fit_transform(scaled_data)
+        scaled_data_pca = pca.fit_transform(combined_data)
 
-        # create and store the preprocessed data
-        pca_image = np.full((reshaped_data.shape[0], scaled_data_pca.shape[1]), np.nan)
-        pca_image[valid_pixels] = scaled_data_pca
-        pca_image = pca_image.reshape(image.shape[1], image.shape[2], -1).transpose(2, 0, 1)
-        prepared_data_with_features.append(pca_image)
+        # store the preprocessed data
+        prepared_data_with_features.append(scaled_data_pca)
 
     df_mod['n_components'] = pca_n_components_list
     df_mod['pca_image'] = prepared_data_with_features
@@ -379,10 +371,9 @@ def select_n_clusters(df, init):
     clustered_images = []
 
     test_image = df['pca_image']
-    valid_pixels = df['valid_pixels']
     for i in cluster_list:
         print(f'current - {i}')
-        clustered_image, inertia = kmeans_clustering_i(test_image, valid_pixels, init, i)
+        clustered_image, inertia = kmeans_clustering_i(test_image, init, i)
         inertia_result.append(inertia)
         clustered_images.append(clustered_image)
 

@@ -40,18 +40,23 @@ init = 'k-means++'
 df_kmeans_default = kmeans_utils.kmeans_clustering(df_scaled, init, default_n_clusters, 'default')
 
 # # step 5 - optimize KMeans
-# df_features_pca = kmeans_utils.preprocess_image_features(df_kmeans_default)
+df_features_pca = kmeans_utils.preprocess_image_features(df_kmeans_default)
 
 # # select the ideal init
 
 # # select the optimal n_clusters
-# kmeans_utils.select_n_clusters(df_features_pca.iloc[0], init) 
+kmeans_utils.select_n_clusters(df_features_pca.iloc[0], init) 
 
 # # step 6 - run optimized KMeans but function incomplete (TO BE ADDED - Currently testing on the first 5 ids)
-# n_cluster_optimize = 4
-# df_kmeans_optimize = kmeans_utils.kmeans_clustering(df_features_pca, init, n_cluster_optimize, 'optimize')
+n_cluster_optimize = 4
+df_kmeans_optimize = kmeans_utils.kmeans_clustering(df_features_pca, init, n_cluster_optimize, 'optimize')
 
 # step 7 - evaluate the result (TO BE ADDED)
+# compare with ndwi
+# compare with water using the perpendicular line to estimate river width (water body)
+# silhouette score
+# calculate the area
+# how about the change of color before and during flood
 
 print('\nCOMPLETE - KMEANS CLUSTERING MODEL\n')
 

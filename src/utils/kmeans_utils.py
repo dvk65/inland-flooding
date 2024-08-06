@@ -220,8 +220,10 @@ def plot_clustered_result(cluster_image, valid_pixels, original_shape, n_cluster
 
     full_image_masked = np.ma.masked_where(full_image == -1, full_image)
     fig, axes = plt.subplots(1, n_clusters + 1, figsize=(20, 8))
+
+    fig.suptitle(f'KMeans result - {file}')
     
-    axes[0].set_title(f'Clustered Image - {file}')
+    axes[0].set_title(f'Clustered Image')
     im = axes[0].imshow(full_image_masked, cmap=cmap_clustered, interpolation='nearest')
     fig.colorbar(im, ax=axes[0], ticks=np.arange(n_clusters))
     axes[0].axis('off')
@@ -283,7 +285,7 @@ def kmeans_clustering(df, init, n_clusters, condition):
 
 def preprocess_image_features(df):
     """
-    Combine the image data and other features with StandardScaler() applied
+    Combine the image data and other features with StandardScaler() and PCA() applied
 
     Args:
         df (pd.DataFrame): The DataFrame with the image data

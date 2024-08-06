@@ -116,7 +116,7 @@ To enhance the analysis of Sentinel-2 images and help improve the performance on
 
 ## Satellite Imagery Data (Sentinel 2)
 Below is the plotted figure before optimization.
-![KMeans clustering before optimization](./figs/kmeans_default/44909_s2_default.png)
+![KMeans clustering before optimization](./figs/kmeans_default/44909_20230711T153821_20230711T154201_T18TXP_VIS.tif_s2_default.png)
 
 Below is the plotted figure after optimization. 
-![KMeans clustering after optimization](./figs/kmeans_optimized/44909_s2_optimized.png)
+![KMeans clustering after optimization]

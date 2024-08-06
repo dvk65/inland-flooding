@@ -30,26 +30,26 @@ df = pd.read_csv('data/s2.csv')
 # batch processing to avoid killed
 
 # step 2 - add the image data to df (consider Batch Processing)
-df_mod  = kmeans_utils.add_image_data(df[:50])
+df_mod  = kmeans_utils.add_image_data(df[:3])
 
-# step 3 - preprocess data
+# step 3 - preprocess data (do not store the reshaped scaled data)
 df_scaled = kmeans_utils.preprocess_data(df_mod)
 
-# step 4 - run default KMeans
+# # step 4 - run default KMeans
 init = 'k-means++'
 df_kmeans_default = kmeans_utils.kmeans_clustering(df_scaled, init, default_n_clusters, 'default')
 
-# step 5 - optimize KMeans
-df_features_pca = kmeans_utils.preprocess_image_features(df_kmeans_default)
+# # step 5 - optimize KMeans
+# df_features_pca = kmeans_utils.preprocess_image_features(df_kmeans_default)
 
-# select the ideal init
+# # select the ideal init
 
-# select the optimal n_clusters
-kmeans_utils.select_n_clusters(df_features_pca.iloc[0], init) 
+# # select the optimal n_clusters
+# kmeans_utils.select_n_clusters(df_features_pca.iloc[0], init) 
 
-# step 6 - run optimized KMeans but function incomplete (TO BE ADDED - Currently testing on the first 5 ids)
-n_cluster_optimize = 4
-df_kmeans_optimize = kmeans_utils.kmeans_clustering(df_features_pca, init, n_cluster_optimize, 'optimize')
+# # step 6 - run optimized KMeans but function incomplete (TO BE ADDED - Currently testing on the first 5 ids)
+# n_cluster_optimize = 4
+# df_kmeans_optimize = kmeans_utils.kmeans_clustering(df_features_pca, init, n_cluster_optimize, 'optimize')
 
 # step 7 - evaluate the result (TO BE ADDED)
 

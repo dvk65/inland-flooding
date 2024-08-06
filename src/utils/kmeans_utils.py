@@ -125,8 +125,7 @@ def add_image_data(df):
             image_path = os.path.join(row['dir'], row['filename'])
             ndwi_path = os.path.join(row['dir_ndwi'], row['filename_ndwi'])
             cloud_path = os.path.join(row['dir_cloud'], row['filename_cloud'])
-            sat_image, bounds, tiff_crs, transform, _  = read_tif(image_path) # shape (3, 1200, 1195)
-            # sat_image = sat_image/255.0 # normalize
+            sat_image, bounds, tiff_crs, transform, _  = read_tif(image_path) # shape (3, 1200, 1195) <- (channels, height, width)
             ndwi_mask, _, _, _, _ = read_tif(ndwi_path)
             cloud_mask, _, _, _, _ = read_tif(cloud_path)
             ndwi_mask = apply_cloud_mask(ndwi_mask, cloud_mask, var='ndwi')
@@ -169,19 +168,18 @@ def preprocess_data(df):
     for _, row in df_mod.iterrows():
         # load the valid image data
         image = row['masked_image']
-        reshaped_image = image.transpose(1, 2, 0).reshape(-1, image.shape[0])
-        valid_pixels = ~np.isnan(reshaped_image).any(axis=1)
+
+        # (channels, height, width) -> (num_pixels = height * width, channels)
+        reshaped_image = image.transpose(1, 2, 0).reshape(-1, image.shape[0]) # convert the image data into a format where each row is a pixel and each column is a channel value (feature) -> flatten into a 2D array for clustering
+        valid_pixels = ~np.isnan(reshaped_image).any(axis=1) # store rows (pixels) with no NaN values (check if any channel value in a pixel is NaN)
         valid_data = reshaped_image[valid_pixels]
 
         # standardize the valid data
         scaler = StandardScaler()
         scaled_data = scaler.fit_transform(valid_data)
 
-        # reshape and store the scaled data
-        scaled_image_full = np.full((reshaped_image.shape[0], scaled_data.shape[1]), np.nan)
-        scaled_image_full[valid_pixels] = scaled_data
-        scaled_image_final = scaled_image_full.reshape(image.shape[1], image.shape[2], -1).transpose(2, 0, 1)
-        scaled_image_list.append(scaled_image_final)
+        # store the scaled data and valid pixel
+        scaled_image_list.append(scaled_data)
         valid_pixels_list.append(valid_pixels)
 
     # assign the list of scaled images to the DataFrame column
@@ -193,7 +191,7 @@ def preprocess_data(df):
 
     return df_mod
 
-def kmeans_clustering_i(image, valid_pixels, init, n_clusters):
+def kmeans_clustering_i(image, init, n_clusters):
     """
     Perform KMeans clustering on the specified image data.
 
@@ -205,20 +203,42 @@ def kmeans_clustering_i(image, valid_pixels, init, n_clusters):
         numpy.ndarray: The clustered image
         float: The inertia of the clustering result
     """
-    reshaped_image = image.transpose(1, 2, 0).reshape(-1, image.shape[0])
-    valid_data = reshaped_image[valid_pixels]
-
-    kmeans = KMeans(n_clusters=n_clusters, init=init, n_init='auto', max_iter=300, random_state=42).fit(valid_data)
+    kmeans = KMeans(n_clusters=n_clusters, init=init, n_init='auto', max_iter=300, random_state=42).fit(image)
     inertia = kmeans.inertia_
+    labels = kmeans.labels_
+    return labels, inertia
 
-    # assign labels to valid pixels
-    labels = np.full(reshaped_image.shape[0], -1)
-    labels[valid_pixels] = kmeans.labels_
+def plot_clustered_result(cluster_image, valid_pixels, original_shape, n_clusters, file):
+    _, height, width = original_shape
+    full_image = np.full(height * width, -1)
+    full_image[valid_pixels] = cluster_image
+    full_image = full_image.reshape(height, width)
 
-    # reshape labels
-    clustered_image = labels.reshape(image.shape[1], image.shape[2])
+    cluster_colors = plt.cm.get_cmap('viridis', n_clusters)
+    cmap_clustered = ListedColormap(cluster_colors.colors)
+    cmap_clustered.set_bad(color='gray')
 
-    return clustered_image, inertia
+    full_image_masked = np.ma.masked_where(full_image == -1, full_image)
+    fig, axes = plt.subplots(1, n_clusters + 1, figsize=(20, 8))
+    
+    axes[0].set_title(f'Clustered Image - {file}')
+    im = axes[0].imshow(full_image_masked, cmap=cmap_clustered, interpolation='nearest')
+    fig.colorbar(im, ax=axes[0], ticks=np.arange(n_clusters))
+    axes[0].axis('off')
+    
+    for j in range(n_clusters):
+        cluster_mask = (full_image == j)
+        cluster_image_display = np.zeros_like(full_image, dtype=float)
+        cluster_image_display[cluster_mask] = 1
+        
+        cmap_cluster = ListedColormap(['black', 'white'])
+        axes[j + 1].set_title(f"Cluster {j}")
+        axes[j + 1].imshow(cluster_image_display, cmap=cmap_cluster, norm=Normalize(vmin=0, vmax=1))
+        axes[j + 1].axis('off')
+    
+    plt.tight_layout()
+    plt.savefig(file)
+    plt.close()
 
 def kmeans_clustering(df, init, n_clusters, condition):
     """
@@ -230,56 +250,27 @@ def kmeans_clustering(df, init, n_clusters, condition):
         condition (str): Condition to determine the clustering approach ('default', 'optimized', 'optimizing')
     """
     global_utils.print_func_header(f'run {condition} KMeans clustering')
-    ids = df['id'].unique()
+
+    df_mod = df.copy()
     clustered_image_list = []
-    for current_id in ids:
-        id_group = df[df['id'] == current_id] 
-        num_images = len(id_group)
-        fig, axes = plt.subplots(num_images, 3 + n_clusters, figsize=(15, 5 * num_images))
-        fig.suptitle(f'{condition} KMeans Clustering for ID: {current_id}', fontsize=16)
-        if num_images == 1:
-            axes = np.array([axes])
-        for i, (_, row) in enumerate(id_group.iterrows()):
-            scaled_image = row['scaled_image']
-            sat_image = row['sat_image']
-            ndwi_mask = row['ndwi_mask']
-            gdf_mask = row['gdf_mask']
-            valid_pixels = row['valid_pixels']
 
-            if condition == 'default':
-                clustered_image, _ = kmeans_clustering_i(scaled_image, valid_pixels, init, n_clusters)
-            elif condition == 'optimize':
-                pca_image = row['pca_image']
-                clustered_image, _ = kmeans_clustering_i(pca_image, valid_pixels, init, n_clusters)
-            clustered_image_list.append(clustered_image)
-            cmap = plt.cm.viridis
-            cmap.set_bad(color='black')
+    for _, row in df_mod.iterrows():
+        scaled_image = row['scaled_image']
+        sat_image = row['sat_image']
+        valid_pixels = row['valid_pixels']
 
-            axes[i, 0].set_title(f"{row['period']} Original")
-            axes[i, 0].imshow(sat_image.transpose(1, 2, 0))
-
-            axes[i, 1].set_title(f"{row['period']} NDWI")
-            axes[i, 1].imshow(np.squeeze(ndwi_mask), cmap=cmap)
-
-            axes[i, 2].set_title(f"{row['period']} KMeans")
-            axes[i, 2].imshow(clustered_image, cmap=cmap)
-
-            for j in range(n_clusters):
-                cluster_mask = (clustered_image == j)
-                cluster_image = np.zeros_like(clustered_image, dtype=float)
-                cluster_image[cluster_mask] = 1  
-                cmap_cluster = ListedColormap(['black', 'white']) 
-                axes[i, j + 3].set_title(f"{row['period']} Cluster {j}")
-                axes[i, j + 3].imshow(cluster_image, cmap=cmap_cluster, norm=Normalize(vmin=0, vmax=1))
-
-        plt.tight_layout(rect=[0, 0.03, 1, 0.95])
         if condition == 'default':
-            plt.savefig(f"figs/kmeans_default/{row['id']}_s2_default.png")
+            file = f"figs/kmeans_default/{row['filename']}_s2_default.png"
+            clustered_image, _ = kmeans_clustering_i(scaled_image, init, n_clusters)
         elif condition == 'optimize':
-            plt.savefig(f"figs/kmeans_optimized/{row['id']}_s2_optimized.png")
-        plt.close(fig)
+            file = f"figs/kmeans_optimized/{row['filename']}_s2_optimized.png"
+            pca_image = row['pca_image']
+            clustered_image, _ = kmeans_clustering_i(pca_image, init, n_clusters)
 
-        print(f'complete - KMeans clustering on {current_id}')
+        clustered_image_list.append(clustered_image)
+        plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, n_clusters, file)
+
+    print(f"complete - KMeans clustering on {row['filename']}")
 
     if condition == 'default':
         df['clustered_image'] = clustered_image_list
@@ -287,8 +278,8 @@ def kmeans_clustering(df, init, n_clusters, condition):
         df['clustered_image_optimal'] = clustered_image_list
 
     # print the first row
-    print('\nprint out the first row for inspection\n', df.iloc[0])
-    return df
+    print('\nprint out the first row for inspection\n', df_mod.iloc[0])
+    return df_mod
 
 def preprocess_image_features(df):
     """

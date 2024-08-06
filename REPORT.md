@@ -115,3 +115,8 @@ To enhance the analysis of Sentinel-2 images and help improve the performance on
 - In this figure, the added flowlines help distinguish the flooded area, especially in the regions where the land cover is similar to the flood-affected areas. 
 
 ## Satellite Imagery Data (Sentinel 2)
+Below is the plotted figure before optimization.
+![KMeans clustering before optimization](./figs/kmeans_default/44909_s2_default.png)
+
+Below is the plotted figure after optimization. 
+![KMeans clustering after optimization](./figs/kmeans_optimized/44909_s2_optimized.png)

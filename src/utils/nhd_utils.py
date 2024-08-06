@@ -76,8 +76,8 @@ def add_nhd_layer_s2(df, area, area_abbr_list):
         # filter the DataFrame for the current state's data during the flood event
         i_abbr = area_abbr_list[i]
         df_i = df[df['state'] == i_abbr]
-        df_i = df_i[df_i['period'] == 'during flood']
-        for index, row in df_i.iterrows():
+        # df_i = df_i[df_i['period'] == 'during flood']
+        for _, row in df_i.iterrows():
 
             # extract the location of the current observation (will be plotted)
             lat = row['latitude']

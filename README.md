@@ -124,6 +124,17 @@ This section runs the KMeans clustering algorithm on the cleaned image dataset.
 make kmeans
 ```
 
+This command will:
+- add the image data, ndwi mask, and cloud/shadow mask (np.ndarray) to the existing DataFrame with image information;
+- preprocess the image data (`StandardScaler`);
+- run the default KMeans clustering algorithm;
+- optimize KMeans clustering algorithm using `PCA` and other features;
+- run the optimal KMeans clustering algorithm;
+- evaluate the performance.
+
+**Note**: 
+- An analysis of the plotted figures can be found in [REPORT.md](REPORT.md#satellite-imagery-data-sentinel-2);
+
 ### Step 7: Evaluate the performance (Onging)
 ```
 make evaluation
@@ -137,7 +148,9 @@ make test
 ## Todo
 - Finish the instruction part (almost)
 - Improve Report.md (flood event/image/kmeans analysis) (almost)
-- Optimize KMeans clustering algorithm and classification part
+- Improve KMeans clustering (almost)
+    - TODO: consistency among images
+    - TODO: batch processing to avoid being killed (normalizing using /255 not ideal)
 - Add the evaluation part
 
 ## Reference

@@ -258,7 +258,7 @@ def export_image_ndwi(image, dir, scale, region, key):
     water_indices = image.select(['B3', 'B8'])
 
     # threshold can be adjusted
-    water_mask = water_indices.normalizedDifference(['B3', 'B8']).gt(-0.25)
+    water_mask = water_indices.normalizedDifference(['B3', 'B8'])
 
     url = water_mask.getDownloadUrl({
         'region': region,

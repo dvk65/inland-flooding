@@ -11,6 +11,7 @@ This file contains the following steps:
 """
 
 # import libraries
+import os
 import pandas as pd
 from utils import eda_s2_utils
 
@@ -30,7 +31,8 @@ df_s2 = eda_s2_utils.create_s2_df(df)
 
 # step 3 - add necessary info to df_s2 
 attr_list = ['id', 'state', 'county', 'latitude', 'longitude', 'note', 'source', 'event_day']
-df_s2_mod = eda_s2_utils.add_metadata_flood_event(df, df_s2, attr_list)
+flood_day_adjust_dict = {'gauge': (0, 0), 'stn': (0, 0)}
+df_s2_mod = eda_s2_utils.add_metadata_flood_event(df, df_s2, attr_list, flood_day_adjust_dict)
 
 # step 4 - filter df_s2
 df_s2_filtered = eda_s2_utils.filter_df_s2(df_s2_mod)
@@ -43,5 +45,13 @@ eda_s2_utils.plot_s2(df_s2_filtered)
 selected_event = ['2023-07']
 date_drop = ['20230619', '20230701', '20230719', '20230731', '20230805']
 cloud_threshold = 50
+flood_day_adjust_dict = {'gauge': (1, 1), 'stn': (0, 0)}
+
 # df_selected = eda_s2_utils.select_s2(df_s2_filtered, selected_event, cloud_threshold, date_drop) # run to explore the image for selected event
-df_selected = eda_s2_utils.select_s2(df_s2_filtered, selected_event, cloud_threshold, date_drop, explore='complete') # run if both selecting event and dropping unwanted images
+df_selected = eda_s2_utils.select_s2(df_s2_filtered, selected_event, cloud_threshold, date_drop, flood_day_adjust_dict, explore='complete') # run if both selecting event and dropping unwanted images
+
+# explore ndwi threshold
+threshold_list = [-0.1, -0.05, 0.0, 0.05, 0.1]
+file_path_list = ["data/img_s2/2023-07_NDWI/44929_20230706T153819_20230706T155055_T18TXN_NDWI.tif", "data/img_s2/2023-07_NDWI/44909_20230711T153821_20230711T154201_T18TXP_NDWI.tif", "data/img_s2/2023-07_NDWI/45358_20230711T153821_20230711T154201_T18TXP_NDWI.tif"]
+for i in file_path_list:
+    eda_s2_utils.test_ndwi_tif(i, threshold_list)

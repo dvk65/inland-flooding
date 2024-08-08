@@ -7,16 +7,17 @@ This script can be imported as a module and includes the following functions:
     * generate_flowline_mask - returns a mask that identifies the pixels covered by flowlines in the image data;
     * add_image_data - returns a DataFrame with the image and mask data added;
     * preprocess_data - returns a DataFrame with the standardized data;
-    * kmeans_clustering_i - returns the clustered image and the inertia;
-    * kmeans_clustering = returns the 
+    * kmeans_clustering_i - unfinished
+    * kmeans_clustering - unfinished
 """
 
 import os
 import rasterio
 import numpy as np
+import pandas as pd
 import geopandas as gpd
-from utils import global_utils
-# from kneed import KneeLocator
+from utils import global_utils, nhd_utils
+from kneed import KneeLocator
 import matplotlib.pyplot as plt
 from shapely.geometry import box
 from sklearn.cluster import KMeans
@@ -128,7 +129,8 @@ def add_image_data(df):
             sat_image, bounds, tiff_crs, transform, _  = read_tif(image_path) # shape (3, 1200, 1195) <- (channels, height, width)
             ndwi_mask, _, _, _, _ = read_tif(ndwi_path)
             cloud_mask, _, _, _, _ = read_tif(cloud_path)
-            ndwi_mask = apply_cloud_mask(ndwi_mask, cloud_mask, var='ndwi')
+            ndwi_mask = nhd_utils.read_ndwi_tif(ndwi_path)
+            ndwi_mask = nhd_utils.apply_cloud_mask(ndwi_mask, cloud_path)
             masked_image = apply_cloud_mask(sat_image, cloud_mask)
 
             # extract the flowline mask
@@ -226,7 +228,8 @@ def plot_clustered_result(cluster_image, valid_pixels, original_shape, n_cluster
     
     axes[0].set_title(f'Clustered Image')
     im = axes[0].imshow(full_image_masked, cmap=cmap_clustered, interpolation='nearest')
-    fig.colorbar(im, ax=axes[0], ticks=np.arange(n_clusters))
+    cbar = plt.colorbar(im, ax=axes[0], fraction=0.046, pad=0.04, ticks=np.arange(n_clusters))
+    cbar.ax.tick_params(labelsize=8)
     axes[0].axis('off')
     
     for j in range(n_clusters):
@@ -243,7 +246,7 @@ def plot_clustered_result(cluster_image, valid_pixels, original_shape, n_cluster
     plt.savefig(file)
     plt.close()
 
-def kmeans_clustering(df, init, n_clusters, condition):
+def kmeans_clustering_default(df, init, n_clusters, condition):
     """
     Perform KMeans clustering on the image datasets.
 
@@ -262,72 +265,48 @@ def kmeans_clustering(df, init, n_clusters, condition):
         sat_image = row['sat_image']
         valid_pixels = row['valid_pixels']
 
-        if condition == 'default':
-            file = f"figs/kmeans_default/{row['id']}_{row['date']}_{row['period']}_s2_default.png"
-            clustered_image, _ = kmeans_clustering_i(scaled_image, init, n_clusters)
-        elif condition == 'optimize':
-            file = f"figs/kmeans_optimized/{row['id']}_{row['date']}_{row['period']}_s2_optimized.png"
-            pca_image = row['pca_image']
-            clustered_image, _ = kmeans_clustering_i(pca_image, init, n_clusters)
+        file = f"figs/kmeans_default/{row['id']}_{row['date']}_{row['period']}_s2_default.png"
+        clustered_image, _ = kmeans_clustering_i(scaled_image, init, n_clusters)
 
         clustered_image_list.append(clustered_image)
         plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, n_clusters, file)
 
     print(f"complete - KMeans clustering on {row['filename']}")
 
-    if condition == 'default':
-        df['clustered_image'] = clustered_image_list
-    elif condition == 'optimize':
-        df['clustered_image_optimal'] = clustered_image_list
-
     # print the first row
     print('\nprint out the first row for inspection\n', df_mod.iloc[0])
-    return df_mod
 
-def preprocess_image_features(df):
+def find_sharpest_slope_point(cluster_list, inertia_result):
     """
-    Combine the image data and other features with StandardScaler() and PCA() applied
-
-    Args:
-        df (pd.DataFrame): The DataFrame with the image data
-
-    Returns:
-        pd.DataFrame: The modified DataFrame with the combined data
+    Find the point with the sharpest slope in the inertia plot
     """
-    global_utils.print_func_header('combine data and standardize/PCA the combined data')
+    slopes = np.diff(inertia_result)
+    sharpest_slope_index = np.argmax(np.abs(slopes))
+    return cluster_list[sharpest_slope_index + 1]
+
+def kmeans_optimization_individual_pca(df, init):
+    global_utils.print_func_header('optimize image individually with pca')
     df_mod = df.copy()
-    prepared_data_with_features = []
     pca_n_components_list = []
-
-    # encode the period attribute (before/during/after flood)
-    labelencode = LabelEncoder()
-    df_mod['period_encoded'] = labelencode.fit_transform(df_mod['period'])
+    explained_variance_list = []
+    n_clusters_list = []
+    clustered_image_list = []
 
     for _, row in df_mod.iterrows():
 
         # load the image data and features to be used
+        sat_image = row['sat_image']
         scaled_image = row['scaled_image']
-        ndwi_mask = row['ndwi_mask']
-        flowline_mask = row['gdf_mask']
-        period_encoded = row['period_encoded']
         valid_pixels = row['valid_pixels']
-        
-        ndwi_mask_flat = ndwi_mask.flatten()[valid_pixels]
-        flowline_mask_flat = flowline_mask.flatten()[valid_pixels]
-        period_channel_flat = np.full(valid_pixels.sum(), period_encoded, dtype=np.float32)
-
-        # standardize non-image features
-        non_image_features = np.column_stack([ndwi_mask_flat, flowline_mask_flat, period_channel_flat])
-        scaler = StandardScaler()
-        non_image_features_scaled = scaler.fit_transform(non_image_features)
 
         # combine the standardized features with the scaled image
-        combined_data = np.column_stack([scaled_image, non_image_features_scaled])
+        combined_data = scaled_image
 
         # determine the optimal number of components for PCA
         pca_test = PCA()
         pca_test.fit(combined_data)
         explained_variance = np.cumsum(pca_test.explained_variance_ratio_)
+        explained_variance_list.append(explained_variance)
 
         # select the number of components
         n_components = np.argmax(explained_variance >= 0.90) + 1
@@ -337,45 +316,135 @@ def preprocess_image_features(df):
         pca = PCA(n_components=n_components)
         scaled_data_pca = pca.fit_transform(combined_data)
 
-        # store the preprocessed data
-        prepared_data_with_features.append(scaled_data_pca)
+        cluster_list = [2, 3, 4, 5, 6]
+        inertia_result = []
+        for i in cluster_list:
+            _, inertia = kmeans_clustering_i(scaled_data_pca, init, i)
+            inertia_result.append(inertia)
+        kl = KneeLocator(cluster_list, inertia_result, curve='convex', direction='decreasing')
+        optimal_clusters = kl.elbow
+        if optimal_clusters is not None and not np.isnan(optimal_clusters):
+            optimal_clusters = int(optimal_clusters)
+        else:
+            optimal_clusters = find_sharpest_slope_point(cluster_list, inertia_result)
+        n_clusters_list.append(int(optimal_clusters))
 
-    df_mod['n_components'] = pca_n_components_list
-    df_mod['pca_image'] = prepared_data_with_features
-
-    print('selected n_components among all the images:\n', df_mod['n_components'].unique())
+        # plot clustered image
+        clustered_image, _ = kmeans_clustering_i(scaled_data_pca, init, optimal_clusters)
+        clustered_image_list.append(clustered_image)
+        file = f"figs/kmeans_optimized/{row['id']}_{row['date']}_{row['period']}_s2_pca_i.png"
+        plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, optimal_clusters, file)
 
     # plot the explained variance
+    print('selected n_components among all the images:\n', set(pca_n_components_list))
+    print('selected n_clusters among all the images:\n', set(n_clusters_list))
+
+def kmeans_optimization_individual_pca_features(df, init):
+    global_utils.print_func_header('optimize image individually with pca and combined features')
+    df_mod = df.copy()
+    pca_n_components_list = []
+    explained_variance_list = []
+    n_clusters_list = []
+    clustered_image_list = []
+    inertia_result_list = []
+
+    for _, row in df_mod.iterrows():
+
+        # load the image data and features to be used
+        scaled_image = row['scaled_image']
+        ndwi_mask = row['ndwi_mask']
+        flowline_mask = row['gdf_mask']
+        valid_pixels = row['valid_pixels']
+        sat_image = row['sat_image']
+
+        ndwi_mask_flat = ndwi_mask.flatten()[valid_pixels]
+        flowline_mask_flat = flowline_mask.flatten()[valid_pixels]
+
+        non_image_features = ndwi_mask_flat.reshape(-1, 1)
+        scaler = StandardScaler()
+        non_image_features_scaled = scaler.fit_transform(non_image_features)
+
+        combined_data = np.column_stack([scaled_image, non_image_features_scaled])
+
+        pca_test = PCA()
+        pca_test.fit(combined_data)
+        explained_variance = np.cumsum(pca_test.explained_variance_ratio_)
+        explained_variance_list.append(explained_variance)
+
+        n_components = np.argmax(explained_variance >= 0.90) + 1
+        pca_n_components_list.append(n_components)
+
+        pca = PCA(n_components=n_components)
+        scaled_data_pca = pca.fit_transform(combined_data)
+
+        cluster_list = [2, 3, 4, 5, 6]
+        inertia_result = []
+        for i in cluster_list:
+            _, inertia = kmeans_clustering_i(scaled_data_pca, init, i)
+            inertia_result.append(inertia)
+        inertia_result_list.append(inertia_result)
+        kl = KneeLocator(cluster_list, inertia_result, curve='convex', direction='decreasing')
+        optimal_clusters = kl.elbow
+        if optimal_clusters is not None and not np.isnan(float(optimal_clusters)):
+            optimal_clusters = int(optimal_clusters)
+        else:
+            optimal_clusters = int(find_sharpest_slope_point(cluster_list, inertia_result))
+        n_clusters_list.append(optimal_clusters)
+
+        clustered_image, _ = kmeans_clustering_i(scaled_data_pca, init, optimal_clusters)
+        clustered_image_list.append(clustered_image)
+        file = f"figs/kmeans_optimized/{row['id']}_{row['date']}_{row['period']}_s2_pca_features_i.png"
+        plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, optimal_clusters, file)
+
+    print('selected n_components among all the images:\n', set(pca_n_components_list))
+    print('selected n_clusters among all the images:\n', set(n_clusters_list))
+
+    result_df = pd.DataFrame(
+        {
+            'id': df_mod['id'],
+            'period': df_mod['period'],
+            'n_components': pca_n_components_list,
+            'n_clusters': n_clusters_list,
+            'cluster_list': cluster_list,
+            'inertia_result': inertia_result_list,
+        }
+    )
+    return result_df
+
+def kmeans_optimization_all_pca(df, init):
+    global_utils.print_func_header('optimize image together with pca')
+    df_mod = df.copy()
+    combined_data_list = []
+
+    for _, row in df_mod.iterrows():
+        scaled_image = row['scaled_image']
+        combined_data_list.append(scaled_image)
+
+    all_combined_data = np.vstack(combined_data_list)
+
+    pca_test = PCA()
+    pca_test.fit(all_combined_data)
+    explained_variance = np.cumsum(pca_test.explained_variance_ratio_)
+
+    n_components = np.argmax(explained_variance >= 0.90) + 1
+
     plt.figure(figsize=(10, 6))
     plt.plot(range(1, len(explained_variance) + 1), explained_variance, marker='o', linestyle='--')
     plt.title('Cumulative Explained Variance by Number of Components')
     plt.xlabel('Number of Components')
     plt.ylabel('Cumulative Explained Variance')
     plt.grid()
-    plt.savefig('figs/kmeans_optimizing/pca_n_components.png')
+    plt.savefig('figs/kmeans_optimizing/pca_n_components_pca_all.png')
     plt.close()
 
-    # print the first row
-    print('\nprint out the first row for inspection\n', df_mod.iloc[0])
+    pca = PCA(n_components=n_components)
+    all_combined_data_pca = pca.fit_transform(all_combined_data)
 
-    return df_mod
-
-
-def select_n_clusters(df, init):
-    """
-    Perform KMeans clustering on the image datasets to find the optimal number of clusters.
-    """
-    global_utils.print_func_header('identify the optimal number of clusters')
     cluster_list = [2, 3, 4, 5, 6]
     inertia_result = []
-    clustered_images = []
-
-    test_image = df['pca_image']
     for i in cluster_list:
-        print(f'current - {i}')
-        clustered_image, inertia = kmeans_clustering_i(test_image, init, i)
+        _, inertia = kmeans_clustering_i(all_combined_data_pca, init, i)
         inertia_result.append(inertia)
-        clustered_images.append(clustered_image)
 
     plt.figure(figsize=(10, 6))
     plt.plot(cluster_list, inertia_result, marker='o', linestyle='--')
@@ -383,10 +452,126 @@ def select_n_clusters(df, init):
     plt.xlabel('Number of Clusters')
     plt.ylabel('Inertia')
     plt.grid(True)
-    plt.savefig(f'figs/kmeans_optimizing/elbow_plot.png')
+    plt.savefig('figs/kmeans_optimizing/elbow_plot_pca_all.png')
     plt.close()
 
-    # kl = KneeLocator(cluster_list, inertia_result, curve='convex', direction='decreasing')
-    # optimal_clusters = kl.elbow
+    kl = KneeLocator(cluster_list, inertia_result, curve='convex', direction='decreasing')
+    optimal_clusters = kl.elbow
+    if optimal_clusters is not None and not np.isnan(optimal_clusters):
+        optimal_clusters = int(optimal_clusters)
+    else:
+        optimal_clusters = find_sharpest_slope_point(cluster_list, inertia_result)
 
-    # print(f'selected n_clusters: {optimal_clusters}')
+    for _, row in df_mod.iterrows():
+        scaled_image = row['scaled_image']
+        valid_pixels = row['valid_pixels']
+        sat_image = row['sat_image']
+
+        scaled_data_pca = pca.transform(scaled_image)
+
+        clustered_image, _ = kmeans_clustering_i(scaled_data_pca, init, optimal_clusters)
+        file = f"figs/kmeans_optimized/{row['id']}_{row['date']}_{row['period']}_s2_pca_all.png"
+        plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, optimal_clusters, file)
+
+    print('Selected n_components among all the images:\n', n_components)
+    print('Selected n_clusters among all the images:\n', optimal_clusters)
+
+
+def kmeans_optimization_all_pca_features(df, init):
+    """
+    resource limitation - killed (need to be revised)
+    """
+    global_utils.print_func_header('optimize image together with pca and combined features')
+    df_mod = df.copy()
+    combined_data_list = []
+    
+    scaler = StandardScaler()  
+
+    for _, row in df_mod.iterrows():
+        scaled_image = row['scaled_image']
+        ndwi_mask = row['ndwi_mask']
+        flowline_mask = row['gdf_mask']
+        valid_pixels = row['valid_pixels']
+        
+        ndwi_mask_flat = ndwi_mask.flatten()[valid_pixels]
+        flowline_mask_flat = flowline_mask.flatten()[valid_pixels]
+
+        non_image_features = ndwi_mask_flat.reshape(-1, 1)
+        non_image_features_scaled = scaler.fit_transform(non_image_features)
+        
+        combined_data = np.column_stack([scaled_image, non_image_features_scaled])
+        combined_data_list.append(combined_data)
+
+        del ndwi_mask_flat, flowline_mask_flat, non_image_features, non_image_features_scaled, combined_data
+
+    all_combined_data = np.vstack(combined_data_list)
+    del combined_data_list  
+
+    pca_test = PCA()
+    pca_test.fit(all_combined_data)
+    explained_variance = np.cumsum(pca_test.explained_variance_ratio_)
+
+    n_components = np.argmax(explained_variance >= 0.90) + 1
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(range(1, len(explained_variance) + 1), explained_variance, marker='o', linestyle='--')
+    plt.title('Cumulative Explained Variance by Number of Components')
+    plt.xlabel('Number of Components')
+    plt.ylabel('Cumulative Explained Variance')
+    plt.grid()
+    plt.savefig('figs/kmeans_optimizing/pca_n_components_pca_features_all.png')
+    plt.close()
+
+    pca = PCA(n_components=n_components)
+    all_combined_data_pca = pca.fit_transform(all_combined_data)
+    del all_combined_data  
+
+    cluster_list = [2, 3, 4, 5, 6]
+    inertia_result = []
+    for i in cluster_list:
+        _, inertia = kmeans_clustering_i(all_combined_data_pca, init, i)
+        inertia_result.append(inertia)
+
+    plt.figure(figsize=(10, 6))
+    plt.plot(cluster_list, inertia_result, marker='o', linestyle='--')
+    plt.title('Elbow Method')
+    plt.xlabel('Number of Clusters')
+    plt.ylabel('Inertia')
+    plt.grid(True)
+    plt.savefig('figs/kmeans_optimizing/elbow_plot_pca_features_all.png')
+    plt.close()
+
+    kl = KneeLocator(cluster_list, inertia_result, curve='convex', direction='decreasing')
+    optimal_clusters = kl.elbow
+    if optimal_clusters is not None and not np.isnan(optimal_clusters):
+        optimal_clusters = int(optimal_clusters)
+    else:
+        optimal_clusters = find_sharpest_slope_point(cluster_list, inertia_result)
+
+    for _, row in df_mod.iterrows():
+        scaled_image = row['scaled_image']
+        ndwi_mask = row['ndwi_mask']
+        flowline_mask = row['gdf_mask']
+        valid_pixels = row['valid_pixels']
+        sat_image = row['sat_image']
+
+        ndwi_mask_flat = ndwi_mask.flatten()[valid_pixels]
+        flowline_mask_flat = flowline_mask.flatten()[valid_pixels]
+
+        non_image_features = ndwi_mask_flat.reshape(-1, 1)
+        non_image_features_scaled = scaler.transform(non_image_features)  
+
+        combined_data = np.column_stack([scaled_image, non_image_features_scaled])
+
+        scaled_data_pca = pca.transform(combined_data)
+
+        del ndwi_mask_flat, flowline_mask_flat, non_image_features, non_image_features_scaled, combined_data
+
+        clustered_image, _ = kmeans_clustering_i(scaled_data_pca, init, optimal_clusters)
+        file = f"figs/kmeans_optimized/{row['id']}_{row['date']}_{row['period']}_s2_pca_features_all.png"
+        plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, optimal_clusters, file)
+
+        del scaled_data_pca, clustered_image
+
+    print('Selected n_components among all the images:\n', n_components)
+    print('Selected n_clusters among all the images:\n', optimal_clusters)

@@ -24,6 +24,8 @@ from rasterio.plot import show
 import matplotlib.pyplot as plt
 from utils import global_utils
 from datetime import datetime, timedelta
+from pyproj import Transformer
+
 
 
 flood_event_periods = global_utils.flood_event_periods
@@ -127,7 +129,7 @@ def create_s2_df(df):
     df_s2.to_csv('data/df_s2/df_s2.csv', index=False)
     return df_s2 
 
-def assign_period_label(row):
+def assign_period_label(row, day_adjust_dict):
     """
     Assign labels to the image indicating whether it was taken before, during, or after a flood event
 
@@ -138,11 +140,14 @@ def assign_period_label(row):
         str: A label indicating whether it was taken before, during, or after a flood event
     """
     date = datetime.strptime(row['date'], '%Y%m%d')
-    
+    source = row['source']
+    start_adjust, end_adjust = day_adjust_dict.get(source, (0, 0))
+
     # category 'gauge'
-    if row['source'] == 'gauge':
-        event_start = datetime.strptime(row['event_day'], '%Y-%m-%d') - timedelta(days=1)
-        event_end = datetime.strptime(row['event_day'], '%Y-%m-%d') + timedelta(days=1)
+    if source == 'gauge':
+        # adjust using +/- timedelta(days=i) after analyzing s2_selected ()
+        event_start = datetime.strptime(row['event_day'], '%Y-%m-%d') - timedelta(days=start_adjust)
+        event_end = datetime.strptime(row['event_day'], '%Y-%m-%d') + timedelta(days=end_adjust)
         if date < event_start:
             return 'before flood'
         elif event_start <= date <= event_end:
@@ -151,18 +156,19 @@ def assign_period_label(row):
             return 'after flood'
     
     # category 'stn'
-    elif row['source'] == 'stn':
+    elif source == 'stn':
+        # adjust using +/- timedelta(days=i) after analyzing s2_selected ()
         event_start, event_end = row['event_day'].split(' to ')
-        start_day = datetime.strptime(event_start, '%Y-%m-%d')
-        end_day = datetime.strptime(event_end, '%Y-%m-%d')
-        if date < start_day - timedelta(days=1):
+        start_day = datetime.strptime(event_start, '%Y-%m-%d') - timedelta(days=start_adjust)
+        end_day = datetime.strptime(event_end, '%Y-%m-%d') + timedelta(days=end_adjust)
+        if date < start_day:
             return 'before flood'
-        elif start_day - timedelta(days=1) <= date <= end_day + timedelta(days=1):
+        elif start_day <= date <= end_day:
             return 'during flood'
         else:
             return 'after flood'
 
-def add_metadata_flood_event(flood_event, s2, attr_list):
+def add_metadata_flood_event(flood_event, s2, attr_list, day_adjust_dict):
     """
     Add additional information to the image dataframe
 
@@ -177,7 +183,7 @@ def add_metadata_flood_event(flood_event, s2, attr_list):
     global_utils.print_func_header('merge additional information from the flood event dataframe')
     df_s2_mod = s2.copy()
     df_s2_mod = pd.merge(s2, flood_event[attr_list], on='id', how='left')
-    df_s2_mod['period'] = df_s2_mod.apply(assign_period_label, axis=1)
+    df_s2_mod['period'] = df_s2_mod.apply(assign_period_label, axis=1, day_adjust_dict=day_adjust_dict)
     global_utils.describe_df(df_s2_mod, 'image with metadata')
 
     return df_s2_mod
@@ -217,44 +223,6 @@ def filter_df_s2(df):
     print('flood events possibly with Sentinel-2 imagery during flood:\n', df_mod['event'].unique())
     return df_mod
 
-def plot_helper(ids, df, event, dir, var):
-    """
-    Call this function to plot Sentinel-2 images grouped by id
-
-    Args:
-        ids : a list of ids
-        df: The DataFrame selected
-        dir: The directory to save plots
-        var: part of plot name
-    """
-    for current_id in ids:
-        # filter the data for the current id
-        id_group = df[df['id'] == current_id]
-        num_images = len(id_group)
-        event_day = id_group['event_day'].iloc[0]
-        
-        # create a figure for the current id
-        fig, axes = plt.subplots(1, num_images, figsize=(15, 5))
-        fig.suptitle(f"Event: {event}, ID: {current_id}, Event Day: {event_day}", fontsize=16)
-
-        if num_images == 1:
-            axes = [axes]
-
-        for j, (index, row) in enumerate(id_group.iterrows()):
-            image_path = os.path.join(row['dir'], row['filename'])
-            if os.path.exists(image_path):
-                with rasterio.open(image_path) as src:
-                    show(src, ax=axes[j])
-                    axes[j].set_title(f"Date: {row['date']}")
-                    axes[j].set_xlim(axes[0].get_xlim())
-                    axes[j].set_ylim(axes[0].get_ylim())
-            else:
-                axes[j].axis('off')
-
-        plt.tight_layout()
-        plt.savefig(f"figs/{dir}/{event}_{current_id}_{var}.png")
-        plt.close(fig)
-
 def plot_s2(df):
     """
     Plot the first 5 images (VIS) for each flood event for visual inspection
@@ -274,7 +242,7 @@ def plot_s2(df):
         # select the first five unique ids for the event
         first_five_ids = event_group['id'].unique()[:5]
 
-        plot_helper(first_five_ids, event_group, event, 's2_vis_inspect', 's2')
+        global_utils.plot_helper(first_five_ids, event_group, 's2_vis_inspect', 's2')
 
         print(f"complete - event: {event}")
 
@@ -293,7 +261,7 @@ def check_cloud_cover(path):
         cloud_percentage = np.mean(cloud_mask == 1) * 100
         return cloud_percentage
 
-def select_s2(df, event_selection, cloud_threshold, date_drop, explore=None):
+def select_s2(df, event_selection, cloud_threshold, date_drop, flood_day_adjust_dict=None, explore=None):
     '''
     Select the ideal image datasets based on plots
 
@@ -318,9 +286,10 @@ def select_s2(df, event_selection, cloud_threshold, date_drop, explore=None):
     global_utils.describe_df(df_mod, 'selected image dataset')
 
     print(f'\nplot the selected images for further inspection')
-    plot_helper(unique_ids, df_mod, '2023-07', 's2_selected', 's2_selected')
+    global_utils.plot_helper(unique_ids, df_mod, 's2_selected', 's2_selected')
 
     if explore == 'complete':
+        df_mod['period'] = df_mod.apply(assign_period_label, axis=1, day_adjust_dict=flood_day_adjust_dict)
         df_ready = df_mod[~df_mod['date'].isin(date_drop)].copy()
         drop_list = []
         for index, row in df_ready.iterrows():
@@ -334,9 +303,32 @@ def select_s2(df, event_selection, cloud_threshold, date_drop, explore=None):
         unique_ids = df_ready['id'].unique()
         global_utils.describe_df(df_ready, 'ready-to-use image dataset')
 
+        # check the images during flood
+        df_during_flood = df_ready[df_ready['period'] == 'during flood']
+        print("\nnumber of images collected during flood:\n", df_during_flood.shape[0])
+        print("\nimages collected during flood:\n", df_during_flood['id'].tolist())
+
         print(f'\nplot the ready-to-use images for verification')
-        plot_helper(unique_ids, df_ready, '2023-07', 's2_ready', 's2_ready')
+        global_utils.plot_helper(unique_ids, df_ready, 's2_ready', 's2_ready')
 
         df_ready.to_csv('data/s2.csv', index=False)
 
     return df_mod
+
+def test_ndwi_tif(file_path, threshold_list):
+    global_utils.print('explore and define ndwi mask threshold')
+    base_name = os.path.basename(file_path)
+    filename = base_name.replace('_NDWI.tif', '')
+    with rasterio.open(file_path) as src:
+        ndwi_mask = src.read(1)
+
+    fig, axes = plt.subplots(1, len(threshold_list), figsize=(20, 5))
+    for ax, threshold in zip(axes, threshold_list):
+        binary_water_mask = ndwi_mask > threshold 
+        ax.imshow(binary_water_mask, cmap='gray')
+        ax.set_title(f'Threshold: {threshold}')
+        ax.axis('off')
+
+    plt.tight_layout()
+    plt.savefig(f'figs/s2_ndwi/{filename}_NDWI_test.png')
+    plt.close()

@@ -33,13 +33,13 @@ gauge = pd.read_csv('data/df_gauge/df_gauge_mod.csv')
 # step 2 - prepare the flood event observation dataset
 global_utils.print_func_header('add the formed and dissipated dates for the events')
 stn[['formed', 'dissipated']] = stn['event'].apply(lambda x: s2_utils.map_dates(x, flood_event_periods))
-stn['start_day'] = pd.to_datetime(stn['formed']) - pd.Timedelta(days=25)
-stn['end_day'] = pd.to_datetime(stn['dissipated']) + pd.Timedelta(days=25)
+stn['start_day'] = pd.to_datetime(stn['formed']) - pd.Timedelta(days=15)
+stn['end_day'] = pd.to_datetime(stn['dissipated']) + pd.Timedelta(days=16)
 stn['event'] = pd.to_datetime(stn['formed']).dt.strftime('%Y-%m')
 stn['event_day'] = stn.apply(lambda row: f"{row['formed']} to {row['dissipated']}", axis=1)
 
-gauge['start_day'] = pd.to_datetime(gauge['event_day']) - pd.Timedelta(days=25)
-gauge['end_day'] = pd.to_datetime(gauge['event_day']) + pd.Timedelta(days=25)
+gauge['start_day'] = pd.to_datetime(gauge['event_day']) - pd.Timedelta(days=15)
+gauge['end_day'] = pd.to_datetime(gauge['event_day']) + pd.Timedelta(days=16)
 
 attr_list = ['id', 'event', 'state', 'county', 'latitude', 'longitude', 'note', 'event_day', 'start_day', 'end_day', 'source']
 df = pd.concat([stn[attr_list], gauge[attr_list]])

@@ -135,21 +135,15 @@ This command will:
 **Note**: 
 - An analysis of the plotted figures can be found in [REPORT.md](REPORT.md#satellite-imagery-data-sentinel-2);
 
-### Step 7: Evaluate the performance (Onging)
+### Step 7: Evaluate the performance (TODO)
 ```
 make evaluation
 ```
 
-### Testing (used for testing functions)
-```
-make test
-```
-
 ## Todo
 - Finish the instruction part (almost)
-- Improve Report.md (flood event/image/kmeans analysis) (almost)
-- Improve KMeans clustering (almost)
-    - TODO: check consistency among images
+- Improve Report.md (flood event/image/kmeans analysis) 
+- Improve KMeans clustering analysis (almost)
 - Add the evaluation part
 
 ## Reference

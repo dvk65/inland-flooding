@@ -399,17 +399,6 @@ def kmeans_optimization_individual_pca_features(df, init):
     print('selected n_components among all the images:\n', set(pca_n_components_list))
     print('selected n_clusters among all the images:\n', set(n_clusters_list))
 
-    result_df = pd.DataFrame(
-        {
-            'id': df_mod['id'],
-            'period': df_mod['period'],
-            'n_components': pca_n_components_list,
-            'n_clusters': n_clusters_list,
-            'cluster_list': cluster_list,
-            'inertia_result': inertia_result_list,
-        }
-    )
-    return result_df
 
 def kmeans_optimization_all_pca(df, init):
     global_utils.print_func_header('optimize image together with pca')

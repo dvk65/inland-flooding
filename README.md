@@ -141,9 +141,9 @@ make evaluation
 ```
 
 ## Todo
-- Finish the instruction part (almost)
+- Finish the instruction part
 - Improve Report.md (flood event/image/kmeans analysis) 
 - Improve KMeans clustering analysis (almost)
-- Add the evaluation part
+- Debugging (id not assigned correctly)
 
 ## Reference

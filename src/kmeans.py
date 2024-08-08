@@ -43,8 +43,8 @@ init = 'k-means++'
 # kmeans_utils.kmeans_clustering_default(df_scaled, init, default_n_clusters, 'default')
 
 # step 5 - optimize KMeans
-# kmeans_utils.kmeans_optimization_individual_pca(df_scaled, init)
-result_df_pca_features = kmeans_utils.kmeans_optimization_individual_pca_features(df_scaled, init)
+kmeans_utils.kmeans_optimization_individual_pca(df_scaled, init)
+kmeans_utils.kmeans_optimization_individual_pca_features(df_scaled, init)
 # kmeans_utils.kmeans_optimization_all_pca(df_flood, init)
 # kmeans_utils.kmeans_optimization_all_pca_features(df_flood[:10], init) # face 
 

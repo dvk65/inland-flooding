@@ -1,19 +1,20 @@
-name: flood_env
+name: flood
 channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.9
-  - scikit-learn
-  - seaborn
-  - matplotlib
-  - make
-  - git
-  - missingno
-  - geopandas
   - beautifulsoup4
   - earthengine-api
-  - pandas
-  - rasterio
+  - geopandas
+  - git
   - google-cloud-sdk
-prefix: /home/qyin/miniconda3/envs/flood_env
+  - make
+  - matplotlib
+  - missingno
+  - pandas
+  - python=3.9
+  - rasterio
+  - scikit-learn
+  - seaborn
+  - kneed
+prefix: /home/qyin/miniconda3/envs/flood

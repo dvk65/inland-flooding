@@ -121,7 +121,7 @@ MA              20
 To understand the locations of flood events, I created a map for each state. Below is the flood events in Vermont.
 ![Vermont Flood Event Map](./figs/flood_event/map_VT.png)
 
-## National Hydrography Dataset
+## National Hydrography Dataset and NDWI 
 To enhance the analysis of Sentinel-2 images and help improve the performance on KMeans clustering algorithms, the flowlines from National Hydrography Dataset are collected. The command `make nhd` plots the flowlines on the filtered Sentinel-2 image dataset (25 images during flood events). Below is an example of plotting the NHD flowline on top of one Sentinel-2 image.
 ### 44909
 ![NHD over S2](./figs/s2_all_masks/44909_20230711T153821_20230711T154201_T18TXP_VIS_all_masks.png)
@@ -129,6 +129,9 @@ To enhance the analysis of Sentinel-2 images and help improve the performance on
 ### TMVC3_1890
 ![NHD over S2](./figs/s2_all_masks/TMVC3_1890_20230711T153821_20230711T154201_T18TXM_VIS_all_masks.png)
 - In this figure, the added flowlines help distinguish the flooded area, especially in the regions where the land cover is similar to the flood-affected areas. 
+
+### NDWI threshold testing on 44909
+![Test NDWI threshold](./figs/s2_ndwi/44909_20230711T153821_20230711T154201_T18TXP_NDWI_test.png)
 
 ## Satellite Imagery Data (Sentinel 2)
 In this section, I added the results for two flood event observations.

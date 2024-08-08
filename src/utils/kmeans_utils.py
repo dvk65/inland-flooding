@@ -343,10 +343,8 @@ def kmeans_optimization_individual_pca_features(df, init):
     global_utils.print_func_header('optimize image individually with pca and combined features')
     df_mod = df.copy()
     pca_n_components_list = []
-    explained_variance_list = []
     n_clusters_list = []
-    clustered_image_list = []
-    inertia_result_list = []
+
 
     for _, row in df_mod.iterrows():
 
@@ -369,7 +367,6 @@ def kmeans_optimization_individual_pca_features(df, init):
         pca_test = PCA()
         pca_test.fit(combined_data)
         explained_variance = np.cumsum(pca_test.explained_variance_ratio_)
-        explained_variance_list.append(explained_variance)
 
         n_components = np.argmax(explained_variance >= 0.90) + 1
         pca_n_components_list.append(n_components)
@@ -382,7 +379,6 @@ def kmeans_optimization_individual_pca_features(df, init):
         for i in cluster_list:
             _, inertia = kmeans_clustering_i(scaled_data_pca, init, i)
             inertia_result.append(inertia)
-        inertia_result_list.append(inertia_result)
         kl = KneeLocator(cluster_list, inertia_result, curve='convex', direction='decreasing')
         optimal_clusters = kl.elbow
         if optimal_clusters is not None and not np.isnan(float(optimal_clusters)):
@@ -392,7 +388,6 @@ def kmeans_optimization_individual_pca_features(df, init):
         n_clusters_list.append(optimal_clusters)
 
         clustered_image, _ = kmeans_clustering_i(scaled_data_pca, init, optimal_clusters)
-        clustered_image_list.append(clustered_image)
         file = f"figs/kmeans_optimized/{row['id']}_{row['date']}_{row['period']}_s2_pca_features_i.png"
         plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, optimal_clusters, file)
 

@@ -4,7 +4,7 @@ This document includes the analysis and discussion about flood event data and sa
 ## Flood Event Data
 
 ### STN
-The cleaned STN flood event dataset has 889 instances. Below is an overview of the attributes in this dataset.
+The cleaned STN high-water marks has 889 instances. Below is an overview of the attributes in this dataset.
 ```
 count of unique values in each attribute (not list or np.ndarray):
 id           889
@@ -17,7 +17,7 @@ note         837
 source         1
 ```
 
-This dataset includes five unique events. They're `2018 January Extratropical Cyclone`, `2018 March Extratropical Cyclone`, `2021 Henri`,`2023 July MA NY VT Flood`, and `2023 December East Coast Cyclone`. Below is the number of flood events in each category. `2023 July MA NY VT Flood` has the largest number of flood events; therefore, the majority of the satellite images will probably belong to this event.
+This dataset includes five unique flood events. They're `2018 January Extratropical Cyclone`, `2018 March Extratropical Cyclone`, `2021 Henri`,`2023 July MA NY VT Flood`, and `2023 December East Coast Cyclone`. Below is the number of flood events in each category. `2023 July MA NY VT Flood` has the largest number of high-water marks; therefore, the majority of the satellite images will probably belong to this event.
 ```
 count flood event observations group by event...
 

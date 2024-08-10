@@ -4,7 +4,6 @@ This script includes the functions used as a module in multiple scripts.
 This file can be imported as a module and includes the following functions:
     * print_func_header - print a summary of the running function;
     * collect_nhd - returns a list of GeoDataFrames, each representing an NHD layer.
-
 """
 # import libaries
 import os
@@ -28,7 +27,7 @@ area_abbr_list = {'Connecticut': 'CT', 'Maine': 'ME',
                   'Rhode Island': 'RI', 'Vermont': 'VT'}
 
 def print_func_header(var):
-    print('-----------------------------------------------------------------------')
+    print("\n" + "-" * 100)
     print(f'{var}...\n')
 
 def describe_df(df, var):
@@ -42,9 +41,8 @@ def describe_df(df, var):
     num_unique = df[[col for col in df.columns if col not in attr_type_list]].nunique()
     print('\ncount of unique values in each attribute (not list or np.ndarray):\n', num_unique)
 
-# def read_tif(file_path):
-#     with rasterio.open(file_path) as src:
-#         return src.read(), src.profile
+    print(f'\n{var} dataset attributes:\n', df.columns.tolist())
+
 
 def plot_helper(ids, df, dir, var, flowline=None):
     """

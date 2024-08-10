@@ -13,21 +13,22 @@ from utils import stn_utils
 
 # start and track the runtime
 start = time.time()
-print('\nSTART - STN FLOOD EVENT DATA COLLECTION AND PREPROCESSING\n')
+print('\nSTART - STN FLOOD EVENT DATA COLLECTION AND PREPROCESSING')
 
 # set variables
-area_list = ["CT", "ME", "MA", "NH", "RI", "VT"]
-attr_list = ['id', 'event', 'state', 'county', 'latitude', 'longitude', 'note']
-check_list = ['event', 'latitude', 'longitude']
-date_threshold = 2015
+area_list = ["CT", "ME", "MA", "NH", "RI", "VT"] # two-letter state abbreviation list (New England Region)
+attr_list = ['id', 'event', 'state', 'county', 'latitude', 'longitude', 'note'] # attributes selected for this project 
+check_list = ['event', 'latitude', 'longitude'] # list used to drop the observations sharing the same location and event name
+date_threshold = 2015 # date used to select the flood event observations (Sentinel-2 availability)
 
-stn_raw_file = 'df_stn_raw'
-stn_mod_file = 'df_stn_mod'
+stn_raw_file = 'df_stn_raw' # original dataset
+stn_mod_file = 'df_stn_mod' # modified dataset
 
 # step 1 - collect high-water marks from STN database
 stn_raw = stn_utils.collect_stn(area_list, stn_raw_file)
 
 # step 2 - preprocess high-water marks
+# stn_mod = stn_utils.preprocess_stn(stn_raw, attr_list, check_list, date_threshold, stn_mod_file, explore=True) # used for exploration without saving the file
 stn_mod = stn_utils.preprocess_stn(stn_raw, attr_list, check_list, date_threshold, stn_mod_file)
 
 # complete and calculate the runtime

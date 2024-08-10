@@ -1,24 +1,40 @@
-# Flood Event Assessment and Visualization in New England Region
+# Automated Assessment of Inland flooding from Satellite Observations
 
-This project aims to assess and visualize flood events in the New England region (CT, ME, MA, NH, RI, VT). It primarily utilizes the STN flood event data (high water marks), gauge real-time water level data (filtered high water levels), and the corresponding satellite imagery to provide insights into flood events and their impacts. 
+This project focus on developing an algorithm for automated assessment of inland flooding from satellite observations. Initially focusing on Maine, the project may be extended to other states with similar flood characteristics. The approach integrates several datasets, including:
+- [STN flood event data](https://stn.wim.usgs.gov/STNDataPortal/) (high water marks) - validated flood event observations from United States Geological Survey;
+- Gauge real-time water level data (high-water levels) - water levels above moderate flood stage from [USGS Water Data Services](https://waterdata.usgs.gov/nwis/rt);
+- Satellite imagery - Sentinel-2 GeoTIFF images corresponding to the areas of interest and timeframes defined by high-water marks and levels;
+- Flowline Data from National Hydrography Dataset - Flowing water data used to enhance analysis and improve algorithm performance;
+- Cloud and Shadow mask - [s2cloudless](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless)-based mask to remove unwanted pixels from satellite imagery;
+- Normalized Difference Water Index mask - generated mask used to identify the water bodies and refine the algorithm's accuracy.
+The algorithm aims to automate flood detection by correlating these data sources and applying the K-means clustering algorithm for image segmentation. Additionally, the methodology may be helpful to flood detection using drone measurements.
 
 ## Table of Contents
-- [Step 1: Collect flood event data](#step-1-collect-flood-event-data)
+- [Step 1: Collect flood event data](#step-1-collect-flood-event-data-high-water-marks-and-levels)
 - [Step 2: Analyze and prepare the collected flood event data](#step-2-analyze-and-prepare-the-collected-flood-event-data)
 - [Step 3: Collect Sentinel 2 imagery associated with the flood event data](#step-3-collect-sentinel-2-imagery-associated-with-the-flood-event-data)
 - [Step 4: Analyze and prepare the Sentinel-2 imagery](#step-4-analyze-and-prepare-sentinel-2-imagery)
-- [Step 5: Download and plot the specified National Hydrography Dataset (DONE)](#step-5-download-and-plot-the-specified-national-hydrography-dataset)
+- [Step 5: Download and plot the specified National Hydrography Dataset](#step-5-download-and-plot-the-specified-national-hydrography-dataset)
 - [Step 6: Use KMeans clustering algorithm to segment Sentinel-2 imagery](#step-6-use-kmeans-clustering-algorithm-to-segment-sentinel-2-imagery)
 - [Step 7: Evaluate the performance](#step-7-evaluate-the-performance)
 
 ## Instruction
-### Step 1: Collect flood event data
+### Step 1: Collect flood event data (high-water marks and levels)
 [STN flood event database](https://stn.wim.usgs.gov/STNDataPortal/) is the primary source for observations documenting [high-water marks](https://www.usgs.gov/special-topics/water-science-school/science/high-water-marks-and-flooding) during flood events. The original dataset includes 53 attributes. For this project, the selected attributes are `eventName`, `stateName`, `countyName`, `hwm_id`, `latitude`, `longitude`, and `hwm_locationdescription`. 
 
 To collect and preprocess flood event data from the STN database, use the following command (estimated runtime: < 1 minute):
 ```
 make stn
 ```
+
+- This command includes the following steps:
+    - download high-water marks from USGS STN Flood Event Data Portal in JSON format and convert it into a Pandas DataFrame;
+    - execute necessary preprocessing steps and save the modified dataset. 
+
+**Note**: 
+- The detailed description of the dataset and implemented steps can be found in [GUIDE.md](GUIDE.md#stn-flood-event-data-portal);
+- The analysis can be found in [REPORT.md](REPORT.md#stn);
+- Datasets will be saved in data/df_stn.
 
 - The goal is to integrate flood event data with Sentinel-2 imagery to analyze flood extents. Therefore, it is crucial to avoid duplicate Sentinel-2 images and exclude any observations before 2015, as Sentinel-2 imagery is available from 2015. 
 - The orginal STN flood event dataset has 3502 observations with 53 attributes. The The modified dataset has 889 observations with 7 attributes (`id`, `event`, `state`, `county`, `latitude`, `longitude`, and `note`). 

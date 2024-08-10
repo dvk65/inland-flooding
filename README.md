@@ -2,12 +2,19 @@
 
 This project focus on developing an algorithm for automated assessment of inland flooding from satellite observations. Initially focusing on Maine, the project may be extended to other states with similar flood characteristics. The approach integrates several datasets, including:
 - [STN flood event data](https://stn.wim.usgs.gov/STNDataPortal/) (high water marks) - validated flood event observations from United States Geological Survey;
-- Gauge real-time water level data (high-water levels) - water levels above moderate flood stage from [USGS Water Data Services](https://waterdata.usgs.gov/nwis/rt);
+- Real-time gauge water level data (high-water levels) - water levels above moderate flood stage from [USGS Water Data Services](https://waterdata.usgs.gov/nwis/rt);
 - Satellite imagery - Sentinel-2 GeoTIFF images corresponding to the areas of interest and timeframes defined by high-water marks and levels;
 - Flowline Data from National Hydrography Dataset - Flowing water data used to enhance analysis and improve algorithm performance;
 - Cloud and Shadow mask - [s2cloudless](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless)-based mask to remove unwanted pixels from satellite imagery;
-- Normalized Difference Water Index mask - generated mask used to identify the water bodies and refine the algorithm's accuracy.
-The algorithm aims to automate flood detection by correlating these data sources and applying the K-means clustering algorithm for image segmentation. Additionally, the methodology may be helpful to flood detection using drone measurements.
+- [Normalized Difference Water Index](https://eos.com/make-an-analysis/ndwi/) mask - created mask used to identify the water bodies and refine the algorithm's accuracy.
+
+The algorithm aims to automate flood detection by correlating these data sources and applying the K-means clustering algorithm for image segmentation. Additionally, the methodology may be helpful for flood detection using drone measurements.
+
+**Note**: 
+- The detailed description of the dataset and implemented steps can be found in [GUIDE.md];
+- The analysis can be found in [REPORT.md];
+- Datasets are stored in the [Google Drive]() for direct use and also the `data` folder after running the following commands.
+- Figures are stored in the [Google Drive]() for direct use and also the `figs` folder after running the following commands.
 
 ## Table of Contents
 - [Step 1: Collect flood event data](#step-1-collect-flood-event-data-high-water-marks-and-levels)
@@ -34,11 +41,7 @@ make stn
     - download high-water marks from USGS STN Flood Event Data Portal in JSON format and convert it into a Pandas DataFrame;
     - execute necessary preprocessing steps and save the modified dataset. 
 
-**Note**: 
-- The detailed description of the dataset and implemented steps can be found in [GUIDE.md](GUIDE.md#stn-flood-event-data-portal);
-- The analysis can be found in [REPORT.md](REPORT.md#stn);
-- Datasets will be saved in data/df_stn.
-
+#### High-water levels from real-time gauge data
 The real-time water levels of gauges from [USGS National Water Information System](https://waterdata.usgs.gov/nwis) provide an additional source for flood events. While the primary dataset for flood events is the STN flood event data, this dataset is included to collect additional Sentinel-2 imagery during flood events. Also, the flood event observations from this dataset provide a means to cross-reference the STN flood event data, providing a more comprehensive analysis. 
 
 In this project,  when the water level of a gauge is above the moderate flood stage, it's considered as a flood event observation. To collect and preprocess gauge water levels above the [moderate flood stage](https://www.weather.gov/aprfc/terminology#:~:text=Moderate%20Flooding), use the following command (estimated runtime: 30-40 minutes):

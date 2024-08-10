@@ -84,8 +84,8 @@ However, the selected satellite is [Sentinel-2](https://developers.google.com/ea
 #### Area of Interest selection `area_list`
 The area of interest is the New England Region, including Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island, and Vermont. Initially, the focus was on Maine; however, due to the limited availability of recent flood event observations when Sentinel-2 data became accessible, the focus shifted. Under the guidance of Samuel Roy, a USGS scientist, the area of interest was expanded to include other states with potentially similar flood characteristics, particularly Vermont. Other states in the New England Region are also being considered.
 
-#### Duplicates check with some discussion of `elev_ft`
-Firstly, around 200 observations were removed due to duplicates after dropping the files attribute, which represents high-water mark files (primarily photos). These files can be viewed on the [STN Flood Event Viewer](https://stn.wim.usgs.gov/FEV/#2023JulyMANYVTFlood), but cannot be downloaded directly using `requests`. 
+#### Duplicates check `latitude`, `longitude`, and `event`
+Firstly, around 200 observations were removed due to duplicates after dropping the `files` attribute representing high-water mark files (primarily photos). These files can be viewed on the [STN Flood Event Viewer](https://stn.wim.usgs.gov/FEV/#2023JulyMANYVTFlood), but cannot be downloaded directly using `requests`. 
 
 Secondly, approximately 2,400 observations were removed due to duplicate combinations of `latitude`, `longitude`, and `event`. A key task in using STN high-water marks is to retrieve corresponding satellite images based on the location and date of the high-water marks. Therefore, it's crucial to avoid collecting duplicate locations for the same flood event.
 
@@ -138,8 +138,7 @@ hwm_id  40935  40936
 ```
 
 These high-water marks can also be examined from the [visualization on Flood Event Viewer](https://stn.wim.usgs.gov/FEV/#2021Henri), 
-![high-water mark duplicate](figs/flood_event/hwm_duplicate.png)
-
+<img src="figs/flood_event/hwm_duplicate.png" width="400" alt="high-water mark duplicate">
 
 
 #### 

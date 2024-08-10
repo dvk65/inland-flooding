@@ -36,12 +36,6 @@ make stn
 - The analysis can be found in [REPORT.md](REPORT.md#stn);
 - Datasets will be saved in data/df_stn.
 
-- The goal is to integrate flood event data with Sentinel-2 imagery to analyze flood extents. Therefore, it is crucial to avoid duplicate Sentinel-2 images and exclude any observations before 2015, as Sentinel-2 imagery is available from 2015. 
-- The orginal STN flood event dataset has 3502 observations with 53 attributes. The The modified dataset has 889 observations with 7 attributes (`id`, `event`, `state`, `county`, `latitude`, `longitude`, and `note`). 
-- The unique flood events included are `2018 January Extratropical Cyclone`, `2018 March Extratropical Cyclone`, `2021 Henri`, `2023 July MA NY VT Flood`, and `2023 December East Coast Cyclone`. 
-- Since the earliest flood event in the modified dataset occurred in 2018, Sentinel-2 Level-2A imagery (available from 2017-03-28) is used without worrying about missing valuable flood event data. This date is also used when collecting real-time water level data from gauges. 
-    - In [Earth Engine Data Catalog](https://developers.google.com/earth-engine/datasets/catalog/sentinel-2), there're two Sentinel-2 datasets including Level-1C dataset and Level-2A dataset. Both provide high-resolution (10m) imagery, but Level-2A includes atmospheric correction, offering more accurate surface reflectance data. 
-
 The real-time water levels of gauges from [USGS National Water Information System](https://waterdata.usgs.gov/nwis) provide an additional source for flood events. While the primary dataset for flood events is the STN flood event data, this dataset is included to collect additional Sentinel-2 imagery during flood events. Also, the flood event observations from this dataset provide a means to cross-reference the STN flood event data, providing a more comprehensive analysis. 
 
 In this project,  when the water level of a gauge is above the moderate flood stage, it's considered as a flood event observation. To collect and preprocess gauge water levels above the [moderate flood stage](https://www.weather.gov/aprfc/terminology#:~:text=Moderate%20Flooding), use the following command (estimated runtime: 30-40 minutes):

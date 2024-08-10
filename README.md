@@ -20,6 +20,9 @@ The algorithm aims to automate flood detection by correlating these data sources
 
 ## Instruction
 ### Step 1: Collect flood event data (high-water marks and levels)
+Flood event data is derived from two primary sources: high-water marks available through the USGS STN Flood Event Data Portal and high-water levels extracted from real-time gauge data provided by USGS Water Data Services. In this context, "flood events" refers to flood event categories, while "flood event observations" (high-water marks/levels) refers to individual data points.
+
+#### High-water marks from USGS STN flood event data portal
 [STN flood event database](https://stn.wim.usgs.gov/STNDataPortal/) is the primary source for observations documenting [high-water marks](https://www.usgs.gov/special-topics/water-science-school/science/high-water-marks-and-flooding) during flood events. The original dataset includes 53 attributes. For this project, the selected attributes are `eventName`, `stateName`, `countyName`, `hwm_id`, `latitude`, `longitude`, and `hwm_locationdescription`. 
 
 To collect and preprocess flood event data from the STN database, use the following command (estimated runtime: < 1 minute):

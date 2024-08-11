@@ -2,8 +2,8 @@
 
 This project focus on developing an algorithm for automated assessment of inland flooding from satellite observations. Initially focusing on Maine, the project may be extended to other states with similar flood characteristics. The approach integrates several datasets, including:
 | **Table 1: Introduction to the Datasets** | | | |
-| Name | Source | Explanation | Format |
-|-------|------|--------|----------------|
+|----------------------------------------|------|--------|----------------|
+| **Name** | **Source** | **Explanation** | **Format** |
 | High-water marks | [STN flood event data](https://stn.wim.usgs.gov/STNDataPortal/) | validated flood event observations from United States Geological Survey | CSV |
 | High-water levels | [USGS Water Data Services](https://waterdata.usgs.gov/nwis/rt) | real-time gauge water levels above moderate flood stage | CSV |
 | Sentinel-2 satellite images | [Sentinel-2 Level-2A](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED) | satellite images corresponding to the areas of interest and timeframes defined by high-water marks and levels | GeoTIFF |

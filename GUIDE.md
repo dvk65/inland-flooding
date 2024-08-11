@@ -15,6 +15,8 @@ This document is a brief guide to help users set up the required environment, ut
         - [Duplicates check](#duplicates-check-latitude-longitude-and-event)
     - [High-water levels from gauges](#high-water-levels-from-gauges)
         - [Dataset overview](#hwl-dataset-overview)
+    - [Sentinel-2 imagery](#sentinel-2-imagery)
+    - [Flowlines from NHD](#flowline-from-national-hydrography-dataset)
 
 ## Environment Setup
 ### Setting up the environment from the environment.yml
@@ -62,11 +64,6 @@ To use Earth Engine, we need to register the project [here](https://code.earthen
 When running `make s2`, you will receive the following output:
 
 <img src="/figs/guide/login.png" width="550" alt="login">
-
-1. create a Cloud project named flood-demo:
-2. create credentials before using Google Earth Engine API:
-3. enable Google Earth Engine API in APIs & Services:
-4. enter authorization code when running `make s2` for the first time:
 
 ## Tools and Platforms
 
@@ -199,7 +196,9 @@ The last dataset `df_gauge_mod` represents the preprocessed dataset. This datase
 - `note` - the flood impact of different water level
 - `source`: a newly created label to identify the source of each high-water levels
 
-### [National Hydrography Dataset](https://www.usgs.gov/national-hydrography)
+### Sentinel-2 imagery
+
+### [Flowline from National Hydrography Dataset](https://www.usgs.gov/national-hydrography)
 The ZIP file for a state's NHD dataset includes the following contents:
 ```
 list all contents within the ZIP file for Vermont

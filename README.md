@@ -2,7 +2,7 @@
 
 This project focus on developing an algorithm for automated assessment of inland flooding from satellite observations. Specifically,, this algorithm collects satellite images corresponding to pre-, during-, and post-flood events and applies the K-means clustering technique to identify flooded areas. While the project initially targeted Maine, it has been expanded to include other states with similar flood characteristics. The ultimate goal is to enhance flood detection capabilities, providing insights that can be applied to flood detection using drone measurements.
 
-The approach integrates several datasets described in Table 1 below:
+The approach integrates the datasets described in Table 1 below:
 | **Table 1: Introduction to the Datasets** | | | | |
 |---|---|---|---|---|
 | **Name** | **Source** | **Explanation** | **Format** | **Links** |
@@ -16,12 +16,12 @@ The approach integrates several datasets described in Table 1 below:
 ## Table of Contents
 - [Step 1: Collect flood event data](#step-1-collect-flood-event-data-high-water-marks-and-levels)
     - [High-water marks](#high-water-marks-from-usgs-stn-flood-event-data-portal)
-    - [High-water levels](#high-water-levels-from-real-time-gauge-data)
-- [Step 2: Analyze and prepare the collected flood event data](#step-2-analyze-and-prepare-the-collected-flood-event-data)
-- [Step 3: Collect Sentinel 2 imagery associated with the flood event data](#step-3-collect-sentinel-2-imagery-associated-with-the-flood-event-data)
-- [Step 4: Analyze and prepare the Sentinel-2 imagery](#step-4-analyze-and-prepare-sentinel-2-imagery)
-- [Step 5: Download and plot the specified National Hydrography Dataset](#step-5-download-and-plot-the-specified-national-hydrography-dataset)
-- [Step 6: Use KMeans clustering algorithm to segment Sentinel-2 imagery](#step-6-use-kmeans-clustering-algorithm-to-segment-sentinel-2-imagery)
+    - [High-water levels](#high-water-levels-from-real-time-gauge-water-data)
+- [Step 2: Analyze and preprocess the collected flood event data](#step-2-analyze-and-preprocess-the-collected-flood-event-data)
+- [Step 3: Collect Sentinel-2 true color imagery, cloud masks, and ndwi masks](#step-3-collect-sentinel-2-true-color-imagery-cloud-masks-and-ndwi-masks-corresponding-to-the-flood-event-data)
+- [Step 4: Analyze and preprocess the Sentinel-2 true color imagery, cloud masks, and ndwi masks](#step-4-analyze-and-preprocess-sentinel-2-true-color-imagery-cloud-masks-and-ndwi-masks)
+- [Step 5: Download and explore the specified National Hydrography Dataset](#step-5-download-and-explore-the-specified-national-hydrography-dataset)
+- [Step 6: Use KMeans clustering algorithm for image segmentation](#step-6-use-kmeans-clustering-technique-for-image-segmentation)
 - [Step 7: Evaluate the performance](#step-7-evaluate-the-performance)
 - [Future work](#future-work)
 
@@ -41,7 +41,7 @@ make stn
     - download high-water marks from USGS STN Flood Event Data Portal in JSON format and convert it into a Pandas DataFrame;
     - execute necessary preprocessing steps and save the modified dataset as **df_stn_mod.csv**. 
 
-#### High-water levels from real-time gauge data
+#### High-water levels from real-time gauge water data
 [USGS National Water Information System](https://waterdata.usgs.gov/nwis) is another source for flood event data by extracting real-time gauge water levels above the moderate flood stage. While the primary dataset for flood events is the STN flood event data, this dataset is included to collect additional Sentinel-2 imagery during flood events. Also, the flood event observations from this dataset provide a means to cross-reference the STN flood event data, providing a more comprehensive analysis. 
 
 In this project,  when the water level of a gauge is above the moderate flood stage, it's considered as a flood event observation. To collect and preprocess gauge water levels above the [moderate flood stage](https://www.weather.gov/aprfc/terminology#:~:text=Moderate%20Flooding), use the following command (estimated runtime: 30-40 minutes):
@@ -53,11 +53,8 @@ make gauge
     - collect real-time gauge water levels above the moderate flood stage;
     - execute necessary preprocessing steps and save the modified dataset as **df_gauge_mod.csv**.
 
-**Note**:
-- For simplicity, the dataset detailing gauge water levels above the moderate flood stage is referred to as the "high-water level" dataset.
-
-### Step 2: Analyze and prepare the collected flood event data
-An analysis is conducted on the collected high-water marks/levels to:
+### Step 2: Analyze and preprocess the collected flood event data
+An analysis is conducted on the high-water marks/levels to:
 - determine flood event dates from flood event reports;
 - visualize the distribution of flood events using countplots and maps;
 - identify common flood events by comparing STN and gauge data.
@@ -71,25 +68,25 @@ The command will:
 - print out summaries for both the STN high-water mark data and the gauge high-water level data;
 - use `countplot` to show the number of observations in each unique flood events;
 - create static maps to show the distribution of flood event observations. 
-- The detailed analysis can be found in [REPORT.md](REPORT.md#flood-event-data).
 
-### Step 3: Collect Sentinel 2 imagery associated with the flood event data
+### Step 3: Collect Sentinel-2 true color imagery, cloud masks, and NDWI masks corresponding to the flood event data
 Before collecting Sentinel 2 imagery from [Google Earth Engine](https://developers.google.com/earth-engine/datasets/catalog/sentinel-2), we need to set up our own Google Cloud Platform project and authenticate using either our personal Google account or a service account. 
 
-The sections `Create a Cloud project` and `Enable the Earth Engine API` in [Set up your Earth Engine enabled Cloud Project](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup) should be completed. A step-by-step demonstration can be found in [GUIDE.md](GUIDE.md). 
+The sections `Create a Cloud project` and `Enable the Earth Engine API` in [Set up your Earth Engine enabled Cloud Project](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup) should be completed. A step-by-step demonstration can be found in [GUIDE.md](GUIDE.md#google-earth-engine-setup). 
 
-To collect Sentinel 2 imagery from Google Earth Engine based on STN flood event data, use the following command (estimated runtime: 180 minutes): 
+To collect Sentinel 2 imagery from Google Earth Engine based on STN flood event data, use the following command (estimated runtime: 160 minutes): 
 ```
 make s2
 ```
 
-- This command downloads three types of .tiff images including the satellite image (True Color), the water mask using NDWI, and the cloud/shadow mask using [s2cloudless](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless).
-- To ensure that we can collect high-quality images before/during/after images, the `start_day` and `end_day` used to collect images is between event start day - 25 and event end day + 25. 
+The command will:
+- define the timeframes (`start_day` to `end_day`) used to collect images (`event_day` - 15 to `event_day` + 16)
+    - *The value 16 is assigned because the `end_day` is exclusive when using [`filterDate`](https://developers.google.com/earth-engine/apidocs/ee-imagecollection-filterdate)*;
+- remove invalid flood event observation that is too close to the already processed observations;
+- remove invalid Sentinel-2 image in which cloud cover is greater than 20% or area is not fully captured;
+- download three types of GeoTIFF files (Sentinel-2 true color image, NDWI mask using NDWI, and cloud mask) for each valid flood event observation
 
-The ready-to-use dataset is available [here](https://drive.google.com/drive/folders/1QHi26bRnB58R46VIkkpXLiby3xe0nm_W?usp=sharing).
-
-
-### Step 4: Analyze and prepare Sentinel-2 imagery
+### Step 4: Analyze and preprocess Sentinel-2 true color imagery, cloud masks, and NDWI masks
 Before applying the KMeans Clustering algorithm, we need to organize and analyze the collected satellite images.
 
 To run analysis and preparation on the images, use the following command (estimated runtime:  minute):
@@ -107,7 +104,7 @@ make eda_s2
 - The detailed analysis can be found in [REPORT.md](REPORT.md#satellite-imagery-data-sentinel-2).
 
 
-### Step 5: Download and plot the specified National Hydrography Dataset
+### Step 5: Download and explore the specified National Hydrography Dataset
 This section collects National Hydrography Dataset for the DataFrame saved after Step 4. [The National Hydrography Dataset](https://www.usgs.gov/national-hydrography/access-national-hydrography-products) is one part of the datasets that represent the surface water of the United States. This project utilizes the flowline shapefiles from NHD to enhance the analysis of flooding areas in Sentinel-2 images. 
 
 The National Hydrography Dataset is downloaded from the [National Map Downloader](https://apps.nationalmap.gov/downloader/). This platform allows users to download the NHD as a shapefile by Hydrologic Unit, by state, or nationally. In this project, the NHD shapefile is downloaded by state. 
@@ -131,7 +128,7 @@ lib/python3.9/site-packages/pyogrio/raw.py:196: UserWarning: Measured (M) geomet
   return ogr_read(
 ```
 
-### Step 6: Use KMeans clustering algorithm to segment Sentinel-2 imagery (Ongoing)
+### Step 6: Use KMeans clustering technique for image segmentation
 This section runs the KMeans clustering algorithm on the cleaned image dataset. 
 ```
 make kmeans
@@ -148,7 +145,7 @@ This command will:
 **Note**: 
 - An analysis of the plotted figures can be found in [REPORT.md](REPORT.md#satellite-imagery-data-sentinel-2);
 
-### Step 7: Evaluate the performance (TODO)
+### Step 7: Evaluate the performance
 ```
 make evaluation
 ```

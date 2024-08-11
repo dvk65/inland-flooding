@@ -69,7 +69,7 @@ def check_region(image, region, threshold):
         ee.Boolean: A Boolean value representing if the coverage ratio meets the threshold
 
     Notes:
-        This function is implemented because the satelliteimagery tiles may not fully cover the area 
+        This function is implemented because the satellite imagery tiles may not fully cover the area 
     """
     # define the scale (resolution in meters)
     scale = 10

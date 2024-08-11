@@ -41,7 +41,7 @@ VT             646
 MA             282
 CT              72
 ```
-<img src="figs/flood_event/countplot_stn.png" width="400" alt="STN Flood Event Distribution">
+<img src="figs/flood_event/countplot_stn.png" width="500" alt="STN Flood Event Distribution">
 
 This dataset doesn't specify the exact dates of these flood event. However, to collect and distinguish the satellite imagery before/during/after flood events, it's necessary to obtain more accurate dates. Therefore, I explored online reports to define the dates and understand how the flood events affected the New England Region. Below is a table summarizing the information from the online reports.
 | Event | Date | Impact | Affected State |

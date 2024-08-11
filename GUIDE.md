@@ -9,6 +9,7 @@ This document is a brief guide to help users set up the required environment, ut
 - [Tools and Platforms](#tools-and-platforms)
 - [Dataset Documentation](#dataset-documentation)
     - [STN high-water marks](#stn-high-water-marks)
+    - [High-water levels from gauges](#high-water-levels-from-gauges)
 
 ## Environment Setup
 ### Setting up the environment from the environment.yml

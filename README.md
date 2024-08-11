@@ -42,7 +42,7 @@ make stn
     - execute necessary preprocessing steps and save the modified dataset as **df_stn_mod.csv**. 
 
 #### High-water levels from real-time gauge data
-[USGS National Water Information System](https://waterdata.usgs.gov/nwis) is another source for flood event data by extracting real-time gauge water levels above the moderate flood stage. allows users to extract provide an additional source for flood events. While the primary dataset for flood events is the STN flood event data, this dataset is included to collect additional Sentinel-2 imagery during flood events. Also, the flood event observations from this dataset provide a means to cross-reference the STN flood event data, providing a more comprehensive analysis. 
+[USGS National Water Information System](https://waterdata.usgs.gov/nwis) is another source for flood event data by extracting real-time gauge water levels above the moderate flood stage. While the primary dataset for flood events is the STN flood event data, this dataset is included to collect additional Sentinel-2 imagery during flood events. Also, the flood event observations from this dataset provide a means to cross-reference the STN flood event data, providing a more comprehensive analysis. 
 
 In this project,  when the water level of a gauge is above the moderate flood stage, it's considered as a flood event observation. To collect and preprocess gauge water levels above the [moderate flood stage](https://www.weather.gov/aprfc/terminology#:~:text=Moderate%20Flooding), use the following command (estimated runtime: 30-40 minutes):
 ```
@@ -57,9 +57,9 @@ make gauge
 - For simplicity, the dataset detailing gauge water levels above the moderate flood stage is referred to as the "high-water level" dataset.
 
 ### Step 2: Analyze and prepare the collected flood event data
-After collecting STN high-water mark data and gauge high-water level data, an analysis is conducted to:
+An analysis is conducted on the collected high-water marks/levels to:
 - determine flood event dates from flood event reports;
-- visualize the distribution of flood events using barplots and maps;
+- visualize the distribution of flood events using countplots and maps;
 - identify common flood events by comparing STN and gauge data.
 
 To visualize the flood event observations, use the following command: 

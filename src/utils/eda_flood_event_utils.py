@@ -11,14 +11,12 @@ This file can be imported as a module and contains the following functions:
     * map_event_interactive - create an interactive map for flood event observations.
 """
 # import libraries
-import folium
 import requests
 import pandas as pd
 import numpy as np
 import seaborn as sns
 import geopandas as gpd
 import matplotlib.pyplot as plt
-from folium.plugins import MarkerCluster
 from shapely.geometry import Point, shape
 from utils import global_utils
 
@@ -31,23 +29,29 @@ def run_eda(df, var, area_list):
         var (str): The specified flood event data
         area_list (list of str): The specified area list
     '''
-    print('***************************************************************************')
+    print("\n" + "*" * 120)
     print(f'ANALYZE {var.upper()} FLOOD EVENT OBSERVATIONS')
     title = f'{var} flood event observations'
 
     if var == 'stn' or var == 'gauge':
         global_utils.describe_df(df, var)
         # count by event
-        count_by_group(df, 'event')
+        count_top_three(df, 'event')
 
         # count by state
-        count_by_group(df, 'state')
+        count_top_three(df, 'state')
 
         # visualize by state
         plot_bar(df, title, var, area_list)
     elif var == 'stn and gauge':
+        global_utils.describe_df(df, var)
+        # count by event
+        count_top_three(df, 'event')
+
+        # count by state
+        count_top_three(df, 'state')
+
         map_event(df, var)
-        map_event_interactive(df)
 
 def map_dates(event, date_range):
     """
@@ -64,17 +68,17 @@ def map_dates(event, date_range):
         formed, dissipated = date_range[event]
         return pd.Series([formed, dissipated], index=['formed', 'dissipated'])
 
-def count_by_group(df, var):
+def count_top_three(df, var):
     """
-    Print the count of flood events group by a specified column in descending order
+    Print the top three counts of flood event observations grouped by a specified column in descending order
 
     Args:
         df (pd.DataFrame): The DataFrame containing the data.
         var (str): The column name used to group data.
     """
-    global_utils.print_func_header(f'count flood event observations group by {var}')
+    global_utils.print_func_header(f'print the top three counts of flood event observations group by {var}')
     var_group = df.groupby(by=[var]).size().sort_values(ascending=False).to_frame(name='total_count')
-    print(var_group)
+    print(var_group.head(3))
 
 def plot_bar(df, var, filename, order):
     """
@@ -195,52 +199,3 @@ def map_event(df, var):
         plt.close()
 
         print(f'complete - {state} flood event map created')
-
-def map_event_interactive(df):
-    """
-    Create an interactive map for flood event observations using Folium
-
-    Args:
-        df (pd.DataFrame): The DataFrame representing the flood event data
-    """
-    global_utils.print_func_header('create an interactive map for flood event observations')
-    map_center = [df['latitude'].mean(), df['longitude'].mean()]
-    m = folium.Map(location=map_center, zoom_start=8)
-
-    folium.TileLayer(
-        tiles='https://basemap.nationalmap.gov/arcgis/rest/services/USGSHydroCached/MapServer/tile/{z}/{y}/{x}',
-        attr='USGS National Map',
-        name='USGS Hydro Cached',
-        overlay=True,
-        control=True
-    ).add_to(m)
-
-    marker_cluster = MarkerCluster().add_to(m)
-
-    for i, row in df[df['source'] == 'gauge'].iterrows():
-        popup_content = f"""
-        <b>Event:</b> {row['event']}<br>
-        <b>ID:</b> {row['id']}<br>
-        <b>Location:</b> {row['latitude']}, {row['longitude']}<br>
-        <b>Note:</b> {row['note']}<br>
-        """
-        folium.Marker(
-            location=[row['latitude'], row['longitude']],
-            popup=folium.Popup(popup_content, max_width=300),
-            icon=folium.Icon(color='red')  
-        ).add_to(m)
-
-    for i, row in df[df['source'] != 'gauge'].iterrows():
-        popup_content = f"""
-        <b>Event:</b> {row['event']}<br>
-        <b>ID:</b> {row['id']}<br>
-        <b>Location:</b> {row['latitude']}, {row['longitude']}<br>
-        <b>Note:</b> {row['note']}<br>
-        """
-        folium.Marker(
-            location=[row['latitude'], row['longitude']],
-            popup=folium.Popup(popup_content, max_width=300),
-            icon=folium.Icon(color='blue')
-        ).add_to(marker_cluster)
-
-    m.save('figs/flood_event/map_interactive.html')

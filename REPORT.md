@@ -17,31 +17,31 @@ note         837
 source         1
 ```
 
-This dataset includes five unique flood events. They're `2018 January Extratropical Cyclone`, `2018 March Extratropical Cyclone`, `2021 Henri`,`2023 July MA NY VT Flood`, and `2023 December East Coast Cyclone`. Below is the number of flood events in each category. `2023 July MA NY VT Flood` has the largest number of high-water marks; therefore, the majority of the satellite images will probably belong to this event.
+This dataset includes five unique flood events. They're `2018 January Extratropical Cyclone`, `2018 March Extratropical Cyclone`, `2021 Henri`,`2023 July MA NY VT Flood`, and `2023 December East Coast Cyclone`. Below are the top three counts of flood event observations group by event(or state) and a `countplot`. 
+- The `2023 July MA NY VT Flood` (641) event has a significantly higher number of flood event compared to the `2018 March Extratropical Cyclone` (115) and the `2018 January Extratropical Cyclone` (81);
+- `VT` (646) has a significantly higher number of flood event compared to the `MA` (282) and the `CT` (72).
+- Based on the print out result and the figure, Vermont (2023 July MA NY VT Flood) has the largest number of flood events, indicating that the majority of the analysis will be from here. 
+
 ```
-count flood event observations group by event...
+print the top three counts of flood event observations group by event...
 
                                     total_count
 event
 2023 July MA NY VT Flood                    641
 2018 March Extratropical Cyclone            115
 2018 January Extratropical Cyclone           81
-2023 December East Coast Cyclone             43
-2021 Henri                                    9
 ```
 
 ```
-count flood event observations group by state...
+print the top three counts of flood event observations group by state...
 
        total_count
 state
-VT             590
-MA             262
-CT              15
-NH              13
-ME               6
-RI               3
+VT             646
+MA             282
+CT              72
 ```
+<img src="figs/flood_event/countplot_stn.png" width="400" alt="STN Flood Event Distribution">
 
 This dataset doesn't specify the exact dates of these flood event. However, to collect and distinguish the satellite imagery before/during/after flood events, it's necessary to obtain more accurate dates. Therefore, I explored online reports to define the dates and understand how the flood events affected the New England Region. Below is a table summarizing the information from the online reports.
 | Event | Date | Impact | Affected State |
@@ -51,9 +51,6 @@ This dataset doesn't specify the exact dates of these flood event. However, to c
 | [2021 Henri](https://www.nhc.noaa.gov/data/tcr/AL082021_Henri.pdf) | 2021-08-15 (formed) - 2021-08-23 (dissipated) | | |
 | [2023 July MA NY VT Flood](https://www.weather.gov/btv/The-Great-Vermont-Flood-of-10-11-July-2023-Preliminary-Meteorological-Summary) | 2023-07-10 (formed) - 2023-07-11 (dissipated) | | |
 | [2023 December East Coast Cyclone](https://cw3e.ucsd.edu/wp-content/uploads/2023/12/20Dec2023_Summary/20231218EastCoast.pdf) | 2023-12-17 (formed) - 2023-12-18 (dissipated) | | |
-
-The figure below illustrates the distribution of STN flood events. Vermont (2023 July MA NY VT Flood) has the largest number of flood events.
-![STN Flood Event Distribution](./figs/flood_event/countplot_stn.png)
 
 ### Gauge
 In this project, I also collected the gauge water level data. Combining this dataset with STN dataset might help us better analyze and understand the flood events. Below is an overview of the cleaned dataset.

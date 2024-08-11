@@ -31,7 +31,6 @@ eda_flood_event_utils.run_eda(gauge, 'gauge', area_list)
 # combine two datasets
 attr_list = ['id', 'event', 'state', 'county', 'latitude', 'longitude', 'note', 'source']
 df = pd.concat([stn[attr_list], gauge[attr_list]])
-print(df.nunique())
 
 # step 3 - integrate these two datasets and perform an analysis using maps
 eda_flood_event_utils.run_eda(df, 'stn and gauge', area_list)

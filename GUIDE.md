@@ -9,7 +9,12 @@ This document is a brief guide to help users set up the required environment, ut
 - [Tools and Platforms](#tools-and-platforms)
 - [Dataset Documentation](#dataset-documentation)
     - [STN high-water marks](#stn-high-water-marks)
+        - [Dataset overview](#hwm-dataset-overview)
+        - [Date selection](#date-selection-date_threshold)
+        - [Area of interest selection](#area-of-interest-selection-area_list)
+        - [Duplicates check](#duplicates-check-latitude-longitude-and-event)
     - [High-water levels from gauges](#high-water-levels-from-gauges)
+        - [Dataset overview](#hwl-dataset-overview)
 
 ## Environment Setup
 ### Setting up the environment from the environment.yml
@@ -60,7 +65,7 @@ When running `make s2`, you will receive the following output:
 ### [STN high-water marks](https://stn.wim.usgs.gov/STNDataPortal/)
 The USGS Short-Term Network (STN) Flood Event Data Portal includes high-water mark data which is the evidence of a flood event. USGS also provide an interactive website called [Flood Event Viewer](https://stn.wim.usgs.gov/FEV/) to explore the flood events. To understand more about high-water mark and its importance, we can check [High-Water Marks and Flooding](https://www.usgs.gov/special-topics/water-science-school/science/high-water-marks-and-flooding) and [A USGS guide for finding and interpreting high-water marks](https://www.youtube.com/watch?v=uZYRQLMcVOA).
 
-#### Dataset overview
+#### HWM dataset overview
 In this project, the downloaded original dataset (53 x 3502) has 53 attributes:
 ```
 high water marks dataset attributes:
@@ -156,7 +161,7 @@ Exemplar:
 2. [Flood-related Information - Kennecbec River at Augusta Information with NWSLI ASTM1](https://water.noaa.gov/gauges/ASTM1);
 3. [Water Levels - Kennebec River at Augusta with NWSLI ASTM1 and USGSID 01049320](https://waterdata.usgs.gov/monitoring-location/01049320/#parameterCode=00065&period=P7D&showMedian=false) and constructed [URL to retrieve data between 2017-03-28 and 2018-05-23](https://nwis.waterservices.usgs.gov/nwis/iv/?sites=01049320&parameterCd=00065&startDT=2017-03-28T00:00:00.000-05:00&endDT=2018-05-23T23:59:59.999-04:00&siteStatus=all&format=rdb) (shorter date range for demonstration only).
 
-#### Data overview
+#### HWL dataset overview
 The first dataset `df_gauge_list` represents the gauges (names and nswli identifiers) in the New England Region. This dataset (3 x 515) has 3 attributes:
 ```
 gauge list dataset attributes:

@@ -18,8 +18,8 @@ source         1
 ```
 
 This dataset includes five unique flood events. They're `2018 January Extratropical Cyclone`, `2018 March Extratropical Cyclone`, `2021 Henri`,`2023 July MA NY VT Flood`, and `2023 December East Coast Cyclone`. Below are the top three counts of flood event observations group by event(or state) and a `countplot`. 
-- The `2023 July MA NY VT Flood` (641) event has a significantly higher number of flood event compared to the `2018 March Extratropical Cyclone` (115) and the `2018 January Extratropical Cyclone` (81);
-- `VT` (646) has a significantly higher number of flood event compared to the `MA` (282) and the `CT` (72).
+- The `2023 July MA NY VT Flood` event has a significantly higher number of flood event compared to the `2018 March Extratropical Cyclone` and the `2018 January Extratropical Cyclone`;
+- `VT` has a significantly higher number of flood event compared to the `MA` and the `CT`.
 - Based on the print out result and the figure, Vermont (2023 July MA NY VT Flood) has the largest number of flood events, indicating that the majority of the analysis will be from here. 
 
 ```
@@ -69,54 +69,30 @@ source         1
 ```
 
 ```
-count flood event observations group by event...
+print the top three counts of flood event observations group by event...
 
          total_count
 event
 2023-12           64
 2023-07           27
 2024-01           18
-2019-04           14
-2018-01           13
-2021-09           11
-2019-11           10
-2017-10            8
-2023-09            8
-2021-07            7
-2019-01            6
-2018-04            5
-2024-03            4
-2023-05            4
-2018-02            3
-2018-05            2
-2017-07            2
-2024-04            2
-2018-12            2
-2022-02            2
-2021-08            2
-2018-09            1
-2020-12            1
-2019-03            1
-2020-04            1
 ```
 
 ```
-count flood event observations group by state...
+print the top three counts of flood event observations group by state...
 
        total_count
 state
 CT              57
 VT              56
 ME              40
-NH              24
-RI              21
-MA              20
 ```
+<img src="figs/flood_event/countplot_gauge.png" width="500" alt="Gauge Flood Event Distribution">
 
 ### STN and Gauge
 
 To understand the locations of flood events, I created a map for each state. Below is the flood events in Vermont.
-![Vermont Flood Event Map](./figs/flood_event/map_VT.png)
+<img src="figs/flood_event/map_VT.png" width="500" alt="VT Flood Event Distribution">
 
 ## National Hydrography Dataset and NDWI 
 To enhance the analysis of Sentinel-2 images and help improve the performance on KMeans clustering algorithms, the flowlines from National Hydrography Dataset are collected. The command `make nhd` plots the flowlines on the filtered Sentinel-2 image dataset (25 images during flood events). Below is an example of plotting the NHD flowline on top of one Sentinel-2 image.

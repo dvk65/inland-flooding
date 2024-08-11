@@ -1,6 +1,8 @@
 # Automated Assessment of Inland flooding from Satellite Observations
 
-This project focus on developing an algorithm for automated assessment of inland flooding from satellite observations. Initially focusing on Maine, the project may be extended to other states with similar flood characteristics. The approach integrates several datasets, including:
+This project focus on developing an algorithm for automated assessment of inland flooding from satellite observations. Specifically,, this algorithm collects satellite images corresponding to pre-, during-, and post-flood events and applies the K-means clustering technique to identify flooded areas. While the project initially targeted Maine, it has been expanded to include other states with similar flood characteristics. The ultimate goal is to enhance flood detection capabilities, providing insights that can be applied to flood detection using drone measurements.
+
+The approach integrates several datasets described in Table 1 below:
 | **Table 1: Introduction to the Datasets** | | | | |
 |---|---|---|---|---|
 | **Name** | **Source** | **Explanation** | **Format** | **Links** |
@@ -9,15 +11,7 @@ This project focus on developing an algorithm for automated assessment of inland
 | Sentinel-2 satellite images | [Sentinel-2 Level-2A](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED) | satellite images corresponding to the areas of interest and timeframes defined by high-water marks and levels | GeoTIFF | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>Data> |
 | Cloud and Shadow masks | [s2cloudless](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) | identified cloud and shadow features to be dropped | GeoTIFF | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>Data> |
 | [Normalized Difference Water Index](https://eos.com/make-an-analysis/ndwi/) masks |  | created mask used to identify the water bodies and refine the algorithm's accuracy | GeoTIFF | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>Data> |
-| Flowlines | National Hydrography Dataset | Flowing water data used to enhance analysis and improve algorithm performance | Shapefiles | 1.[Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>Data> |
-
-The algorithm aims to automate flood detection by correlating these data sources and applying the K-means clustering algorithm for image segmentation. Additionally, the methodology may be helpful for flood detection using drone measurements.
-
-**Note**: 
-- The detailed description of the dataset and implemented steps can be found in [GUIDE.md];
-- The analysis can be found in [REPORT.md];
-- Datasets are stored in the [Google Drive]() for direct use and also the `data` folder after running the following commands.
-- Figures are stored in the [Google Drive]() for direct use and also the `figs` folder after running the following commands.
+| Flowlines | National Hydrography Dataset | Flowing water data used to enhance analysis and improve algorithm performance | Shapefile | 1.[Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>Data> |
 
 ## Table of Contents
 - [Step 1: Collect flood event data](#step-1-collect-flood-event-data-high-water-marks-and-levels)

@@ -4,7 +4,7 @@ This project focus on developing an algorithm for automated assessment of inland
 | **Table 1: Introduction to the Datasets** | | | | |
 |---|---|---|---|---|
 | **Name** | **Source** | **Explanation** | **Format** | **Links** |
-| High-water marks | [STN flood event data](https://stn.wim.usgs.gov/STNDataPortal/) | validated flood event observations from United States Geological Survey | CSV | [Report >](REPORT.md)<br>[Guide >](GUIDE.md)<br>Data > |
+| High-water marks | [STN flood event data](https://stn.wim.usgs.gov/STNDataPortal/) | validated flood event observations from United States Geological Survey | CSV | [Report>](REPORT.md)<br>[Guide >](GUIDE.md)<br>Data > |
 | High-water levels | [USGS Water Data Services](https://waterdata.usgs.gov/nwis/rt) | real-time gauge water levels above moderate flood stage | CSV | 1.[Report](REPORT.md)<br>2.[Guide](GUIDE.md)<br>3.Data |
 | Sentinel-2 satellite images | [Sentinel-2 Level-2A](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED) | satellite images corresponding to the areas of interest and timeframes defined by high-water marks and levels | GeoTIFF | 1.[Report](REPORT.md)<br>2.[Guide](GUIDE.md)<br>3.Data |
 | Cloud and Shadow masks | [s2cloudless](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) | identified cloud and shadow features to be dropped | GeoTIFF | 1.[Report](REPORT.md)<br>2.[Guide](GUIDE.md)<br>3.Data |

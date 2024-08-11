@@ -73,7 +73,7 @@ make eda_flood_event
 The command will:
 - print out summaries for both the STN high-water mark data and the gauge high-water level data;
 - use `countplot` to show the number of observations in each unique flood events;
-- create both static and interactive maps to show the distribution of flood event observations. 
+- create static maps to show the distribution of flood event observations. 
 - The detailed analysis can be found in [REPORT.md](REPORT.md#flood-event-data).
 
 ### Step 3: Collect Sentinel 2 imagery associated with the flood event data

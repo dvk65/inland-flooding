@@ -91,7 +91,7 @@ ME              40
 
 ### STN and Gauge
 
-To understand the locations of flood events, I created a map for each state. Below is the flood events in Vermont.
+To understand the locations of flood events, I created a map for each state. Based on the previous examination on STN and Gauge flood event, Vermont (2023 July MA NY VT Flood) should include majority of data point. Below is the flood events in Vermont.
 <img src="figs/flood_event/map_VT.png" width="500" alt="VT Flood Event Distribution">
 
 ## National Hydrography Dataset and NDWI 

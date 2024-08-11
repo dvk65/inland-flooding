@@ -39,25 +39,22 @@ make stn
 
 - This command includes the following steps:
     - download high-water marks from USGS STN Flood Event Data Portal in JSON format and convert it into a Pandas DataFrame;
-    - execute necessary preprocessing steps and save the modified dataset. 
+    - execute necessary preprocessing steps and save the modified dataset as **df_stn_mod.csv**. 
 
 #### High-water levels from real-time gauge data
-The real-time water levels of gauges from [USGS National Water Information System](https://waterdata.usgs.gov/nwis) provide an additional source for flood events. While the primary dataset for flood events is the STN flood event data, this dataset is included to collect additional Sentinel-2 imagery during flood events. Also, the flood event observations from this dataset provide a means to cross-reference the STN flood event data, providing a more comprehensive analysis. 
+[USGS National Water Information System](https://waterdata.usgs.gov/nwis) is another source for flood event data by extracting real-time gauge water levels above the moderate flood stage. allows users to extract provide an additional source for flood events. While the primary dataset for flood events is the STN flood event data, this dataset is included to collect additional Sentinel-2 imagery during flood events. Also, the flood event observations from this dataset provide a means to cross-reference the STN flood event data, providing a more comprehensive analysis. 
 
 In this project,  when the water level of a gauge is above the moderate flood stage, it's considered as a flood event observation. To collect and preprocess gauge water levels above the [moderate flood stage](https://www.weather.gov/aprfc/terminology#:~:text=Moderate%20Flooding), use the following command (estimated runtime: 30-40 minutes):
 ```
 make gauge
 ```
 
-- Collecting gauge water levels above the moderate flood stage includes three steps:
-    - collect NWSLI identifiers and descriptions for the gauges from NOAA.
-    - identify the corresponding usgsid for each gauge and gather flood-related information, including flood stage thresholds and flood impacts.
-    - collect real-time water levels using usgsid and compare them against the flood stage thresholds to identify observations where levels exceed the moderate flood stage.
-- The date range for collecting water level is from 2017-03-28 (start of Sentinel-2 Level-2A imagery availability) to 2024-05-23 (initial data collection date)
-- For clarity, the dataset detailing gauge water levels above the moderate flood stage is referred to as the "high-water level" dataset.
-- The high-water level dataset includes 218 observations and 9 attributes.
+- This command includes the following steps:
+    - collect real-time gauge water levels above the moderate flood stage;
+    - execute necessary preprocessing steps and save the modified dataset as **df_gauge_mod.csv**.
 
-The ready-to-use datasets are available [here](https://drive.google.com/drive/folders/1QHi26bRnB58R46VIkkpXLiby3xe0nm_W?usp=sharing). 
+**Note**:
+- For simplicity, the dataset detailing gauge water levels above the moderate flood stage is referred to as the "high-water level" dataset.
 
 ### Step 2: Analyze and prepare the collected flood event data
 After collecting STN high-water mark data and gauge high-water level data, an analysis is conducted to:
@@ -161,5 +158,13 @@ make evaluation
 - Improve Report.md (flood event/image/kmeans analysis) 
 - Improve KMeans clustering analysis (almost)
 - Debugging (id not assigned correctly)
+
+## Future Work
+This section includes some potential improvements and other relevant resources that can be explored. 
+### STN high-water marks
+- `elev_ft` is one attribute that might be useful when combining with elevation model. However, it's important to remember that some high-water marks with the same location have different `elev_ft` values.
+### Real-time gauge water levels
+- [USGS National Water Information System Surface-Water Data](https://waterdata.usgs.gov/nwis/sw) includes various types of data. There might be a better approach to extract high-water levels which is more efficient and comphrehensive. 
+- USGS has some other valuable flood-related platforms: One called [WaterWatch](https://waterwatch.usgs.gov/?id=ww_flood) and the other called [Flood Inundation Mapper](https://fim.wim.usgs.gov/fim/). Both resources utilizes the flow conditions of streamgages to evaluate flooded areas.
 
 ## Reference

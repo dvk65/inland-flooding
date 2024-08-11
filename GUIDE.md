@@ -8,6 +8,7 @@ This document is a brief guide to help users set up the required environment, ut
     - [Google Earth Engine Setup](#google-earth-engine-setup)
 - [Tools and Platforms](#tools-and-platforms)
 - [Dataset Documentation](#dataset-documentation)
+    - [STN high-water marks](#stn-high-water-marks)
 
 ## Environment Setup
 ### Setting up the environment from the environment.yml
@@ -55,7 +56,7 @@ When running `make s2`, you will receive the following output:
 
 ## Dataset Documentation
 
-### [STN Flood Event Data Portal](https://stn.wim.usgs.gov/STNDataPortal/)
+### [STN high-water marks](https://stn.wim.usgs.gov/STNDataPortal/)
 The USGS Short-Term Network (STN) Flood Event Data Portal includes high-water mark data which is the evidence of a flood event. USGS also provide an interactive website called [Flood Event Viewer](https://stn.wim.usgs.gov/FEV/) to explore the flood events. To understand more about high-water mark and its importance, we can check [High-Water Marks and Flooding](https://www.usgs.gov/special-topics/water-science-school/science/high-water-marks-and-flooding) and [A USGS guide for finding and interpreting high-water marks](https://www.youtube.com/watch?v=uZYRQLMcVOA).
 
 #### Dataset overview
@@ -137,11 +138,51 @@ difference between id 40935 and id 40936:
 hwm_id  40935  40936
 ```
 
-These high-water marks can also be examined from the [visualization on Flood Event Viewer](https://stn.wim.usgs.gov/FEV/#2021Henri), 
+These high-water marks can also be examined from the [visualization on Flood Event Viewer](https://stn.wim.usgs.gov/FEV/#2021Henri):
 <img src="figs/flood_event/hwm_duplicate.png" width="400" alt="high-water mark duplicate">
 
 
-#### 
+### High-water levels from gauges
+High-water levels from gauges are collected and preprocessed using four steps:
+- collect NWSLI identifiers and descriptions for the gauges from NOAA;
+- identify the corresponding usgsid for each gauge and gather flood-related information, including flood stage thresholds and flood impacts;
+- collect real-time water levels using usgsid and compare them against the flood stage thresholds to identify observations where levels exceed the moderate flood stage (2017-03-28 to 2024-05-23);
+- preprocess the collected high-water levels by selecting the specified attributes, assigning the source (gauge), and creating a `event` attribute to group the high-water levels by YYYY-MM.
+
+
+Exemplar:
+1. [ME gauge list](https://hads.ncep.noaa.gov/charts/ME.shtml);
+2. [Flood-related Information - Kennecbec River at Augusta Information with NWSLI ASTM1](https://water.noaa.gov/gauges/ASTM1);
+3. [Water Levels - Kennebec River at Augusta with NWSLI ASTM1 and USGSID 01049320](https://waterdata.usgs.gov/monitoring-location/01049320/#parameterCode=00065&period=P7D&showMedian=false) and constructed [URL to retrieve data between 2017-03-28 and 2018-05-23](https://nwis.waterservices.usgs.gov/nwis/iv/?sites=01049320&parameterCd=00065&startDT=2017-03-28T00:00:00.000-05:00&endDT=2018-05-23T23:59:59.999-04:00&siteStatus=all&format=rdb) (shorter date range for demonstration only).
+
+#### Data overview
+The first dataset `df_gauge_list` represents the gauges (names and nswli identifiers) in the New England Region. This dataset (3 x 515) has 3 attributes:
+```
+gauge list dataset attributes:
+ ['nwsli', 'description', 'state']
+```
+
+The second dataset `df_gauge_info` represents the gauge metadata, specially flood-related information. This dataset (10 x 154) has 10 attributes:
+```
+Guage info dataset attributes:
+ ['usgsid', 'nwsli', 'latitude', 'longitude', 'state', 'county', 'minor', 'moderate', 'major', 'floodimpacts']
+```
+
+The third dataset `df_gauge_raw` represents the real-time water levels above moderate flood stages. This dataset (11 x 218) has 11 attributes:
+```
+gauge high-water levels dataset attributes:
+ ['usgsid', 'event_day', 'tz_cd', 'elev_ft', 'latitude', 'longitude', 'nwsli', 'note', 'state', 'county', 'id']
+```
+
+The last dataset `df_gauge_mod` represents the preprocessed dataset. This dataset (9 x 218) has 9 attributes (7 from the original dataset and 2 created during preprocessing):
+- `id` - a unique identifier for each high-water level (nwsli + index)
+- `event` - the created category of the flood event (YYYY-MM)
+- `event_day` - the date of the high-water level (YYYY-MM-DD)
+- `latitude` and `longitude` - the geographical coordinates of each high-water level
+- `state` and `county` (formerly `stateName` and `countyName`) - the state and county where each high-water level is located
+- `note` - the flood impact of different water level
+- `source`: a newly created label to identify the source of each high-water levels
+
 ### [National Hydrography Dataset](https://www.usgs.gov/national-hydrography)
 The ZIP file for a state's NHD dataset includes the following contents:
 ```

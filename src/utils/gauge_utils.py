@@ -11,6 +11,7 @@ This file can be imported as a module and contains the following functions:
 
 # import libraries
 import re
+import time
 import requests
 import pandas as pd
 from io import StringIO
@@ -87,7 +88,7 @@ def collect_gauge_info(df, filename):
     data_all = []
     progress = None
 
-    for index, row in df.iterrows():
+    for _, row in df.iterrows():
 
         data = {}
         nwsli = row['nwsli']
@@ -141,7 +142,7 @@ def collect_gauge_info(df, filename):
 
     return df
 
-def collect_water_level(df, date_threshold, filename):
+def collect_water_level(df, date_threshold, filename, area):
     """
     Collect and preprocess real-time water level above moderate flood stage value for specified gauges from USGS Water Data Services 
     (e.g., https://waterdata.usgs.gov/monitoring-location/01049320/#parameterCode=00065&period=P7D&showMedian=false)
@@ -154,7 +155,7 @@ def collect_water_level(df, date_threshold, filename):
     Returns:
         pd.DataFrame: A DataFrame representing the instances that the water level is above the moderate flood stage value for the gauges with 'USGIS' ids
     """
-    global_utils.print_func_header('step 3 - download high-water levels')
+    global_utils.print_func_header(f'step 3 - download high-water levels in {area}')
 
     df_water = pd.DataFrame()
     col = ['agency_cd', 'usgsid', 'datetime', 'tz_cd', 'elev_ft', 'note']
@@ -164,6 +165,7 @@ def collect_water_level(df, date_threshold, filename):
     for index, row in df.iterrows():
         threshold = pd.to_numeric(row['moderate'])
         id = row['usgsid']
+
         # construct the URL for data retrieval
         date_threshold
         url = f"https://nwis.waterservices.usgs.gov/nwis/iv/?sites={id}&parameterCd=00065&startDT={date_threshold}T00:00:00.000-05:00&endDT=2024-05-23T23:59:59.999-04:00&siteStatus=all&format=rdb"
@@ -183,8 +185,17 @@ def collect_water_level(df, date_threshold, filename):
             try:
                 df_i.columns = col
                 df_i['elev_ft'] = pd.to_numeric(df_i['elev_ft'], errors='coerce')
-                df_i_filtered = df_i[df_i['elev_ft'] >= threshold]
-                if not df_i.empty:
+                df_i = df_i.dropna(subset=['datetime', 'elev_ft'])
+                df_i['event_day'] = pd.to_datetime(df_i['datetime']).dt.date
+
+                # filter the dataframe to keep only the rows where 'elev_ft' is the maximum for each 'event_day'
+                df_i_filtered = df_i.loc[df_i.groupby('event_day')['elev_ft'].idxmax()]
+
+                # filter the dataframe to keep only the rows where 'elev_ft' is above the threshold
+                df_i_filtered = df_i_filtered[df_i_filtered['elev_ft'] >= threshold]
+
+                # accumulate the results if df_i_filtered is not empty
+                if not df_i_filtered.empty:
                     df_water = pd.concat([df_water, df_i_filtered])
             except ValueError:
                 error.append(id)
@@ -194,26 +205,24 @@ def collect_water_level(df, date_threshold, filename):
         progress = ((index+1) / df_size) * 100
         print(f'complete - high-water level for gauge USGS {id}: {round(progress, 2)}%')
 
-
     # preprocess the water level data
     df = df.rename(columns={'floodimpacts': 'note'})
-    df_raw = pd.merge(df_water[['usgsid', 'datetime', 'tz_cd', 'elev_ft']], df[['usgsid', 'latitude', 'longitude', 'nwsli', 'note', 'state', 'county']], on='usgsid', how='left')
-    df_raw['id'] = df_raw['nwsli'] + '_' + df_raw.index.astype(str) 
-
-    global_utils.describe_df(df_raw, 'gauge high-water levels')
+    df_raw = pd.merge(df_water[['usgsid', 'event_day', 'tz_cd', 'elev_ft']], df[['usgsid', 'latitude', 'longitude', 'nwsli', 'note', 'state', 'county']], on='usgsid', how='left')
 
     # save to a CSV file
     df_raw.to_csv(f'data/df_gauge/{filename}.csv', index=False)
+
+    # sleep for 60 seconds to avoid hitting the server too frequently
+    time.sleep(60)
     return df_raw
 
-def preprocess_water_level(df, attr_list, check_list, filename):
+def preprocess_water_level(df, attr_list, filename):
     """
     Preprocess the collected high water levels above moderate flood stage
     
     Args:
         df (pd.DataFrame): The DataFrame representing the high water levels (above moderate flood stage)
         attr_list (list of str): A list of column names to be selected
-        duplicate_check (list of str): A list of column names to identify duplicate rows
     
     Returns:
         pd.DataFrame: A DataFrame representing the cleaned high water levels above moderate flood stage
@@ -221,12 +230,8 @@ def preprocess_water_level(df, attr_list, check_list, filename):
     print('--------------------------------------------------------------')
     print('Step 4 - Preprocess high water level above moderate flood stage value...\n')
     df_mod = df.copy()
-    df_mod['datetime'] = pd.to_datetime(df_mod['datetime'])
-    df_mod['event_day'] = df_mod['datetime'].dt.strftime('%Y-%m-%d')
-    df_mod['event'] = df_mod['datetime'].dt.to_period('M').astype(str)
-
-    # drop the instances with the same location and event name
-    df_mod = df_mod.drop_duplicates(subset=check_list, keep='first').reset_index(drop=True)
+    df_mod['event_day'] = pd.to_datetime(df_mod['event_day'], errors='coerce')
+    df_mod['event'] = df_mod['event_day'].dt.to_period('M').astype(str)
 
     # select the specified attributes
     df_mod = df_mod[attr_list]

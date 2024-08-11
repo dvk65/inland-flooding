@@ -1,15 +1,15 @@
 # Automated Assessment of Inland flooding from Satellite Observations
 
 This project focus on developing an algorithm for automated assessment of inland flooding from satellite observations. Initially focusing on Maine, the project may be extended to other states with similar flood characteristics. The approach integrates several datasets, including:
-| **Table 1: Introduction to the Datasets** | | | |
+| **Table 1: Introduction to the Datasets** | | | | | |
 |---|---|---|---|
-| **Name** | **Source** | **Explanation** | **Format** |
-| High-water marks | [STN flood event data](https://stn.wim.usgs.gov/STNDataPortal/) | validated flood event observations from United States Geological Survey | CSV |
-| High-water levels | [USGS Water Data Services](https://waterdata.usgs.gov/nwis/rt) | real-time gauge water levels above moderate flood stage | CSV |
-| Sentinel-2 satellite images | [Sentinel-2 Level-2A](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED) | satellite images corresponding to the areas of interest and timeframes defined by high-water marks and levels | GeoTIFF |
-| Cloud and Shadow masks | [s2cloudless](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) | identified cloud and shadow features to be dropped | GeoTIFF |
-| [Normalized Difference Water Index](https://eos.com/make-an-analysis/ndwi/) masks |  | created mask used to identify the water bodies and refine the algorithm's accuracy | GeoTIFF |
-| Flowlines | National Hydrography Dataset | Flowing water data used to enhance analysis and improve algorithm performance | Shapefiles |
+| **Name** | **Source** | **Explanation** | **Format** | **Links** | **Note**|
+| High-water marks | [STN flood event data](https://stn.wim.usgs.gov/STNDataPortal/) | validated flood event observations from United States Geological Survey | CSV | - Guide<br>- Report | |
+| High-water levels | [USGS Water Data Services](https://waterdata.usgs.gov/nwis/rt) | real-time gauge water levels above moderate flood stage | CSV | | |
+| Sentinel-2 satellite images | [Sentinel-2 Level-2A](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED) | satellite images corresponding to the areas of interest and timeframes defined by high-water marks and levels | GeoTIFF | | |
+| Cloud and Shadow masks | [s2cloudless](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) | identified cloud and shadow features to be dropped | GeoTIFF | | |
+| [Normalized Difference Water Index](https://eos.com/make-an-analysis/ndwi/) masks |  | created mask used to identify the water bodies and refine the algorithm's accuracy | GeoTIFF | | |
+| Flowlines | National Hydrography Dataset | Flowing water data used to enhance analysis and improve algorithm performance | Shapefiles | | |
 
 The algorithm aims to automate flood detection by correlating these data sources and applying the K-means clustering algorithm for image segmentation. Additionally, the methodology may be helpful for flood detection using drone measurements.
 

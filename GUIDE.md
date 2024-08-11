@@ -33,28 +33,34 @@ Google Earth Engine has a guide about [setting up Earth Engine enabled Cloud Pro
 
 #### step 1 - create a cloud project
 Create a Google Cloud Project using this [link](https://console.cloud.google.com/projectcreate) or clicking on the link in the official setup guide. 
+
 <img src="/figs/guide/create_project.png" width="550" alt="create a project">
 
 #### step 2 - enable the Earth Engine API
 To enable the Earth Engine API, click on the link (Enable the Earth Engine API) in the offical setup guide or search for Earth Engine API in APIs & Services section. 
+
 <img src="/figs/guide/enable_api.png" width="550" alt="enable api">
 
 To enable this API, setting up the credentials is required. If credentials are not set up, a warning will appear after you click the Enable button. 
+
 <img src="/figs/guide/create_credentials.png" width="550" alt="create credentials">
 
 Clicking on the CREATE CREDENTIALS button, we'll move to the section of creating credentials. 
+
 <img src="/figs/guide/set_credential_type.png" width="550" alt="credential type">
 <img src="/figs/guide/consent_screen.png" width="550" alt="consent screen">
 <img src="/figs/guide/client_id.png" width="550" alt="client id">
 
 #### step 3 - register Earth Engine
 To use Earth Engine, we need to register the project [here](https://code.earthengine.google.com/register). 
+
 <img src="/figs/guide/register_project.png" width="550" alt="get started">
 <img src="/figs/guide/select_use.png" width="550" alt="select use">
 <img src="/figs/guide/select_project.png" width="550" alt="select project">
 
 #### step 4 - fetch credentials using gcloud
 When running `make s2`, you will receive the following output:
+
 <img src="/figs/guide/login.png" width="550" alt="login">
 
 1. create a Cloud project named flood-demo:

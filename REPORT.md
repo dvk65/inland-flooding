@@ -72,12 +72,18 @@ Below is the plotted figure after optimization (ndwi as feature and pca).
 Below is the plotted figure after optimization (flowline and ndwi as features and pca).
 ![KMeans clustering after optimization](./figs/kmeans_optimized/44909_20230711_during%20flood_s2_pca_features_i.png)
 
-#### TMVC3_1890
+#### TMVC3_39
 Below is the plotted figure before optimization.
-![KMeans clustering before optimization](./figs/kmeans_default/TMVC3_1890_20230711_during%20flood_s2_default.png)
+![KMeans clustering before optimization](./figs/kmeans_default/TMVC3_39_20230711_during%20flood_s2_default.png)
 
 Below is the plotted figure after optimization (pca).
-![KMeans clustering after optimization](./figs/kmeans_optimized/TMVC3_1890_20230711_during%20flood_s2_pca_i.png)
+![KMeans clustering after optimization](./figs/kmeans_optimized/TMVC3_39_20230711_during%20flood_s2_pca_i.png)
+
+Below is the plotted figure after optimization (flowline as feature and pca). 
+![KMeans clustering after optimization](./figs/kmeans_optimized/TMVC3_39_20230711_during%20flood_s2_pca_flowline_i.png)
 
 Below is the plotted figure after optimization (ndwi as feature and pca). 
-![KMeans clustering after optimization](./figs/kmeans_optimized/TMVC3_1890_20230711_during%20flood_s2_pca_features_i.png)
+![KMeans clustering after optimization](./figs/kmeans_optimized/TMVC3_39_20230711_during%20flood_s2_pca_ndwi_i.png)
+
+Below is the plotted figure after optimization (ndwi and flowline as feature and pca). 
+![KMeans clustering after optimization](./figs/kmeans_optimized/TMVC3_39_20230711_during%20flood_s2_pca_features_i.png)

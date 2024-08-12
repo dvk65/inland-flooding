@@ -35,16 +35,22 @@ The approach integrates the datasets described in Table 1 below:
 | **Note** | No exact dates are assigned to the flood events. Therefore, to collect and distinguish the satellite imagery before/during/after flood events, I explored online reports to define the dates. This process will be included in [GUIDE](GUIDE.md). | High-water levels depends on the moderate flood stage threshold which can be adjusted. |
 | **Analysis** | In Vermont, the 2023 July MA NY VT Flood event has the highest number of data points. Many of these points are clustered close to each other, with minimal overlap between STN and gauge data. | In Connecticut, there are fewer data points. STN data points are primarily located along the coast, while gauge data points are concentrated near the river. There is no overlap between the STN and gauge data. |
 
-### National Hydrography Dataset and NDWI 
+### Sentinel-2 true color imagery, cloud masks, and NDWI masks corresponding to the flood event data
+| **Table 3: Sentinel-2 and Masks Data Summary** | **Description** | **Result** |
+|---|---|---|
+| **collected image dataset** | 1107 flood event observations are used to collect Sentinel-2 imagery. After removing invalid observations and Sentinel-2 images, **379** images with their cloud masks and NDWI masks are collected. | <img src="figs/s2_ready/44909_s2_ready.png" width="500" alt="44909 s2"> |
+| **filtered image dataset** | After necessary [filtering steps](README.md#step-4-analyze-and-preprocess-sentinel-2-true-color-imagery-cloud-masks-and-ndwi-masks), the dataset has **102** images | \ |
+| **images with during flood lable** | Labels are assigned to each image based on the comparison between image date and event data. The number of images collected during flood is 25. | '44909', '44911', '44929', '44992', '45015', '45067', '45141', '45142', '45160', '45206', '45237', '45257', '45288', '45310', '45319', '45321', '45358', '45359', '45423', '45427', '45501', 'CLMM3_97', 'GAYC3_20', 'MNTM3_114', 'TMVC3_39' |
+| **vis on map** | A map visualization is applied to show the location of images | <img src="figs/map/map_VT_sentinel2.png" width="500" alt="s2 map"> |
+
+### National Hydrography Dataset and NDWI threshold
 To enhance the analysis of Sentinel-2 images and help improve the performance on KMeans clustering algorithms, the flowlines from National Hydrography Dataset are collected. The command `make nhd` plots the flowlines on the filtered Sentinel-2 image dataset (25 images during flood events). Below is an example of plotting the NHD flowline on top of one Sentinel-2 image.
-#### 44909
-![NHD over S2](./figs/s2_all_masks/44909_20230711T153821_20230711T154201_T18TXP_VIS_all_masks.png)
+| **Table 4: Flowline Summary** | **Figures** | **Description** |
+|---|---|---|
+| **44909** | <img src="figs/s2_nhd/44909_s2_nhd.png" width="500" alt="s2 nhd"> | Major river |
+| **44909 full** | <img src="figs/nhd_full_test.png" width="500" alt="s2 full"> | All |
 
-#### TMVC3_1890
-![NHD over S2](./figs/s2_all_masks/TMVC3_1890_20230711T153821_20230711T154201_T18TXM_VIS_all_masks.png)
-- In this figure, the added flowlines help distinguish the flooded area, especially in the regions where the land cover is similar to the flood-affected areas. 
-
-#### NDWI threshold testing on 44909
+Also, NDWI threshold is selected by comparing the results of different threshold. Below is an example on 44909.
 ![Test NDWI threshold](./figs/s2_ndwi/44909_20230711T153821_20230711T154201_T18TXP_NDWI_test.png)
 
 ### Satellite Imagery Data (Sentinel 2)
@@ -57,7 +63,13 @@ Below is the plotted figure before optimization.
 Below is the plotted figure after optimization (pca).
 ![KMeans clustering after optimization](./figs/kmeans_optimized/44909_20230711_during%20flood_s2_pca_i.png)
 
+Below is the plotted figure after optimization (flowline as feature and pca).
+![KMeans clustering after optimization](./figs/kmeans_optimized/44909_20230711_during%20flood_s2_pca_flowline_i.png)
+
 Below is the plotted figure after optimization (ndwi as feature and pca). 
+![KMeans clustering after optimization](./figs/kmeans_optimized/44909_20230711_during%20flood_s2_pca_ndwi_i.png)
+
+Below is the plotted figure after optimization (flowline and ndwi as features and pca).
 ![KMeans clustering after optimization](./figs/kmeans_optimized/44909_20230711_during%20flood_s2_pca_features_i.png)
 
 #### TMVC3_1890

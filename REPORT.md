@@ -90,17 +90,17 @@ Flowlines from NHD is introduced to help identify the flooded areas and enhance 
 Below is the result of 44909
 | \ | **True Color**| **Result** |
 |---|---|---|
-| **Default** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/44909_20230711_default.png"> |
-| **PCA** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/44909_20230711_pca_i.png"> |
-| **PCA with flowline** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/44909_20230711_pca_flowline_i.png"> |
-| **PCA with NDWI** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/44909_20230711_pca_ndwi_i.png"> |
-| **PCA with flowline and NDWI** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/44909_20230711_pca_features_i.png"> |
+| **Default** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/44909_20230711_default.png"> |
+| **PCA** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/44909_20230711_pca_i.png"> |
+| **PCA with flowline** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/44909_20230711_pca_flowline_i.png"> |
+| **PCA with NDWI** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/44909_20230711_pca_ndwi_i.png"> |
+| **PCA with flowline and NDWI** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/44909_20230711_pca_features_i.png"> |
 
 Below is the result of 45358
 | \ | **True Color**| **Result** |
 |---|---|---|
-| **Default** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/45358_20230711_default.png"> |
-| **PCA** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_i.png"> |
-| **PCA with flowline** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_flowline_i.png"> |
-| **PCA with NDWI** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_ndwi_i.png"> |
-| **PCA with flowline and NDWI** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_features_i.png"> |
+| **Default** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/45358_20230711_default.png"> |
+| **PCA** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_i.png"> |
+| **PCA with flowline** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_flowline_i.png"> |
+| **PCA with NDWI** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_ndwi_i.png"> |
+| **PCA with flowline and NDWI** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_features_i.png"> |

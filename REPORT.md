@@ -67,16 +67,16 @@ When downloading Sentinel-2 images, [s2cloudless](https://developers.google.com/
 Below is a table showing the cloud masks.
 | \ | **True Color** | **Cloud Mask** |
 |---|---|---|
-| **44909** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png" width="500"> | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_cloud.png" width="500"> |
-| **44929** | <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_s2.png" width="500"> | <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_cloud.png" width="500"> |
+| **44909** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_cloud.png"> |
+| **44929** | <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_s2.png"> | <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_cloud.png"> |
 
 
 Also, NDWI mask is collected when downloading Sentinel-2 images. After that, the NDWI threshold is selected by comparison. Below is a table showing the threshold selection. The selected threshold is -0.1.
 | \ | **NDWI thresholds**| **True Color** |
 |---|---|---|
-| **44909** | <img src="figs/s2_ndwi/44909_20230711T153821_20230711T154201_T18TXP_NDWI_test.png"> | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png" width="500"> |
-| **44929** | <img src="figs/s2_ndwi/44929_20230711T153821_20230711T154201_T18TXN_NDWI_test.png"> | <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_s2.png" width="500"> |
-| **45358** | <img src="figs/s2_ndwi/45358_20230711T153821_20230711T154201_T18TXP_NDWI_test.png"> | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2.png" width="500"> |
+| **44909** | <img src="figs/s2_ndwi/44909_20230711T153821_20230711T154201_T18TXP_NDWI_test.png"> | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> |
+| **44929** | <img src="figs/s2_ndwi/44929_20230711T153821_20230711T154201_T18TXN_NDWI_test.png"> | <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_s2.png"> |
+| **45358** | <img src="figs/s2_ndwi/45358_20230711T153821_20230711T154201_T18TXP_NDWI_test.png"> | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> |
 
 #### Flowline Masks
 Flowlines from NHD is introduced to help identify the flooded areas and enhance KMeans clustering performance. In this project, the focus is major rivers based on the visual inspection. Therefore, the major rivers are selected from flowlines. However, there might be a better approach to idetify major rivers. 
@@ -86,34 +86,21 @@ Flowlines from NHD is introduced to help identify the flooded areas and enhance 
 | **44909** | <img src="figs/flowline_no_filter.png"> | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> |
 
 ### KMeans Clustering Result
-#### 44909
-Below is the plotted figure before optimization.
-![KMeans clustering before optimization](./figs/kmeans_default/44909_20230711_during%20flood_s2_default.png)
 
-Below is the plotted figure after optimization (pca).
-![KMeans clustering after optimization](./figs/kmeans_optimized/44909_20230711_during%20flood_s2_pca_i.png)
+Below is the result of 44909
+| \ | **True Color**| **Result** |
+|---|---|---|
+| **Default** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/44909_20230711_default.png"> |
+| **PCA** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/44909_20230711_pca_i.png"> |
+| **PCA with flowline** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/44909_20230711_pca_flowline_i.png"> |
+| **PCA with NDWI** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/44909_20230711_pca_ndwi_i.png"> |
+| **PCA with flowline and NDWI** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/44909_20230711_pca_features_i.png"> |
 
-Below is the plotted figure after optimization (flowline as feature and pca).
-![KMeans clustering after optimization](./figs/kmeans_optimized/44909_20230711_during%20flood_s2_pca_flowline_i.png)
-
-Below is the plotted figure after optimization (ndwi as feature and pca). 
-![KMeans clustering after optimization](./figs/kmeans_optimized/44909_20230711_during%20flood_s2_pca_ndwi_i.png)
-
-Below is the plotted figure after optimization (flowline and ndwi as features and pca).
-![KMeans clustering after optimization](./figs/kmeans_optimized/44909_20230711_during%20flood_s2_pca_features_i.png)
-
-#### TMVC3_39
-Below is the plotted figure before optimization.
-![KMeans clustering before optimization](./figs/kmeans_default/TMVC3_39_20230711_during%20flood_s2_default.png)
-
-Below is the plotted figure after optimization (pca).
-![KMeans clustering after optimization](./figs/kmeans_optimized/TMVC3_39_20230711_during%20flood_s2_pca_i.png)
-
-Below is the plotted figure after optimization (flowline as feature and pca). 
-![KMeans clustering after optimization](./figs/kmeans_optimized/TMVC3_39_20230711_during%20flood_s2_pca_flowline_i.png)
-
-Below is the plotted figure after optimization (ndwi as feature and pca). 
-![KMeans clustering after optimization](./figs/kmeans_optimized/TMVC3_39_20230711_during%20flood_s2_pca_ndwi_i.png)
-
-Below is the plotted figure after optimization (ndwi and flowline as feature and pca). 
-![KMeans clustering after optimization](./figs/kmeans_optimized/TMVC3_39_20230711_during%20flood_s2_pca_features_i.png)
+Below is the result of 45358
+| \ | **True Color**| **Result** |
+|---|---|---|
+| **Default** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/45358_20230711_default.png"> |
+| **PCA** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_i.png"> |
+| **PCA with flowline** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_flowline_i.png"> |
+| **PCA with NDWI** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/45359_20230711_pca_ndwi_i.png"> |
+| **PCA with flowline and NDWI** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_features_i.png"> |

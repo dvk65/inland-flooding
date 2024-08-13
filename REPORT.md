@@ -16,8 +16,10 @@ The approach integrates the datasets described in the table below:
 
 ## Method
 1. Collect flood event data from two sources: high-water marks available through the USGS STN Flood Event Data Portal and high-water levels extracted from real-time gauge data provided by USGS Water Data Services;
-2. Collect satellite images corresponding to pre-, during-, and post-flood event data;
+2. Collect satellite images corresponding to before-, during-, and after-flood event data;
 3. Apply the K-means clustering technique to identify flooded areas
+<img src="figs/workflow.png" width="800" alt="workflow">
+
 
 ## Result
 

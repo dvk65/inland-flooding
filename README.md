@@ -4,7 +4,7 @@ This project focus on developing an algorithm for automated assessment of inland
 
 While the project initially targeted Maine, it has been expanded to include other states with similar flood characteristics. 
 
-<img src="figs/workflow.png" width="800" alt="s2 nhd">
+<img src="figs/workflow.png" width="800" alt="workflow">
 
 | **Name** | **Source** | **Description** | **Format** | **Links** |
 |---|---|---|---|---|

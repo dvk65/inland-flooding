@@ -100,6 +100,8 @@ This section includes some potential improvements and other relevant resources t
 - USGS has some other valuable flood-related platforms: One called [WaterWatch](https://waterwatch.usgs.gov/?id=ww_flood) and the other called [Flood Inundation Mapper](https://fim.wim.usgs.gov/fim/). Both resources utilizes the flow conditions of streamgages to evaluate flooded areas.
 ### Flowline
 - The current approach includes lakes.
+### KMeans
+- better approach to combine these features
 ### Evaluation
 - 
 

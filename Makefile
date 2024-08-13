@@ -25,7 +25,7 @@ eda_s2:
 
 # run KMeans algorithm
 kmeans:
-	mkdir -p figs/kmeans_optimizing figs/kmeans_clusters
+	mkdir -p figs/kmeans_optimizing figs/kmeans_default figs/kmeans_pca figs/kmeans_ndwi_pca figs/kmeans_flowline_pca figs/kmeans_features_pca
 	python -B src/kmeans.py
 
 # run experiment (currently code used to explore the flowline features)

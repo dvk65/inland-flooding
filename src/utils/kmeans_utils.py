@@ -237,7 +237,7 @@ def identify_flood_cluster(unique_labels, clustered_image, ndwi_mask_flat):
             flood_cluster = cluster
     return flood_cluster
 
-def kmeans_clustering_default(df, init, n_clusters):
+def kmeans_clustering_default(df, init, n_clusters, condition):
     """
     Perform KMeans clustering on the image datasets.
 
@@ -268,7 +268,7 @@ def kmeans_clustering_default(df, init, n_clusters):
         flood_cluster_list.append(flood_cluster)
 
         filename = f"{row['id']}_{row['date']}_default"
-        plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, n_clusters, filename)
+        plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, n_clusters, filename, condition)
         print(f"complete - KMeans clustering on {row['filename']}")
 
     # print the first row
@@ -283,7 +283,7 @@ def kmeans_clustering_default(df, init, n_clusters):
 
     return result_df
 
-def kmeans_optimization_individual_pca(df, init, check=False):
+def kmeans_optimization_individual_pca(df, init, condition, check=False):
     global_utils.print_func_header('optimize image individually with pca')
     df_mod = df.copy()
     pca_n_components_list = []
@@ -340,7 +340,7 @@ def kmeans_optimization_individual_pca(df, init, check=False):
         flood_cluster_list.append(flood_cluster)
 
         filename = f"{row['id']}_{row['date']}_pca_i"
-        plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, optimal_clusters, filename)
+        plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, optimal_clusters, filename, condition)
         if check:
             plot_evaluation_metrics(explained_variance, cluster_list, inertia_result, filename)
 
@@ -380,11 +380,11 @@ def kmeans_optimization_individual_pca_features(df, init, condition, check=False
         ndwi_mask_flat = ndwi_mask.flatten()[valid_pixels]
         flowline_mask_flat = flowline_mask.flatten()[valid_pixels]
 
-        if condition == 'pca_flowline':
+        if condition == 'flowline_pca':
             non_image_features = flowline_mask_flat.reshape(-1, 1)
-        elif condition == 'pca_ndwi':
+        elif condition == 'ndwi_pca':
             non_image_features = ndwi_mask_flat.reshape(-1, 1)
-        elif condition == 'pca_features':
+        elif condition == 'features_pca':
             non_image_features = np.column_stack([ndwi_mask_flat, flowline_mask_flat])
 
         scaler = StandardScaler()
@@ -433,7 +433,7 @@ def kmeans_optimization_individual_pca_features(df, init, condition, check=False
 
         # add necessary plot
         filename = f"{row['id']}_{row['date']}_{condition}_i"
-        plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, optimal_clusters, filename)
+        plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, optimal_clusters, filename, condition)
         if check:
             plot_evaluation_metrics(explained_variance, cluster_list, inertia_result, filename)
 
@@ -452,7 +452,7 @@ def kmeans_optimization_individual_pca_features(df, init, condition, check=False
 
     return result_df
 
-def plot_clustered_result(cluster_image, valid_pixels, original_shape, n_clusters, file):
+def plot_clustered_result(cluster_image, valid_pixels, original_shape, n_clusters, file, dir_ending):
     name = file.split('/')[-1]
     _, height, width = original_shape
     full_image = np.full(height * width, -1)
@@ -464,7 +464,7 @@ def plot_clustered_result(cluster_image, valid_pixels, original_shape, n_cluster
     cmap_clustered.set_bad(color='gray')
 
     full_image_masked = np.ma.masked_where(full_image == -1, full_image)
-    fig, axes = plt.subplots(1, n_clusters + 1, figsize=(4 * (n_clusters + 1), 10))
+    fig, axes = plt.subplots(1, n_clusters + 1, figsize=(4 * (n_clusters + 1), 5))
     fig.suptitle(f'KMeans result - {name}')
     
     axes[0].set_title(f'Clustered Image')
@@ -484,7 +484,7 @@ def plot_clustered_result(cluster_image, valid_pixels, original_shape, n_cluster
         axes[j + 1].axis('off')
     
     plt.tight_layout()
-    plt.savefig(f'figs/kmeans_clusters/{file}.png')
+    plt.savefig(f'figs/kmeans_{dir_ending}/{file}.png')
     plt.close()
 
 def plot_evaluation_metrics(explained_variance, cluster_list, inertia_result, file):

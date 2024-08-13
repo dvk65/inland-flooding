@@ -73,7 +73,7 @@ Below is a table showing the cloud masks.
 
 Also, NDWI mask is collected when downloading Sentinel-2 images. After that, the NDWI threshold is selected by comparison. Below is a table showing the threshold selection. The selected threshold is -0.1.
 | \ | **NDWI thresholds**| **True Color** |
-|---|---|
+|---|---|---|
 | **44909** | <img src="figs/s2_ndwi/44909_20230711T153821_20230711T154201_T18TXP_NDWI_test.png"> | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png" width="500"> |
 | **44929** | <img src="figs/s2_ndwi/44929_20230711T153821_20230711T154201_T18TXN_NDWI_test.png"> | <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_s2.png" width="500"> |
 | **45358** | <img src="figs/s2_ndwi/45358_20230711T153821_20230711T154201_T18TXP_NDWI_test.png"> | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2.png" width="500"> |

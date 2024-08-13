@@ -24,16 +24,23 @@ The approach integrates the datasets described in the table below:
 ## Result
 
 ### Flood Event Data
-| **Table 2: Flood Event Data Summary** | | |
-|---|---|---|
+Firstly, we can check the floood event data summary table below:
 | \ | **High-water marks** | **High-water levels** |
+|---|---|---|
 | **overview** | 889 observations | 218 observations |
-| **top 3 counts by event** | 2023 July MA NY VT Flood 641<br>2018 March Extratropical Cyclone 115<br>2018 January Extratropical Cyclone 81| 2023-12 64<br>2023-07 27<br>2024-01 18 |
-| **top 3 counts by state** | VT 646<br>MA 282<br>CT 72 | CT 57<br>VT 56<br>ME 40 |
+| **top 3 counts by event** | 2023 July MA NY VT Flood (641)<br>2018 March Extratropical Cyclone (115)<br>2018 January Extratropical Cyclone (81)| 2023-12 (64)<br>2023-07 (27)<br>2024-01 (18) |
+| **top 3 counts by state** | VT (646)<br>MA (282)<br>CT (72) | CT (57)<br>VT (56)<br>ME (40) |
 | **countplot** | <img src="figs/countplot/countplot_stn.png" width="500" alt="STN Flood Event Distribution">| <img src="figs/countplot/countplot_gauge.png" width="500" alt="Gauge Flood Event Distribution"> |
-| **map based on top 3 by state** | <img src="figs/map/map_VT_stn_gauge.png" width="500" alt="VT Flood Event Distribution"> | <img src="figs/map/map_CT_stn_gauge.png" width="500" alt="CT Flood Event Distribution"> |
-| **Note** | No exact dates are assigned to the flood events. Therefore, to collect and distinguish the satellite imagery before/during/after flood events, I explored online reports to define the dates. This process will be included in [GUIDE](GUIDE.md). | High-water levels depends on the moderate flood stage threshold which can be adjusted. |
-| **Analysis** | In Vermont, the 2023 July MA NY VT Flood event has the highest number of data points. Many of these points are clustered close to each other, with minimal overlap between STN and gauge data. | In Connecticut, there are fewer data points. STN data points are primarily located along the coast, while gauge data points are concentrated near the river. There is no overlap between the STN and gauge data. |
+| **map based on top 1 by state** | <img src="figs/map/map_VT_stn_gauge.png" width="500" alt="VT Flood Event Distribution"> | <img src="figs/map/map_CT_stn_gauge.png" width="500" alt="CT Flood Event Distribution"> |
+
+**Discussion**
+- In Vermont, the 2023 July MA NY VT Flood event has the highest number of data points. Many of these points are clustered close to each other, with minimal overlap between STN and gauge data;
+- In Connecticut, there are fewer data points. STN data points are primarily located along the coast, while gauge data points are concentrated near the river. There is no overlap between the STN and gauge data.
+
+**Note**
+- No exact dates are assigned to the flood events. Therefore, to collect and distinguish the satellite imagery before/during/after flood events, I explored online reports to define the dates. This process will be included in [GUIDE](GUIDE.md);
+- High-water levels depends on the moderate flood stage threshold which can be adjusted.
+- (map color similarity)
 
 ### Sentinel-2 true color imagery, cloud masks, and NDWI masks corresponding to the flood event data
 | **Table 3: Sentinel-2 and Masks Data Summary** | **Description** | **Result** |

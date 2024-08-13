@@ -21,7 +21,7 @@ The approach integrates the datasets described in the table below:
 <img src="figs/workflow.png" width="800" alt="workflow">
 
 
-## Result
+## Result and Discussion
 
 ### Flood Event Data
 Firstly, we can check the flood event data summary table below:
@@ -43,12 +43,23 @@ Firstly, we can check the flood event data summary table below:
 - (map color similarity)
 
 ### Sentinel-2 True Color Imagery, Cloud Masks, NDWI Masks, and Flowline Masks
-| \ | **Description** | **Result** | **Discussion** |
-|---|---|---|---|
-| **True Color Imagery** | 1107 flood event observations are used to collect Sentinel-2 imagery. After removing invalid observations and Sentinel-2 images, **379** images with their cloud masks and NDWI masks are collected. After filtering steps, the dataset has **102** images. | <img src="figs/s2_ready/44909_s2_ready.png" width="500" alt="44909 s2"> | TODO |
-| **Cloud Mask** | TODO | TODO | TODO |
-| **NDWI Mask** | NDWI mask is TODO | TODO | TODO |
-| **Flowline Mask** | Flowlines are all flowing waters. To avoid adding noise to the algorithm, selecting the appropriate features from flowlines is necessary. Flowlines include `ftype`, `fcode`, `gnis_name`, and `lengthkm` that can be used to remove noise. | <img src="figs/flowline_no_filter.png" width="500" alt="bad flowline"> <img src="figs/s2/44909_20230706T153819_20230706T155055_T18TXP_VIS_s2_flowline.png" width="500" alt="better flowline"> | The top figure on the left is the flowline without filter. The bottom figure on the left is the flowline with specified restriction. |
+The filtered dataset consists of 102 Sentinel-2 True Color images, each paired with corresponding masks for clouds, shadows, NDWI, and flowlines. 
+
+* [True Color](https://custom-scripts.sentinel-hub.com/custom-scripts/sentinel-2/composites/) - band combination of red (B04), green (B03), and blue (B02)
+
+#### Sentinel-2 True Color Imagery
+Initially, the downloaded images with their masks (CLOUD AND NDWI) are **379** images from 17 different flood events using 1107 flood event observations. However, after plotting the images of the first 5 observations from these flood events, some of the images are not ideal (reason to be added). After the examination, 2023-07 is selected as the flood event used for analysis and kmeans clustering. 
+
+The ideal Sentinel-2 True Color image dataset includes **102** images, **25** of them are collected during flood events. After exploring the images, **10** of them shows notable flooded area using visual inspection. Their ids are 44909, 44929, 45067, 45237, 45321, 45358, 45427, 45501, MNTM3_114, TMVC3_39. 
+
+Below is a table showing some of the collected images.
+| \ | **Figure** |
+|---|---|---|
+| **44909** | <img src="figs/s2_ready/44909_s2_ready.png" width="500"> |
+| **44929** | <img src="figs/s2_ready/44929_s2_ready.png" width="500">|
+| **45358** | <img src="figs/s2_ready/45358_s2_ready.png" width="500"> |
+| **TMVC3_39** | <img src="figs/s2_ready/TMVC3_39_s2_ready.png" width="500"> |
+| **Some of removed ids and images** | <img src="figs/s2_selected/CLMM3_97_s2_selected.png" width="500"> <img src="figs/s2_vis_inspect/AUBM1_59_s2.png" width="500">|
 
 ### Satellite Imagery Data (Sentinel 2) - TODO
 In this section, I added the results for two flood event observations.

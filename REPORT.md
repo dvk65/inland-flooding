@@ -55,11 +55,11 @@ The refined dataset of ideal Sentinel-2 True Color images comprises 102 images, 
 Below is a table showing some of the collected images.
 | \ | **Figure** | **Note** |
 |---|---|---|
-| **44909** | <img src="figs/s2_ready/44909_s2_ready.png" width="500"> | from STN high-water marks |
-| **44929** | <img src="figs/s2_ready/44929_s2_ready.png" width="500">| from STN high-water marks |
-| **45358** | <img src="figs/s2_ready/45358_s2_ready.png" width="500"> | from STN high-water marks |
-| **TMVC3_39** | <img src="figs/s2_ready/TMVC3_39_s2_ready.png" width="500"> | from Gauge high-water levels |
-| **Some of removed ids and images** | <img src="figs/s2_selected/CLMM3_97_s2_selected.png" width="500"> <img src="figs/s2_vis_inspect/AUBM1_59_s2.png" width="500">| In the top image set, The image with date 20230706 is dropped due to the cloud cover. In the bottom image set, even though the river is brown. The color similarity indicates that it's not an ideal image for this project. |
+| **44909** | <img src="figs/s2_ready/44909_s2_ready.png"> | from STN high-water marks |
+| **44929** | <img src="figs/s2_ready/44929_s2_ready.png">| from STN high-water marks |
+| **45358** | <img src="figs/s2_ready/45358_s2_ready.png"> | from STN high-water marks |
+| **TMVC3_39** | <img src="figs/s2_ready/TMVC3_39_s2_ready.png"> | from Gauge high-water levels |
+| **Some of removed ids and images** | <img src="figs/s2_selected/CLMM3_97_s2_selected.png"> <img src="figs/s2_vis_inspect/AUBM1_59_s2.png">| In the top image set, The image with date 20230706 is dropped due to the cloud cover. In the bottom image set, even though the river is brown. The color similarity indicates that it's not an ideal image for this project. |
 
 ####  Cloud Masks and NDWI Masks (from Earth Engine)
 When downloading Sentinel-2 images, [s2cloudless](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) is utilized to extract the cloud and shadow mask. This step is included to drop the cloud and shadow pixels in Kmeans clustering algorithm. The cloud masked created using the s2cloudless algorithm can be affected by high reflectance which is demonstrated below.
@@ -68,13 +68,15 @@ Below is a table showing the cloud masks.
 | \ | **True Color** | **Cloud Mask** |
 |---|---|---|
 | **44909** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png" width="500"> | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_cloud.png" width="500"> |
-| **44929** | <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_s2.png" width="500">| <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_cloud.png" width="500"> |
+| **44929** | <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_s2.png" width="500"> | <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_cloud.png" width="500"> |
+
 
 Also, NDWI mask is collected when downloading Sentinel-2 images. After that, the NDWI threshold is selected by comparison. Below is a table showing the threshold selection. The selected threshold is -0.1.
-| \ | **NDWI thresholds**| 
+| \ | **NDWI thresholds**| **True Color** |
 |---|---|
-| **44909** | <img src="figs/s2_ndwi/44909_20230711T153821_20230711T154201_T18TXP_NDWI_test.png"> |
-| **44929** | <img src="figs/s2_ndwi/44929_20230711T153821_20230711T154201_T18TXN_NDWI_test.png"> |
+| **44909** | <img src="figs/s2_ndwi/44909_20230711T153821_20230711T154201_T18TXP_NDWI_test.png"> | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png" width="500"> |
+| **44929** | <img src="figs/s2_ndwi/44929_20230711T153821_20230711T154201_T18TXN_NDWI_test.png"> | <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_s2.png" width="500"> |
+| **45358** | <img src="figs/s2_ndwi/45358_20230711T153821_20230711T154201_T18TXP_NDWI_test.png"> | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2.png" width="500"> |
 
 #### Flowline Masks
 Flowlines from NHD is introduced to help identify the flooded areas and enhance KMeans clustering performance. In this project, the focus is major rivers based on the visual inspection. Therefore, the major rivers are selected from flowlines. However, there might be a better approach to idetify major rivers. 

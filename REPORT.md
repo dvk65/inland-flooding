@@ -54,7 +54,7 @@ The ideal Sentinel-2 True Color image dataset includes **102** images, **25** of
 
 Below is a table showing some of the collected images.
 | \ | **Figure** |
-|---|---|---|
+|---|---|
 | **44909** | <img src="figs/s2_ready/44909_s2_ready.png" width="500"> |
 | **44929** | <img src="figs/s2_ready/44929_s2_ready.png" width="500">|
 | **45358** | <img src="figs/s2_ready/45358_s2_ready.png" width="500"> |

@@ -56,7 +56,6 @@ Below is a table showing some of the collected images.
 | \ | **Figure** | **Note** |
 |---|---|---|
 | **44909** | <img src="figs/s2_ready/44909_s2_ready.png"> | from STN high-water marks |
-| **44929** | <img src="figs/s2_ready/44929_s2_ready.png">| from STN high-water marks |
 | **45358** | <img src="figs/s2_ready/45358_s2_ready.png"> | from STN high-water marks |
 | **TMVC3_39** | <img src="figs/s2_ready/TMVC3_39_s2_ready.png"> | from Gauge high-water levels |
 | **Some of removed ids and images** | <img src="figs/s2_selected/CLMM3_97_s2_selected.png"> <img src="figs/s2_vis_inspect/AUBM1_59_s2.png">| In the top image set, The image with date 20230706 is dropped due to the cloud cover. In the bottom image set, even though the river is brown. The color similarity indicates that it's not an ideal image for this project. |
@@ -68,14 +67,13 @@ Below is a table showing the cloud masks.
 | \ | **True Color** | **Cloud Mask** |
 |---|---|---|
 | **44909** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_cloud.png"> |
-| **44929** | <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_s2.png"> | <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_cloud.png"> |
+| **45358** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_cloud.png"> |
 
 
 Also, NDWI mask is collected when downloading Sentinel-2 images. After that, the NDWI threshold is selected by comparison. Below is a table showing the threshold selection. The selected threshold is -0.1.
 | \ | **NDWI thresholds**| **True Color** |
 |---|---|---|
 | **44909** | <img src="figs/s2_ndwi/44909_20230711T153821_20230711T154201_T18TXP_NDWI_test.png"> | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> |
-| **44929** | <img src="figs/s2_ndwi/44929_20230711T153821_20230711T154201_T18TXN_NDWI_test.png"> | <img src="figs/s2/44929_20230711T153821_20230711T154201_T18TXN_VIS_s2.png"> |
 | **45358** | <img src="figs/s2_ndwi/45358_20230711T153821_20230711T154201_T18TXP_NDWI_test.png"> | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2.png"> |
 
 #### Flowline Masks

@@ -24,7 +24,7 @@ The approach integrates the datasets described in the table below:
 ## Result
 
 ### Flood Event Data
-Firstly, we can check the floood event data summary table below:
+Firstly, we can check the flood event data summary table below:
 | \ | **High-water marks** | **High-water levels** |
 |---|---|---|
 | **overview** | 889 observations | 218 observations |
@@ -42,23 +42,13 @@ Firstly, we can check the floood event data summary table below:
 - High-water levels depends on the moderate flood stage threshold which can be adjusted.
 - (map color similarity)
 
-### Sentinel-2 true color imagery, cloud masks, and NDWI masks corresponding to the flood event data
-| **Table 3: Sentinel-2 and Masks Data Summary** | **Description** | **Result** |
-|---|---|---|
-| **collected image dataset** | 1107 flood event observations are used to collect Sentinel-2 imagery. After removing invalid observations and Sentinel-2 images, **379** images with their cloud masks and NDWI masks are collected. | <img src="figs/s2_ready/44909_s2_ready.png" width="500" alt="44909 s2"> |
-| **filtered image dataset** | After necessary [filtering steps](README.md#step-4-analyze-and-preprocess-sentinel-2-true-color-imagery-cloud-masks-and-ndwi-masks), the dataset has **102** images | \ |
-| **images with during flood lable** | Labels are assigned to each image based on the comparison between image date and event data. The number of images collected during flood is 25. | '44909', '44911', '44929', '44992', '45015', '45067', '45141', '45142', '45160', '45206', '45237', '45257', '45288', '45310', '45319', '45321', '45358', '45359', '45423', '45427', '45501', 'CLMM3_97', 'GAYC3_20', 'MNTM3_114', 'TMVC3_39' |
-| **vis on map** | A map visualization is applied to show the location of images | <img src="figs/map/map_VT_sentinel2.png" width="500" alt="s2 map"> |
-
-### National Hydrography Dataset and NDWI threshold
-To enhance the analysis of Sentinel-2 images and help improve the performance on KMeans clustering algorithms, the flowlines from National Hydrography Dataset are collected. The command `make nhd` plots the flowlines on the filtered Sentinel-2 image dataset (25 images during flood events). Below is an example of plotting the NHD flowline on top of one Sentinel-2 image.
-| **Table 4: Flowline Summary** | **Figures** | **Description** |
-|---|---|---|
-| **44909** | <img src="figs/s2_nhd/44909_s2_nhd.png" width="500" alt="s2 nhd"> | Major river |
-| **44909 full** | <img src="figs/nhd_full_test.png" width="500" alt="s2 full"> | All |
-
-Also, NDWI threshold is selected by comparing the results of different threshold. Below is an example on 44909.
-![Test NDWI threshold](./figs/s2_ndwi/44909_20230711T153821_20230711T154201_T18TXP_NDWI_test.png)
+### Sentinel-2 True Color Imagery, Cloud Masks, NDWI Masks, and Flowline Masks
+| \ | **Definition** | **Result** | **Example** |
+|---|---|---|---|
+| **True Color Imagery** | 1107 flood event observations are used to collect Sentinel-2 imagery. After removing invalid observations and Sentinel-2 images, **379** images with their cloud masks and NDWI masks are collected. After filtering steps, the dataset has **102** images. | <img src="figs/s2_ready/44909_s2_ready.png" width="500" alt="44909 s2"> | |
+| **Cloud Mask** | After necessary [filtering steps](README.md#step-4-analyze-and-preprocess-sentinel-2-true-color-imagery-cloud-masks-and-ndwi-masks), the dataset has **102** images | \ | |
+| **NDWI Mask** | Labels are assigned to each image based on the comparison between image date and event data. The number of images collected during flood is 25. | '44909', '44911', '44929', '44992', '45015', '45067', '45141', '45142', '45160', '45206', '45237', '45257', '45288', '45310', '45319', '45321', '45358', '45359', '45423', '45427', '45501', 'CLMM3_97', 'GAYC3_20', 'MNTM3_114', 'TMVC3_39' | |
+| **Flowline Mask** | Flowlines are all flowing waters. | To avoid adding noise to the algorithm, selecting the appropriate features from flowlines is necessary. | <img src="figs/flowline_no_filter.png" width="500" alt="bad flowline"> <img src="figs/s2/44909_20230706T153819_20230706T155055_T18TXP_VIS_s2_flowline.png" width="500" alt="better flowline"> |
 
 ### Satellite Imagery Data (Sentinel 2)
 In this section, I added the results for two flood event observations.

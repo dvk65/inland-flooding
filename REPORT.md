@@ -100,7 +100,14 @@ Below is the result of 45358
 | \ | **True Color**| **Result** |
 |---|---|---|
 | **Default** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/45358_20230711_default.png"> |
-| **PCA** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_i.png"> |
+| **PCA** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_i.png"> |
 | **PCA with flowline** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_flowline_i.png"> |
 | **PCA with NDWI** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_ndwi_i.png"> |
 | **PCA with flowline and NDWI** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_s2_flowline.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_features_i.png"> |
+
+### Comparison between Target Cluster (Flooded Area) and NDWI
+
+| \ | **NDWI**| **Best Cluster** | **Pixels** |
+|---|---|---|---|
+| **44909** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_ndwi.png"> | <img src="figs/kmeans_clusters/44909_20230711_pca_ndwi_i.png"> | NDWI: 37389<br>Target Cluster: 36039 |
+| **45358** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_ndwi.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_ndwi_i.png"> | NDWI: 36823<br>Target Cluster: 36715 |

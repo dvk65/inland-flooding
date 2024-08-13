@@ -17,16 +17,18 @@ This file can be imported as a module and contains the following functions:
 # import libraries
 import os
 import re
+import requests
+import zipfile
 import rasterio
 import pandas as pd
 import numpy as np
-from rasterio.plot import show
+import geopandas as gpd
+
 import matplotlib.pyplot as plt
-from utils import global_utils
+from utils import global_utils, kmeans_utils
 from datetime import datetime, timedelta
 from pyproj import Transformer
-
-
+from rasterio.plot import show
 
 flood_event_periods = global_utils.flood_event_periods
 
@@ -141,7 +143,7 @@ def assign_period_label(row, day_adjust_dict):
     """
     date = datetime.strptime(row['date'], '%Y%m%d')
     source = row['source']
-    start_adjust, end_adjust = day_adjust_dict.get(source, (0, 0))
+    start_adjust, end_adjust = day_adjust_dict[source]
 
     # category 'gauge'
     if source == 'gauge':
@@ -186,42 +188,8 @@ def add_metadata_flood_event(flood_event, s2, attr_list, day_adjust_dict):
     df_s2_mod['period'] = df_s2_mod.apply(assign_period_label, axis=1, day_adjust_dict=day_adjust_dict)
     global_utils.describe_df(df_s2_mod, 'image with metadata')
 
+    df_s2_mod.to_csv('data/df_s2/df_s2_mod.csv', index=False)
     return df_s2_mod
-
-def check_during_period_label(i):
-    """
-    Check if any image is labeled as 'during flood'
-
-    Args:
-        i (pd.Series): A Series representing a group of observations to be checked
-
-    Returns:
-        bool: True if any observation within the group has a period label of during flood; otherwise, False    
-    """
-    return (i['period'] == 'during flood').any()
-
-def filter_df_s2(df):
-    '''
-    Filter the image dataframe by:
-        * dropping duplicate combinations of 'id' and 'date' (overlapping coverage of Sentinel-2 tiles - example: )
-        * dropping events without any 'during flood' period label
-
-    Args:
-        df (pd.DataFrame): The specified DataFrame to be filtered
-
-    Returns:
-        pd.DataFrame: The filtered dataset
-    '''
-    global_utils.print_func_header('filter the image dataframe')
-    df_mod = df.copy()
-    df_mod = df_mod.drop_duplicates(subset=['id', 'date'])
-    df_mod = df_mod.groupby('event').filter(check_during_period_label)
-    global_utils.describe_df(df_mod, 'image with metadata (filtered)')
-
-    df_mod.to_csv('data/df_s2/df_s2_mod.csv', index=False)
-
-    print('flood events possibly with Sentinel-2 imagery during flood:\n', df_mod['event'].unique())
-    return df_mod
 
 def plot_s2(df):
     """
@@ -281,6 +249,7 @@ def select_s2(df, event_selection, cloud_threshold, date_drop, flood_day_adjust_
     '''
     global_utils.print_func_header('select the ideal event based on plots')
     df_mod = df[df['event'].isin(event_selection)].copy()
+    df_mod = df_mod.drop_duplicates(subset=['id', 'date'])
     df_mod = df_mod.reset_index(drop=True)
     unique_ids = df_mod['id'].unique()
     global_utils.describe_df(df_mod, 'selected image dataset')
@@ -307,28 +276,166 @@ def select_s2(df, event_selection, cloud_threshold, date_drop, flood_day_adjust_
         df_during_flood = df_ready[df_ready['period'] == 'during flood']
         print("\nnumber of images collected during flood:\n", df_during_flood.shape[0])
         print("\nimages collected during flood:\n", df_during_flood['id'].tolist())
-
         print(f'\nplot the ready-to-use images for verification')
         global_utils.plot_helper(unique_ids, df_ready, 's2_ready', 's2_ready')
 
         df_ready.to_csv('data/s2.csv', index=False)
+        return df_ready
+    else:
+        return df_mod
 
-    return df_mod
+def test_ndwi_tif(df, threshold_list):
+    global_utils.print_func_header(f'test ndwi threshold list {threshold_list}')
+    for _, row in df.iterrows():
+        file_path = os.path.join(row['dir_ndwi'], row['filename_ndwi'])
+        cloud_path = os.path.join(row['dir_cloud'], row['filename_cloud'])
+        base_name = os.path.basename(file_path)
+        global_utils.print_func_header(f'explore and define ndwi mask threshold for {base_name}')
+        filename = base_name.replace('_NDWI.tif', '')
+        with rasterio.open(file_path) as src:
+            ndwi_mask = src.read(1)
 
-def test_ndwi_tif(file_path, threshold_list):
-    global_utils.print('explore and define ndwi mask threshold')
-    base_name = os.path.basename(file_path)
-    filename = base_name.replace('_NDWI.tif', '')
-    with rasterio.open(file_path) as src:
-        ndwi_mask = src.read(1)
+        ndwi_mask = global_utils.apply_cloud_mask(ndwi_mask, cloud_path)
 
-    fig, axes = plt.subplots(1, len(threshold_list), figsize=(20, 5))
-    for ax, threshold in zip(axes, threshold_list):
-        binary_water_mask = ndwi_mask > threshold 
-        ax.imshow(binary_water_mask, cmap='gray')
-        ax.set_title(f'Threshold: {threshold}')
-        ax.axis('off')
+        fig, axes = plt.subplots(1, len(threshold_list), figsize=(4 * len(threshold_list), 5))
+        fig.suptitle(f'NDWI threshold exploration for {filename}')
+        for ax, threshold in zip(axes, threshold_list):
+            binary_water_mask = ndwi_mask > threshold 
+            ax.imshow(binary_water_mask, cmap='gray')
+            ax.set_title(f'threshold: {threshold}')
+            ax.axis('off')
 
-    plt.tight_layout()
-    plt.savefig(f'figs/s2_ndwi/{filename}_NDWI_test.png')
-    plt.close()
+        plt.tight_layout()
+        plt.savefig(f'figs/s2_ndwi/{filename}_NDWI_test.png')
+        plt.close()
+        print(f"complete - {filename}")
+
+def download_nhd_shape(area_list, content_list):
+    """
+    Download the National Hydrography Dataset Flowline for specified states
+
+    Args:
+        area_list (list of str): The specified states for which NHD data needs to be collected
+        content_list: The specified components of the NHD data
+    """
+    global_utils.print_func_header('download NHD')
+    for i in area_list:
+
+        # construct URL to download NHD (e.g., https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/State/Shape/NHD_H_Vermont_State_Shape.zip)
+        url = f'https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/State/Shape/NHD_H_{i}_State_Shape.zip'
+
+        # download the ZIP file to the specified directory
+        dir = f'data/nhd/{i}'
+        os.makedirs(dir, exist_ok=True)
+        name = os.path.basename(url)
+        file_path = os.path.join(dir, name)
+        res = requests.get(url)
+        with open(file_path, 'wb') as f:
+            f.write(res.content)
+        print(f'download NHD for {i} - {name}')
+
+        # extract the flowline-related files 
+        with zipfile.ZipFile(file_path, 'r') as z:
+            contents = z.namelist()
+            
+            for item in content_list:
+                if item in contents:
+                    z.extract(item, dir)
+                    print(f'\nextract {i} {item}')
+
+        # delete the ZIP file
+        os.remove(file_path)
+
+    # explore the contents within the ZIP file
+    print(f'list all contents within the ZIP file for {i}')
+    print(contents)
+
+def add_nhd_layer_s2(df, area, area_abbr_list):
+    '''
+    Plot the NHD flowlines on top of Sentinel-2 images during flood events for visual inspection
+
+    Args:
+        df (pd.DataFrame): The selected DataFrame used to add NHD flowline layer
+        area (list of str): The specified area (state)
+        area_abbr_list (dict): A dictionary mapping full state names to their abbreviations
+    '''
+    global_utils.print_func_header('plot image and all masks (cloud, NDWI, flowline) individually')
+    for i in area:
+
+        # read the shapefile into a GeoDataFrame
+        shp_path = f'data/nhd/{i}/Shape/NHDFlowline.shp'
+
+        # flowline['ftype'] or ['fcode'] (might be helpful for extracting major river?) 
+        major_river = [558]
+        flowline = gpd.read_file(shp_path)
+        major_rivers = flowline[(flowline['ftype'].isin(major_river)) & (flowline['lengthkm'] >= 0.6)]
+
+        # filter the DataFrame for the current state's data during the flood event
+        i_abbr = area_abbr_list[i]
+        df_i = df[df['state'] == i_abbr]
+
+        # plot all the mask (original Sentinel-2, NDWI mask, flowline) for each image
+        for _, row in df_i.iterrows():
+            image_path = os.path.join(row['dir'], row['filename'])
+            ndwi_path = os.path.join(row['dir_ndwi'], row['filename_ndwi'])
+            cloud_path = os.path.join(row['dir_cloud'], row['filename_cloud'])
+            _, sat_bounds, tiff_crs, _, _  = kmeans_utils.read_tif(image_path) 
+
+            ndwi_mask = global_utils.read_ndwi_tif(ndwi_path)
+            ndwi_mask = global_utils.apply_cloud_mask(ndwi_mask, cloud_path)
+
+            # extract the flowline mask
+            if major_rivers.crs != tiff_crs:
+                major_rivers = major_rivers.to_crs(tiff_crs)
+
+            # plot satellite image
+            lat = row['latitude']
+            lon = row['longitude']
+            transformer = Transformer.from_crs("EPSG:4326", tiff_crs, always_xy=True)
+            raster_x, raster_y = transformer.transform(lon, lat)
+
+            fig, ax = plt.subplots(figsize=(10, 10))
+            with rasterio.open(image_path) as src:
+                show(src, ax=ax, title=f"S2 - ID: {row['id']}, Date: {row['date']}")
+                ax.plot(raster_x, raster_y, 'ro', markersize=6, zorder=3)
+            plt.tight_layout()
+            output_filename = f"{row['filename'].replace('.tif', '')}_s2.png"
+            plt.savefig(f'figs/s2/{output_filename}')
+            plt.close(fig)
+
+            fig, ax = plt.subplots(figsize=(10, 10))
+            with rasterio.open(image_path) as src:
+                show(src, ax=ax, title=f"S2 with flowline - ID: {row['id']}, Date: {row['date']}")
+            major_rivers.plot(ax=ax, color='cyan', linewidth=0.5)
+            ax.set_xlim(sat_bounds.left, sat_bounds.right)
+            ax.set_ylim(sat_bounds.bottom, sat_bounds.top)
+            plt.tight_layout()
+            output_filename = f"{row['filename'].replace('.tif', '')}_s2_flowline.png"
+            plt.savefig(f'figs/s2/{output_filename}')
+            plt.close(fig)
+
+            fig, ax = plt.subplots(figsize=(10, 10))
+            cmap = plt.cm.gray
+            cmap.set_bad(color='black')
+            ax.imshow(ndwi_mask, cmap=cmap)
+            ax.set_title(f"NDWI - ID: {row['id']}, Date: {row['date']}")
+            ax.axis('off')
+            plt.tight_layout()
+            output_filename = f"{row['filename'].replace('.tif', '')}_ndwi.png"
+            plt.savefig(f'figs/s2/{output_filename}')
+            plt.close(fig)
+
+            fig, ax = plt.subplots(figsize=(10, 10))
+            with rasterio.open(cloud_path) as src:
+                cloud_mask = src.read(1) 
+            ax.imshow(cloud_mask, cmap='gray')
+            ax.set_title(f"Cloud - ID: {row['id']}, Date: {row['date']}")
+            ax.axis('off')
+            plt.tight_layout()
+            output_filename = f"{row['filename'].replace('.tif', '')}_cloud.png"
+            plt.savefig(f'figs/s2/{output_filename}')
+            plt.close(fig)
+
+            print(f"complete - plot image and all masks individually {row['filename']}")
+        
+        print(f"complete - {i}")

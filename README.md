@@ -1,11 +1,10 @@
 # Automated Assessment of Inland flooding from Satellite Observations
 
-This project focus on developing an algorithm for automated assessment of inland flooding from satellite observations. Specifically,, this algorithm collects satellite images corresponding to pre-, during-, and post-flood events and applies the K-means clustering technique to identify flooded areas. While the project initially targeted Maine, it has been expanded to include other states with similar flood characteristics. The ultimate goal is to enhance flood detection capabilities, providing insights that can be applied to flood detection using drone measurements.
+This project focus on developing an algorithm for automated assessment of inland flooding from satellite observations. Specifically, this algorithm collects satellite images corresponding to pre-, during-, and post-flood events and applies the K-means clustering technique to identify flooded areas. While the project initially targeted Maine, it has been expanded to include other states with similar flood characteristics. The ultimate goal is to enhance flood detection capabilities, providing insights that can be applied to flood detection using drone measurements.
 
-The approach integrates the datasets described in Table 1 below:
-| **Table 1: Introduction to the Datasets** | | | | |
+The approach integrates the datasets described in the table below:
+| **Name** | **Source** | **Description** | **Format** | **Links** |
 |---|---|---|---|---|
-| **Name** | **Source** | **Explanation** | **Format** | **Links** |
 | High-water marks | [STN flood event data](https://stn.wim.usgs.gov/STNDataPortal/) | validated flood event observations from United States Geological Survey | CSV | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>Data> |
 | High-water levels | [USGS Water Data Services](https://waterdata.usgs.gov/nwis/rt) | real-time gauge water levels above moderate flood stage | CSV | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>Data> |
 | Sentinel-2 satellite images | [Sentinel-2 Level-2A](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED) | satellite images corresponding to the areas of interest and timeframes defined by high-water marks and levels | GeoTIFF | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>Data> |
@@ -13,7 +12,7 @@ The approach integrates the datasets described in Table 1 below:
 | [Normalized Difference Water Index](https://eos.com/make-an-analysis/ndwi/) masks |  | created mask used to identify the water bodies and refine the algorithm's accuracy | GeoTIFF | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>Data> |
 | Flowlines | National Hydrography Dataset | Flowing water data used to enhance analysis and improve algorithm performance | Shapefile | 1.[Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>Data> |
 
-## Table of Contents
+## Instruction
 - [Step 1: Collect flood event data](#step-1-collect-flood-event-data-high-water-marks-and-levels)
     - [High-water marks](#high-water-marks-from-usgs-stn-flood-event-data-portal)
     - [High-water levels](#high-water-levels-from-real-time-gauge-water-data)
@@ -22,10 +21,7 @@ The approach integrates the datasets described in Table 1 below:
 - [Step 4: Analyze and preprocess the Sentinel-2 true color imagery, cloud masks, and ndwi masks](#step-4-analyze-and-preprocess-sentinel-2-true-color-imagery-cloud-masks-and-ndwi-masks)
 - [Step 5: Download and explore the specified National Hydrography Dataset](#step-5-download-and-explore-the-specified-national-hydrography-dataset)
 - [Step 6: Use KMeans clustering algorithm for image segmentation](#step-6-use-kmeans-clustering-technique-for-image-segmentation)
-- [Step 7: Evaluate the performance](#step-7-evaluate-the-performance)
-- [Future work](#future-work)
 
-## Instruction
 ### Step 1: Collect flood event data (high-water marks and levels)
 Flood event data is derived from two primary sources: high-water marks available through the USGS STN Flood Event Data Portal and high-water levels extracted from real-time gauge data provided by USGS Water Data Services. In this context, "flood events" refers to flood event categories, while "flood event observations" (high-water marks/levels) refers to individual data points.
 
@@ -59,7 +55,7 @@ An analysis is conducted on the high-water marks/levels to:
 - visualize the distribution of flood events using countplots and maps;
 - identify common flood events by comparing STN and gauge data.
 
-To visualize the flood event observations, use the following command: 
+To visualize the flood event observations, use the following command (1): 
 ```
 make eda_flood_event
 ```
@@ -89,12 +85,12 @@ The command will:
 ### Step 4: Analyze and preprocess Sentinel-2 true color imagery, cloud masks, and NDWI masks
 Before applying the KMeans Clustering algorithm, we need to organize and analyze the collected satellite images.
 
-To run analysis and preparation on the images, use the following command (estimated runtime:  minute):
+To run analysis and preparation on the images, use the following command (estimated runtime: 15-20 minutes):
 ```
 make eda_s2
 ```
 
-- The original dataframe representing the image filename and its metedata has 541 image instances. The filtered dataframe has 104 image instances.
+- The original dataframe representing the image filename and its metedata has 379 image instances. The filtered dataframe has 102 image instances.
 - The filtering steps includes:
     - dropping duplicate combinations of id and date (overlapping coverage of Sentinel-2 tiles)
     - dropping flood events without Sentinel-2 imagery during flood
@@ -129,7 +125,7 @@ lib/python3.9/site-packages/pyogrio/raw.py:196: UserWarning: Measured (M) geomet
 ```
 
 ### Step 6: Use KMeans clustering technique for image segmentation
-This section runs the KMeans clustering algorithm on the cleaned image dataset. 
+This section runs the KMeans clustering algorithm on the cleaned image dataset (30-40). 
 ```
 make kmeans
 ```
@@ -142,20 +138,6 @@ This command will:
 - run the optimal KMeans clustering algorithm;
 - evaluate the performance.
 
-**Note**: 
-- An analysis of the plotted figures can be found in [REPORT.md](REPORT.md#satellite-imagery-data-sentinel-2);
-
-### Step 7: Evaluate the performance
-```
-make evaluation
-```
-
-## Todo
-- Finish the instruction part
-- Improve Report.md (flood event/image/kmeans analysis) 
-- Improve KMeans clustering analysis (almost)
-- Debugging (id not assigned correctly)
-
 ## Future Work
 This section includes some potential improvements and other relevant resources that can be explored. 
 ### STN high-water marks
@@ -163,5 +145,7 @@ This section includes some potential improvements and other relevant resources t
 ### Real-time gauge water levels
 - [USGS National Water Information System Surface-Water Data](https://waterdata.usgs.gov/nwis/sw) includes various types of data. There might be a better approach to extract high-water levels which is more efficient and comphrehensive. 
 - USGS has some other valuable flood-related platforms: One called [WaterWatch](https://waterwatch.usgs.gov/?id=ww_flood) and the other called [Flood Inundation Mapper](https://fim.wim.usgs.gov/fim/). Both resources utilizes the flow conditions of streamgages to evaluate flooded areas.
+### Flowline
+### Evaluation
 
 ## Reference

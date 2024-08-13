@@ -95,6 +95,14 @@ The flood events in original STN dataset include:
 
 However, the selected satellite is [Sentinel-2](https://developers.google.com/earth-engine/datasets/catalog/sentinel-2). Sentinel-2 (Level-1C) was launched in 2015. As a result, high-water marks before 2015 will not be included. Additionally, based on the previous output, the earliest flood event after 2015 occurred in 2018. Therefore, we can set the date threshold to 2017. This allows us to utilize the more precise Sentinel-2 Level-2A dataset, which has been available since March 28, 2017. This date (2017-03-28) will be used when collecting high-water levels.
 
+| Event | Date |
+|-------|------|
+| [2018 January Extratropical Cyclone](https://en.wikipedia.org/wiki/January_2018_North_American_blizzard) | 2018-01-02 (formed) - 2018-01-06 (dissipated) |
+| [2018 March Extratropical Cyclone](https://en.wikipedia.org/wiki/March_1%E2%80%933,_2018_nor%27easter) | 2018-03-01 (formed) - 2018-03-05 (dissipated) |
+| [2021 Henri](https://www.nhc.noaa.gov/data/tcr/AL082021_Henri.pdf) | 2021-08-15 (formed) - 2021-08-23 (dissipated) |
+| [2023 July MA NY VT Flood](https://www.weather.gov/btv/The-Great-Vermont-Flood-of-10-11-July-2023-Preliminary-Meteorological-Summary) | 2023-07-10 (formed) - 2023-07-11 (dissipated) |
+| [2023 December East Coast Cyclone](https://cw3e.ucsd.edu/wp-content/uploads/2023/12/20Dec2023_Summary/20231218EastCoast.pdf) | 2023-12-17 (formed) - 2023-12-18 (dissipated) |
+
 #### Area of Interest selection `area_list`
 The area of interest is the New England Region, including Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island, and Vermont. Initially, the focus was on Maine; however, due to the limited availability of recent flood event observations when Sentinel-2 data became accessible, the focus shifted. Under the guidance of Samuel Roy, a USGS scientist, the area of interest was expanded to include other states with potentially similar flood characteristics, particularly Vermont. Other states in the New England Region are also being considered.
 
@@ -152,7 +160,7 @@ hwm_id  40935  40936
 ```
 
 These high-water marks can also be examined from the [visualization on Flood Event Viewer](https://stn.wim.usgs.gov/FEV/#2021Henri):
-<img src="figs/flood_event/hwm_duplicate.png" width="400" alt="high-water mark duplicate">
+<img src="figs/hwm_duplicate.png" width="400" alt="high-water mark duplicate">
 
 
 ### High-water levels from gauges
@@ -210,3 +218,27 @@ The selected contents for this project are 'Shape/NHDFlowline.shp', 'Shape/NHDFl
 - 'Shape/NHDFlowline.shx': links .dbf with .shp using index data;
 - 'Shape/NHDFlowline.dbf': represents the attribute data about the geometries;
 - 'Shape/NHDFlowline.prj': represents the coordinate system and projection information.
+
+The `flowline` when using `gpd.read_file` includes the following features:
+```
+# columns
+Index(['permanent_', 'fdate', 'resolution', 'gnis_id', 'gnis_name', 'lengthkm',
+       'reachcode', 'flowdir', 'wbarea_per', 'ftype', 'fcode', 'mainpath',
+       'innetwork', 'visibility', 'SHAPE_Leng', 'ObjectID', 'geometry'],
+      dtype='object')
+
+# ftype
+[558, 460, 336, 334, 420, 428]
+
+# fcode
+[55800, 46006, 46003, 33600, 33400, 42000, 33601, 46000, 42812, 42811, 42809, 42801, 42807]
+```
+
+- `ftype`
+    - 334	  Connector
+    - 336	  Canal/Ditch
+    - 420	  Underground Conduit
+    - 428	  Pipeline
+    - 460	  Stream / River
+    - 558	  Artificial Path
+    - 566	  Coastline

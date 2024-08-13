@@ -62,8 +62,8 @@ def plot_helper(ids, df, dir, var, flowline=None):
         event_day = id_group['event_day'].iloc[0]
         
         # Create a figure for the current id
-        fig, axes = plt.subplots(1, num_images, figsize=(20, 10))
-        fig.suptitle(f"ID: {current_id}, Event Day: {event_day}", fontsize=16)
+        fig, axes = plt.subplots(1, num_images, figsize=(4 * num_images, 5))
+        fig.suptitle(f"ID: {current_id}\nEvent Day: {event_day}")
 
         if num_images == 1:
             axes = [axes]
@@ -85,11 +85,11 @@ def plot_helper(ids, df, dir, var, flowline=None):
                     
                     flowline.plot(ax=axes[j], color='cyan', linewidth=0.4)
 
-                    transformer = Transformer.from_crs("EPSG:4326", tiff_crs, always_xy=True)
-                    raster_x, raster_y = transformer.transform(lon, lat)
-                    axes[j].plot(raster_x, raster_y, 'ro', markersize=3, zorder=3)
+                transformer = Transformer.from_crs("EPSG:4326", tiff_crs, always_xy=True)
+                raster_x, raster_y = transformer.transform(lon, lat)
+                axes[j].plot(raster_x, raster_y, 'ro', markersize=6, zorder=3)
 
-                axes[j].set_title(f"Date: {row['date']}")
+                axes[j].set_title(f"Date: {row['date']}\nPeriod: {row['period']}")
                 axes[j].set_xlim(bounds.left, bounds.right)
                 axes[j].set_ylim(bounds.bottom, bounds.top)
 
@@ -97,3 +97,22 @@ def plot_helper(ids, df, dir, var, flowline=None):
         plt.savefig(f"figs/{dir}/{current_id}_{var}.png")
         plt.close(fig)
         print(f"complete - {current_id}")
+
+def apply_cloud_mask(image, cloud_mask_path):
+
+    with rasterio.open(cloud_mask_path) as src:
+        cloud_mask = src.read(1)
+
+    valid_mask = cloud_mask == 0
+    result = np.where(valid_mask, image, np.nan)
+
+    return result
+
+def read_ndwi_tif(file_path, threshold=-0.1):
+
+    with rasterio.open(file_path) as src:
+        ndwi_mask = src.read(1) 
+
+    binary_water_mask = ndwi_mask > threshold
+
+    return binary_water_mask

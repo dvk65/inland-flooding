@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 from shapely.geometry import Point, shape
 from utils import global_utils
 
-def run_eda(df, var, area_list):
+def run_eda(df, var, area_list=None):
     '''
     Run an Exploratory Data Analysis (EDA) on the specified flood event data
 
@@ -42,8 +42,8 @@ def run_eda(df, var, area_list):
         count_top_three(df, 'state')
 
         # visualize by state
-        plot_bar(df, title, var, area_list)
-    elif var == 'stn and gauge':
+        plot_bar(df, title, var, 'event', area_list)
+    elif var == 'stn_gauge':
         global_utils.describe_df(df, var)
         # count by event
         count_top_three(df, 'event')
@@ -51,6 +51,10 @@ def run_eda(df, var, area_list):
         # count by state
         count_top_three(df, 'state')
 
+        map_event(df, var)
+    elif var == 'sentinel2':
+        area_list = df['state'].unique().tolist()
+        plot_bar(df, title, var, 'period', area_list)
         map_event(df, var)
 
 def map_dates(event, date_range):
@@ -80,7 +84,7 @@ def count_top_three(df, var):
     var_group = df.groupby(by=[var]).size().sort_values(ascending=False).to_frame(name='total_count')
     print(var_group.head(3))
 
-def plot_bar(df, var, filename, order):
+def plot_bar(df, var, filename, hue_select, order=None):
     """
     Visualize the dataset using a countplot
 
@@ -98,15 +102,16 @@ def plot_bar(df, var, filename, order):
     plt.title(f'{var} by state')
     plt.xlabel('State')
     plt.ylabel('Count')
-    ax = sns.countplot(df, x='state', hue='event', order=order)
+    palette = sns.color_palette("tab20", n_colors=len(df[hue_select].unique()))
+    ax = sns.countplot(df, x='state', hue=hue_select, order=order, palette=palette)
     
     for i in ax.containers:
         ax.bar_label(i)
     
-    ax.legend(title='Event', bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0, fontsize='small')
+    ax.legend(title=hue_select, bbox_to_anchor=(1.02, 1), loc='upper left', borderaxespad=0, fontsize='small')
     plt.tight_layout()
 
-    plt.savefig(f'figs/flood_event/countplot_{filename}.png', bbox_inches='tight')
+    plt.savefig(f'figs/countplot/countplot_{filename}.png', bbox_inches='tight')
     plt.close()
 
 def collect_nhd(layers):
@@ -155,11 +160,9 @@ def map_event(df, var):
     unique_events = df['event'].drop_duplicates().reset_index(drop=True)
     num_unique_events = len(unique_events)
 
-    # Generate a set of distinct colors
-    palette = sns.color_palette("hsv", num_unique_events)  # Using seaborn's color palette for distinct colors
+    palette = sns.color_palette("hsv", num_unique_events)
     colors = np.array(palette)
 
-    # Map each unique event to a color
     event_color_mapping = {event: colors[idx] for idx, event in enumerate(unique_events)}
 
     nhd_layers = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
@@ -195,7 +198,7 @@ def map_event(df, var):
         ax.legend(loc='upper left', title='Events', bbox_to_anchor=(1.02, 1), borderaxespad=0)
         
         plt.tight_layout()
-        plt.savefig(f'figs/flood_event/map_{state}.png')
+        plt.savefig(f'figs/map/map_{state}_{var}.png')
         plt.close()
 
         print(f'complete - {state} flood event map created')

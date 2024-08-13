@@ -8,10 +8,13 @@ This script includes the following steps:
 """
 
 # import libraries
+import time
 import pandas as pd
 from utils import eda_flood_event_utils
 
-print('\nSTART - ANALYZE FLOOD EVENTS')
+# track the runtime
+start = time.time()
+print('\nSTART - ANALYZE FLOOD EVENT OBSERVATIONS')
 
 # set variables
 area_list = ["CT", "ME", "MA", "NH", "RI", "VT"]
@@ -33,6 +36,10 @@ attr_list = ['id', 'event', 'state', 'county', 'latitude', 'longitude', 'note', 
 df = pd.concat([stn[attr_list], gauge[attr_list]])
 
 # step 3 - integrate these two datasets and perform an analysis using maps
-eda_flood_event_utils.run_eda(df, 'stn and gauge', area_list)
+eda_flood_event_utils.run_eda(df, 'stn_gauge', area_list)
 
+print('\nCOMPLETE - ANALYZE FLOOD EVENT OBSERVATIONS\n')
 
+# calculate the runtime
+end = time.time()
+print(f'\nRUNTIME: {round((end - start) / 60, 2)} minutes')

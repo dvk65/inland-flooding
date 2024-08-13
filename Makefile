@@ -10,35 +10,24 @@ gauge:
 
 # conduct EDA on flood event data
 eda_flood_event:
-	mkdir -p figs/flood_event
+	mkdir -p figs/countplot figs/map
 	python -B src/eda_flood_event.py
 
-# collect and preprocess the corresponding sentinel 2 imagery for STN dataset
+# collect and preprocess the corresponding sentinel 2 imagery
 s2:
 	mkdir -p data/img_s2
 	python -B src/s2.py
 
 # conduct EDA on the corresponding sentinel 2 imagery
 eda_s2:
-	mkdir -p data/df_s2 figs/s2_vis_inspect figs/s2_selected figs/s2_ready figs/s2_ndwi
+	mkdir -p data/df_s2 figs/s2_vis_inspect figs/s2_selected figs/s2_ready figs/s2_ndwi figs/s2 data/nhd
 	python -B src/eda_s2.py
-
-# collect National Hydrography Dataset
-nhd:
-	mkdir -p data/nhd figs/s2_nhd figs/s2_all_masks
-	python -B src/nhd.py
 
 # run KMeans algorithm
 kmeans:
-	mkdir -p figs/kmeans_default figs/kmeans_optimizing figs/kmeans_optimized 
+	mkdir -p figs/kmeans_optimizing figs/kmeans_clusters
 	python -B src/kmeans.py
 
-# evaluation
-evaluation:
-
-# run test
-test:
-	python -B src/test.py
-
+# run experiment (currently code used to explore the flowline features)
 experiment:
 	python -B src/experiment.py

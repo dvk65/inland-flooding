@@ -3,15 +3,15 @@ This script includes the functions used to organize and analyze the collected Se
 
 This file can be imported as a module and contains the following functions:
     * check_s2_folder - delete empty folders;
-    * create_s2_df - returns a DataFrame containing organized image information;
-    * assign_period_label - returns a label indicating whether it was taken before, during, or after a flood event;
-    * add_metadata_flood_event - returns a DataFrame with additional flood-related information;
-    * check_during_period_label - returns True if any observation within the specified group is labeled as 'during flood';
-    * filter_df_s2 - return the filtered dataset;
-    * plot_helper - plot images by ids;
-    * plot_s2 - plots the image grouped by ids for visual inspection;
-    * check_cloud_cover - returns the percentage of cloud and shadow coverage;
-    * select_s2 - decide the ideal dataset;
+    * create_s2_df - return a DataFrame containing organized image information;
+    * assign_period_label - return a label indicating whether it was taken before, during, or after a flood event;
+    * add_metadata_flood_event - return a DataFrame with additional flood-related information;
+    * plot_s2 - plot the image grouped by ids for visual inspection;
+    * check_cloud_cover - return the percentage of cloud and shadow coverage;
+    * select_s2 - return the ideal dataset;
+    * test_ndwi_tif - plot the results of applying different NDWI threshold values to identify water areas;
+    * download_nhd_shape - download the flowline shapefiles for specified states;
+    * add_nhd_layer_s2 - plot flowlines on top of Sentinel-2 images and plot other figures (Sentinel-2, cloud mask, NDWI mask) individually
 """
 
 # import libraries
@@ -23,12 +23,11 @@ import rasterio
 import pandas as pd
 import numpy as np
 import geopandas as gpd
-
+from pyproj import Transformer
+from rasterio.plot import show
 import matplotlib.pyplot as plt
 from utils import global_utils, kmeans_utils
 from datetime import datetime, timedelta
-from pyproj import Transformer
-from rasterio.plot import show
 
 flood_event_periods = global_utils.flood_event_periods
 
@@ -137,7 +136,8 @@ def assign_period_label(row, day_adjust_dict):
 
     Args:
         row (pd.Series): A row of data containing information about the image and the event
-
+        day_adjust_dict (dict):  A dictionary to assign period (before, during, or after flood)
+        
     Returns:
         str: A label indicating whether it was taken before, during, or after a flood event
     """
@@ -178,6 +178,7 @@ def add_metadata_flood_event(flood_event, s2, attr_list, day_adjust_dict):
         flood_event (pd.DataFrame): The DataFrame with high-water marks and high-water levels
         s2 (pd.DataFrame): The DataFrame with image information
         attr_list (list of str): The specified attributes to be selected
+        day_adjust_dict (dict): A dictionary to assign period (before, during, or after flood)
 
     Returns:
         pd.DataFrame: The DataFrame with additional information added
@@ -210,7 +211,7 @@ def plot_s2(df):
         # select the first five unique ids for the event
         first_five_ids = event_group['id'].unique()[:5]
 
-        global_utils.plot_helper(first_five_ids, event_group, 's2_vis_inspect', 's2')
+        global_utils.plot_helper(first_five_ids, event_group, 's2_raw_vis_by_id')
 
         print(f"complete - event: {event}")
 
@@ -235,6 +236,11 @@ def select_s2(df, event_selection, cloud_threshold, date_drop, flood_day_adjust_
 
     Args:
         df (pd.DataFrame): The specified DataFrame to be selected
+        event_selection (list of str): A list of events used to filter the DataFrame
+        cloud_threshold (int): A threshold to drop image with much cloud
+        date_drop (list of str): A list of image date used to filter teh DataFrame
+        flood_day_adjust_dict (dict): A dictionary used to adjust period labels in `assign_period_label`
+        explore (str): If set to 'complete', additional cleaning steps are added. If None, only process event_selection and plot for examination
 
     Returns:
         pd.DataFrame: The ready-to-use dataset for KMeans clustering
@@ -255,7 +261,7 @@ def select_s2(df, event_selection, cloud_threshold, date_drop, flood_day_adjust_
     global_utils.describe_df(df_mod, 'selected image dataset')
 
     print(f'\nplot the selected images for further inspection')
-    global_utils.plot_helper(unique_ids, df_mod, 's2_selected', 's2_selected')
+    global_utils.plot_helper(unique_ids, df_mod, 's2_event_selected')
 
     if explore == 'complete':
         df_mod['period'] = df_mod.apply(assign_period_label, axis=1, day_adjust_dict=flood_day_adjust_dict)
@@ -277,7 +283,7 @@ def select_s2(df, event_selection, cloud_threshold, date_drop, flood_day_adjust_
         print("\nnumber of images collected during flood:\n", df_during_flood.shape[0])
         print("\nimages collected during flood:\n", df_during_flood['id'].tolist())
         print(f'\nplot the ready-to-use images for verification')
-        global_utils.plot_helper(unique_ids, df_ready, 's2_ready', 's2_ready')
+        global_utils.plot_helper(unique_ids, df_ready, 's2_cleaned')
 
         df_ready.to_csv('data/s2.csv', index=False)
         return df_ready
@@ -285,6 +291,13 @@ def select_s2(df, event_selection, cloud_threshold, date_drop, flood_day_adjust_
         return df_mod
 
 def test_ndwi_tif(df, threshold_list):
+    """
+    Test different NDWI threshold values to identify water areas
+
+    Args:
+        df (pd.DataFrame): A DataFrame used to test NDWI threshold
+        threshold_list (list of str): A list of NDWI threshold values
+    """
     global_utils.print_func_header(f'test ndwi threshold list {threshold_list}')
     for _, row in df.iterrows():
         file_path = os.path.join(row['dir_ndwi'], row['filename_ndwi'])
@@ -306,7 +319,7 @@ def test_ndwi_tif(df, threshold_list):
             ax.axis('off')
 
         plt.tight_layout()
-        plt.savefig(f'figs/s2_ndwi/{filename}_NDWI_test.png')
+        plt.savefig(f"figs/s2_ndwi_test/{row['id']}_{row['date']}_NDWI_test.png")
         plt.close()
         print(f"complete - {filename}")
 
@@ -352,7 +365,7 @@ def download_nhd_shape(area_list, content_list):
 
 def add_nhd_layer_s2(df, area, area_abbr_list):
     '''
-    Plot the NHD flowlines on top of Sentinel-2 images during flood events for visual inspection
+    Plot the NHD flowlines on top of Sentinel-2 images and plot other figures (Sentinel-2, cloud mask, NDWI mask) individually
 
     Args:
         df (pd.DataFrame): The selected DataFrame used to add NHD flowline layer
@@ -399,7 +412,7 @@ def add_nhd_layer_s2(df, area, area_abbr_list):
                 show(src, ax=ax, title=f"S2 - ID: {row['id']}, Date: {row['date']}")
                 ax.plot(raster_x, raster_y, 'ro', markersize=6, zorder=3)
             plt.tight_layout()
-            output_filename = f"{row['filename'].replace('.tif', '')}_s2.png"
+            output_filename = f"{row['id']}_{row['date']}_s2.png"
             plt.savefig(f'figs/s2/{output_filename}')
             plt.close(fig)
 
@@ -410,7 +423,7 @@ def add_nhd_layer_s2(df, area, area_abbr_list):
             ax.set_xlim(sat_bounds.left, sat_bounds.right)
             ax.set_ylim(sat_bounds.bottom, sat_bounds.top)
             plt.tight_layout()
-            output_filename = f"{row['filename'].replace('.tif', '')}_s2_flowline.png"
+            output_filename = f"{row['id']}_{row['date']}_s2_flowline.png"
             plt.savefig(f'figs/s2/{output_filename}')
             plt.close(fig)
 
@@ -421,7 +434,7 @@ def add_nhd_layer_s2(df, area, area_abbr_list):
             ax.set_title(f"NDWI - ID: {row['id']}, Date: {row['date']}")
             ax.axis('off')
             plt.tight_layout()
-            output_filename = f"{row['filename'].replace('.tif', '')}_ndwi.png"
+            output_filename = f"{row['id']}_{row['date']}_ndwi.png"
             plt.savefig(f'figs/s2/{output_filename}')
             plt.close(fig)
 
@@ -432,7 +445,7 @@ def add_nhd_layer_s2(df, area, area_abbr_list):
             ax.set_title(f"Cloud - ID: {row['id']}, Date: {row['date']}")
             ax.axis('off')
             plt.tight_layout()
-            output_filename = f"{row['filename'].replace('.tif', '')}_cloud.png"
+            output_filename = f"{row['id']}_{row['date']}_cloud.png"
             plt.savefig(f'figs/s2/{output_filename}')
             plt.close(fig)
 

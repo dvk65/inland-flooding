@@ -71,7 +71,7 @@ Before applying the KMeans clustering algorithm, necessary preprocessing steps a
 
 Meanwhile, flowlines from National Hydrography Dataset are collected to enhance the analysis of flooded areas in Sentinel-2 images.
 
-To run analysis and preparation on the images, use the following command (estimated runtime: 15-20 minutes):
+To run analysis and preparation on the images, use the following command (estimated runtime: 10-15 minutes):
 ```
 make eda_s2
 ```

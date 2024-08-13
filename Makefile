@@ -20,12 +20,12 @@ s2:
 
 # conduct EDA on the corresponding sentinel 2 imagery
 eda_s2:
-	mkdir -p data/df_s2 figs/s2_vis_inspect figs/s2_selected figs/s2_ready figs/s2_ndwi figs/s2 data/nhd
+	mkdir -p data/df_s2 figs/s2_raw_vis_by_id figs/s2_event_selected figs/s2_cleaned figs/s2_ndwi_test figs/s2 data/nhd
 	python -B src/eda_s2.py
 
 # run KMeans algorithm
 kmeans:
-	mkdir -p figs/kmeans_optimizing figs/kmeans_default figs/kmeans_pca figs/kmeans_ndwi_pca figs/kmeans_flowline_pca figs/kmeans_features_pca
+	mkdir -p data/df_kmeans figs/kmeans_optimizing figs/kmeans_default figs/kmeans_pca figs/kmeans_ndwi_pca figs/kmeans_flowline_pca figs/kmeans_features_pca
 	python -B src/kmeans.py
 
 # run experiment (currently code used to explore the flowline features)

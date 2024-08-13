@@ -2,18 +2,17 @@
 This script includes the functions used for KMeans clustering algorithm.
 
 This script can be imported as a module and includes the following functions:
-    * read_tif - returns the image data and metadata from the TIFF file;
-    * generate_flowline_mask - returns a mask that identifies the pixels covered by flowlines in the image data;
-    * add_image_data - returns a DataFrame with the image and mask data added;
-    * preprocess_data - returns a DataFrame with the standardized image data and valid pixels;
-    * kmeans_clustering_i - returns the clustered image and inertia for specified image;
-    * find_sharpest_slope_point - returns the optimal number of clusters defined by the sharpest slope point;
-    * identify_flood_cluster - 
-    * kmeans_clustering_default - 
-    * kmeans_optimization_individual_pca
-    * kmeans_optimization_individual_pca_features
-    * plot_clustered_result
-    * plot_evaluation_metrics
+    * read_tif - return the image data and metadata from the TIFF file;
+    * generate_flowline_mask - return a mask that identifies the pixels covered by flowlines in the image data;
+    * add_image_data - return a DataFrame with the image and mask data added;
+    * preprocess_data - return a DataFrame with the standardized image data and valid pixels;
+    * kmeans_clustering_i - return the clustered image and inertia for specified image;
+    * find_sharpest_slope_point - return the optimal number of clusters defined by the sharpest slope point;
+    * identify_flood_cluster - return the lable of cluster that has the greatest overlap with the NDWI mask
+    * kmeans_clustering_default - return the result of default KMeans clustering optimization;
+    * kmeans_optimization_individual_pca_features - return the result of KMeans clustering optimization by introducing NDWI/flowline mask and applying PCA;
+    * plot_clustered_result - plot the clustered image and individual clusters separately;
+    * plot_evaluation_metrics - plot and save evaluation metrics (cumulative explained variance and elbow method) for KMeans clustering;
 """
 
 import os
@@ -239,11 +238,15 @@ def identify_flood_cluster(unique_labels, clustered_image, ndwi_mask_flat):
 
 def kmeans_clustering_default(df, init, n_clusters, condition):
     """
-    Perform KMeans clustering on the image datasets.
+    Perform default KMeans clustering on the image datasets
 
     Args:
         df (pd.DataFrame): The dataset with file paths and other metadata for images
+        init (str): The specified initialization method for KMeans
         n_clusters (int): The number of clusters for KMeans clustering
+        condition (str): The string used to label the executed KMeans clustering setting
+    Returns:
+        pd.DataFrame: A dataframe storing the results
     """
     global_utils.print_func_header(f'run default KMeans clustering')
 
@@ -281,92 +284,32 @@ def kmeans_clustering_default(df, init, n_clusters, condition):
         'flooded_cluster_default': flood_cluster_list
     })
 
+    result_df.to_csv('data/df_kmeans/df_kmeans_default.csv', index=False)
+
     return result_df
 
-def kmeans_optimization_individual_pca(df, init, condition, check=False):
-    global_utils.print_func_header('optimize image individually with pca')
+def kmeans_optimization_individual_pca_features(df, init, condition):
+    """
+    Optimize KMeans clustering by introducing NDWI/flowline mask and applying PCA
+
+    Args:
+        df (pd.DataFrame): The dataframe with image data used to do optimization
+        init (str): The specified initialization method for KMeans
+        condition (str): The string used to determine what type of optimization is applied
+    
+    Returns:
+        pd.DataFrame: A dataframe storing the results 
+    """
+    global_utils.print_func_header(f'optimize image individually with {condition}')
     df_mod = df.copy()
+
+    # create list to store information
     pca_n_components_list = []
     n_clusters_list = []
     cluster_pixel_count_list = []
     flood_cluster_list = []
-    for _, row in df_mod.iterrows():
-
-        # load the image data and features to be used
-        sat_image = row['sat_image']
-        scaled_image = row['scaled_image']
-        valid_pixels = row['valid_pixels']
-        ndwi_mask = row['ndwi_mask']
-
-        ndwi_mask_flat = ndwi_mask.flatten()[valid_pixels]
-
-        # combine the standardized features with the scaled image
-        combined_data = scaled_image
-
-        # determine the optimal number of components for PCA
-        pca_test = PCA()
-        pca_test.fit(combined_data)
-        explained_variance = np.cumsum(pca_test.explained_variance_ratio_)
-
-        # select the number of components
-        n_components = np.argmax(explained_variance >= 0.90) + 1
-        pca_n_components_list.append(n_components)
-
-        # apply PCA with selected n_components
-        pca = PCA(n_components=n_components)
-        scaled_data_pca = pca.fit_transform(combined_data)
-
-        cluster_list = [2, 3, 4, 5, 6]
-        inertia_result = []
-        for i in cluster_list:
-            _, inertia = kmeans_clustering_i(scaled_data_pca, init, i)
-            inertia_result.append(inertia)
-        kl = KneeLocator(cluster_list, inertia_result, curve='convex', direction='decreasing')
-        optimal_clusters = kl.elbow
-        if optimal_clusters is not None and not np.isnan(optimal_clusters):
-            optimal_clusters = int(optimal_clusters)
-        else:
-            optimal_clusters = find_sharpest_slope_point(cluster_list, inertia_result)
-        n_clusters_list.append(int(optimal_clusters))
-
-        # plot clustered image
-        clustered_image, _ = kmeans_clustering_i(scaled_data_pca, init, optimal_clusters)
-        unique_labels, counts = np.unique(clustered_image, return_counts=True)
-        cluster_pixel_count = {f'cluster_{label}': int(count) for label, count in zip(unique_labels, counts)}
-        cluster_pixel_count_list.append(cluster_pixel_count)
-
-        # automatically identify the flood cluster
-        flood_cluster = identify_flood_cluster(unique_labels, clustered_image, ndwi_mask_flat)
-        flood_cluster_list.append(flood_cluster)
-
-        filename = f"{row['id']}_{row['date']}_pca_i"
-        plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, optimal_clusters, filename, condition)
-        if check:
-            plot_evaluation_metrics(explained_variance, cluster_list, inertia_result, filename)
-
-        print(f"complete - optimize image individually with pca {row['filename']}")
-
-    # plot the explained variance
-    print('selected n_components among all the images:\n', set(pca_n_components_list))
-    print('selected n_clusters among all the images:\n', set(n_clusters_list))
-
-    result_df = pd.DataFrame({
-        'id': df_mod['filename'],
-        'cluster_pixel_count_pca_i': cluster_pixel_count_list,
-        'n_clusters_pca_i': n_clusters_list,
-        'n_components_pca_i': pca_n_components_list,
-        'flooded_cluster_pca_i': flood_cluster_list
-    })
-
-    return result_df
-
-def kmeans_optimization_individual_pca_features(df, init, condition, check=False):
-    global_utils.print_func_header(f'optimize image individually with {condition} and pca')
-    df_mod = df.copy()
-    pca_n_components_list = []
-    n_clusters_list = []
-    cluster_pixel_count_list = []
-    flood_cluster_list = []
+    explained_variance_list = []
+    inertia_result_list = []
 
     for _, row in df_mod.iterrows():
 
@@ -377,31 +320,42 @@ def kmeans_optimization_individual_pca_features(df, init, condition, check=False
         valid_pixels = row['valid_pixels']
         sat_image = row['sat_image']
 
+        # flatten the data
         ndwi_mask_flat = ndwi_mask.flatten()[valid_pixels]
         flowline_mask_flat = flowline_mask.flatten()[valid_pixels]
 
+        # check which optimization to be selected
         if condition == 'flowline_pca':
             non_image_features = flowline_mask_flat.reshape(-1, 1)
         elif condition == 'ndwi_pca':
             non_image_features = ndwi_mask_flat.reshape(-1, 1)
         elif condition == 'features_pca':
             non_image_features = np.column_stack([ndwi_mask_flat, flowline_mask_flat])
+        else:
+            non_image_features = None
 
-        scaler = StandardScaler()
-        non_image_features_scaled = scaler.fit_transform(non_image_features)
+        # define the data used to PCA and KMeans clustering
+        if non_image_features is not None:
+            scaler = StandardScaler()
+            non_image_features_scaled = scaler.fit_transform(non_image_features)
+            combined_data = np.column_stack([scaled_image, non_image_features_scaled])
+        else:
+            combined_data = scaled_image
 
-        combined_data = np.column_stack([scaled_image, non_image_features_scaled])
-
+        # test PCA and determine the optimal n_components
         pca_test = PCA()
         pca_test.fit(combined_data)
         explained_variance = np.cumsum(pca_test.explained_variance_ratio_)
+        explained_variance_list.append(str(explained_variance.tolist()))
 
         n_components = np.argmax(explained_variance >= 0.90) + 1
         pca_n_components_list.append(n_components)
 
+        # apply PCA with the optimal n_components
         pca = PCA(n_components=n_components)
         scaled_data_pca = pca.fit_transform(combined_data)
 
+        # determine the optimal n_clusters using elbow method
         cluster_list = [2, 3, 4, 5, 6]
         inertia_result = []
         for i in cluster_list:
@@ -414,45 +368,54 @@ def kmeans_optimization_individual_pca_features(df, init, condition, check=False
         else:
             optimal_clusters = int(find_sharpest_slope_point(cluster_list, inertia_result))
         n_clusters_list.append(optimal_clusters)
+        inertia_result_list.append(str(inertia_result))
 
+        # run KMeans
         clustered_image, _ = kmeans_clustering_i(scaled_data_pca, init, optimal_clusters)
         unique_labels, counts = np.unique(clustered_image, return_counts=True)
         cluster_pixel_count = {f'cluster_{label}': int(count) for label, count in zip(unique_labels, counts)}
         cluster_pixel_count_list.append(cluster_pixel_count)
 
-        # automatically identify the flood cluster
-        flood_cluster = None
-        overlap_threshold = 0
-        for cluster in unique_labels:
-            cluster_match = (clustered_image == cluster)
-            overlap = np.sum(cluster_match & (ndwi_mask_flat == 1))
-            if overlap > overlap_threshold:
-                overlap_threshold = overlap
-                flood_cluster = cluster
+        # automatically identify the flood cluster by checking the overlap between cluster and NDWI
+        flood_cluster = identify_flood_cluster(unique_labels, clustered_image, ndwi_mask_flat)
         flood_cluster_list.append(flood_cluster)
 
         # add necessary plot
         filename = f"{row['id']}_{row['date']}_{condition}_i"
         plot_clustered_result(clustered_image, valid_pixels, sat_image.shape, optimal_clusters, filename, condition)
-        if check:
-            plot_evaluation_metrics(explained_variance, cluster_list, inertia_result, filename)
 
-        print(f"complete - optimize image individually with {condition} and pca {row['filename']}")
+        print(f"complete - optimize image individually with {condition} {row['filename']}")
 
     print('selected n_components among all the images:\n', set(pca_n_components_list))
     print('selected n_clusters among all the images:\n', set(n_clusters_list))
 
+    # create a DataFrame to store results
     result_df = pd.DataFrame({
             'id': df_mod['filename'],
-            f'cluster_pixel_count_{condition}': cluster_pixel_count_list,
-            f'n_clusters_{condition}': n_clusters_list,
-            f'n_components_{condition}': pca_n_components_list,
-            f'flooded_cluster_{condition}': flood_cluster_list
+            f'cluster_pixel_count_{condition}_i': cluster_pixel_count_list,
+            f'n_clusters_{condition}_i': n_clusters_list,
+            f'n_components_{condition}_i': pca_n_components_list,
+            f'flooded_cluster_{condition}_i': flood_cluster_list,
+            f'explained_variance_{condition}_i': explained_variance_list,
+            f'inertia_result_{condition}_i': inertia_result_list,
+            f'n_clusters_list_{condition}_i': [str(cluster_list)] * len(df_mod)
         })
 
+    result_df.to_csv(f'data/df_kmeans/df_kmeans_{condition}_i.csv', index=False)
     return result_df
 
 def plot_clustered_result(cluster_image, valid_pixels, original_shape, n_clusters, file, dir_ending):
+    """
+    Plot the clustered image and individual clusters separately
+
+    Args:
+        cluster_image (np.ndarray): An array containing the cluster labels assigned to valid pixels
+        valid_pixels (np.ndarray): An array representing the valid pixels
+        original_shape (tuple): The original shape of the image
+        n_clusters (int): The number of clusters
+        file (str): The filename of the file to be saved
+        dir_ending (str): A string used as part of directory name
+    """
     name = file.split('/')[-1]
     _, height, width = original_shape
     full_image = np.full(height * width, -1)
@@ -488,7 +451,17 @@ def plot_clustered_result(cluster_image, valid_pixels, original_shape, n_cluster
     plt.close()
 
 def plot_evaluation_metrics(explained_variance, cluster_list, inertia_result, file):
+    """
+    Plot and save evaluation metrics (cumulative explained variance and elbow method) for KMeans clustering
 
+    Args:
+        explained_variance (list of float): A list of float numbers representing cumulative explained variance ratios by the number of PCA components
+        cluster_list (list of int): A list of integer representing the number of clusters used in KMeans clustering
+        inertia_result (list of float): A list of inertia values corresponding to the number clusters
+        file (str): The basename used to save the plot
+    """
+
+    # plot the cumulative explained variance by the number of PCA components
     plt.figure(figsize=(10, 10))
     plt.plot(range(1, len(explained_variance) + 1), explained_variance, marker='o', linestyle='--')
     plt.title(f'cumulative explained variance by number of components\n{file}')
@@ -498,6 +471,7 @@ def plot_evaluation_metrics(explained_variance, cluster_list, inertia_result, fi
     plt.savefig(f'figs/kmeans_optimizing/{file}_n_components.png')
     plt.close()
 
+    # plot the inertia results using the elbow method for determining the optimal number of clusters
     plt.figure(figsize=(10, 10))
     plt.plot(cluster_list, inertia_result, marker='o', linestyle='--')
     plt.title(f'elbow method\n{file}')

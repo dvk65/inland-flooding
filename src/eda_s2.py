@@ -5,8 +5,12 @@ This file contains the following steps:
     * step 1 - delete empty folders;
     * step 2 - create a dataframe to store the image filename and its metadata;
     * step 3 - add necessary info to df_s2;
-    * step 4 - plot the images to identify the ideal events and dates;
+    * step 4 - plot the images to identify the ideal events and verify the assigned period labels;
     * step 5 - drop images based on step 4;
+    * step 6 - extract images where their ids have a during flood period label.
+    * step 7 - plot the distribution;
+    * step 8 - explore ndwi threshold;
+    * step 9 - collect the National Hydrography Dataset for specified states and plot all data one by one (Sentinel-2 image, flowline, NDWI, cloud).
 """
 
 # import libraries
@@ -45,24 +49,26 @@ selected_event = ['2023-07']
 date_drop = ['20230619', '20230701', '20230719', '20230731', '20230805']
 cloud_threshold = 50
 flood_day_adjust_dict = {'gauge': (1, 1), 'stn': (0, 0)}
-
-# run if both selecting event and dropping unwanted images
 df_selected = eda_s2_utils.select_s2(df_s2_mod, selected_event, cloud_threshold, date_drop, flood_day_adjust_dict, explore='complete') 
 
-# more analysis
-eda_flood_event_utils.run_eda(df_selected, 'sentinel2')
+# step 6 - extract images where their ids have a during flood period label (the flood event observation is captured by Sentinel-2)
+flood_ids = df_selected[df_selected['period'] == 'during flood']['id'].unique()
+df_id_with_flood = df_selected[df_selected['id'].isin(flood_ids)].copy()
+df_id_with_flood.to_csv('data/s2_id_with_flood.csv', index=False)
 
-# explore ndwi threshold
+# step 7 - plot the distribution 
+eda_flood_event_utils.run_eda(df_id_with_flood, 'sentinel2')
+
+# step 8 - explore ndwi threshold
 threshold_list = [-0.15, -0.1, -0.05, 0.0, 0.05, 0.1]
-eda_s2_utils.test_ndwi_tif(df_selected, threshold_list)
+eda_s2_utils.test_ndwi_tif(df_id_with_flood, threshold_list)
 
-# collect and explore the National Hydrography Dataset for specified states
-area_in_df = df_selected['state'].unique().tolist()
+# step 9 - collect the National Hydrography Dataset for specified states and plot all data one by one (Sentinel-2 image, flowline, NDWI, cloud)
+area_in_df = df_id_with_flood['state'].unique().tolist()
 area_list = [state for state, abbr in area_abbr_list.items() if abbr in area_in_df]
-content_selected = ['Shape/NHDFlowline.shp', 'Shape/NHDFlowline.shx', 'Shape/NHDFlowline.dbf', 'Shape/NHDFlowline.prj']
-
-eda_s2_utils.download_nhd_shape(area_list, content_selected)
-eda_s2_utils.add_nhd_layer_s2(df_selected, area_list, area_abbr_list)
+content_selected = ['Shape/NHDFlowline.shp', 'Shape/NHDFlowline.shx', 'Shape/NHDFlowline.dbf', 'Shape/NHDFlowline.prj'] # selected flowline files
+eda_s2_utils.download_nhd_shape(area_list, content_selected) # download flowline shapefiles 
+eda_s2_utils.add_nhd_layer_s2(df_id_with_flood, area_list, area_abbr_list) # add flowline as a layer and also plot Sentinel-2 image, flowline, NDWI, and cloud
 
 # calculate the runtime
 end = time.time()

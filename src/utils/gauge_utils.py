@@ -150,7 +150,8 @@ def collect_water_level(df, date_threshold, filename, area):
     Args:
         df (pd.DataFrame): The DataFrame representing flood-related information for gauges from NOAA
         date_threshold (str): The date to filter water levels
-        filename: The file to be saved
+        filename (str): The file to be saved
+        area (str): The area of interests (state)
     
     Returns:
         pd.DataFrame: A DataFrame representing the instances that the water level is above the moderate flood stage value for the gauges with 'USGIS' ids

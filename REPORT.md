@@ -1,12 +1,14 @@
 # Report - Automated Assessment of Inland Flooding From Satellite Observations
-This project focuses on developing an algorithm for automated assessment of inland flooding from satellite observations. Specifically, this algorithm collects satellite images before/during/after flood events and applies the K-means clustering algorithm to identify flooded areas. Satellite data is a straightforward method for observing flooded areas. Sentinel-2, with its 10-meter resolution, enables detailed analysis. Although weather conditions during flood events can be challenging, this project explores the possibility of utilizing satellite imagery and applying a machine learning algorithm named K-means clustering algorithm to automatically identify flooded areas. Additionally, this approach aims to offer insights into enhancing flood detection using drone measurements.  
+This project focuses on developing an algorithm for automated assessment of inland flooding from satellite observations. Specifically, this algorithm collects satellite images captured before/during/after flood events and applies the K-means clustering algorithm to automatically identify flooded areas. 
 
-**Area of Interests**: The project initially targeted Maine, but due to limited flood event observations in Maine, it has been expanded to include other states in the New England Region (primarily Vermont) which shares similar flood characteristics.
+Satellite data, particularly from Sentinel-2 with its 10-meter resolution, provides a powerful tool for observing and analyzing flood events in detail. Although weather conditions during flood events can be challenging, this project explores the potential of utilizing satellite imagery and machine learning techniques to identify flooded areas. Moreover, this approach seeks to offer insights into enhancing flood detection using drone measurements.  
+
+**Area of Interests**: The project initially focused on Maine. However, due to limited flood event observations in Maine, it has been expanded to include other states in the New England Region (primarily Vermont) which shares similar flood characteristics.
 
 ## Method
-1. Collect flood event data from two sources: high-water marks available through the USGS STN Flood Event Data Portal and high-water levels extracted from real-time gauge data provided by USGS Water Data Services;
-2. Collect satellite images corresponding to before-, during-, and after-flood event data;
-3. Apply the K-means clustering technique to identify flooded areas
+1. Collect flood event data from two sources: high-water marks available through the USGS STN Flood Event Data Portal and high-water levels extracted from real-time gauge water levels provided by USGS Water Data Services;
+2. Collect satellite images captured before, during, and after flood event observations;
+3. Apply the K-means clustering algorithm to identify flooded areas
 <img src="figs/workflow.png" alt="workflow">
 
 ## Data
@@ -15,32 +17,45 @@ The approach integrates the datasets described in the table below:
 |---|---|---|---|---|
 | [High-water marks](https://www.usgs.gov/special-topics/water-science-school/science/high-water-marks-and-flooding) | [STN flood event data](https://stn.wim.usgs.gov/STNDataPortal/) | validated flood event observations from USGS | CSV | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>[Data>](https://drive.google.com/drive/folders/1HnRyw0KoQEsYrYD9Uid-N08lBs0q-1jo?usp=sharing) |
 | [High-water levels](https://www.weather.gov/aprfc/terminology) | [USGS Water Data Services](https://waterdata.usgs.gov/nwis/rt) | real-time gauge water levels above moderate flood stage | CSV | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>[Data>](https://drive.google.com/drive/folders/1HnRyw0KoQEsYrYD9Uid-N08lBs0q-1jo?usp=sharing) |
-| [Sentinel-2 satellite images](https://developers.google.com/earth-engine/datasets/catalog/sentinel-2) | [Sentinel-2 Level-2A](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED) | satellite images corresponding to the areas of interest and timeframes defined by high-water marks and levels | GeoTIFF | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>[Data>](https://drive.google.com/drive/folders/1HnRyw0KoQEsYrYD9Uid-N08lBs0q-1jo?usp=sharing) |
-| [Cloud and Shadow](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) masks | [s2cloudless](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) | cloud and shadow pixels to be dropped | GeoTIFF | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>[Data>](https://drive.google.com/drive/folders/1HnRyw0KoQEsYrYD9Uid-N08lBs0q-1jo?usp=sharing) |
-| [Normalized Difference Water Index](https://eos.com/make-an-analysis/ndwi/) masks | [Example](https://medium.com/@melqkiades/water-detection-using-ndwi-on-google-earth-engine-2919a9bf1951) | water body pixels defined by NDWI index to refine the algorithm's accuracy | GeoTIFF | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>[Data>](https://drive.google.com/drive/folders/1HnRyw0KoQEsYrYD9Uid-N08lBs0q-1jo?usp=sharing) |
-| [Flowlines](https://www.usgs.gov/ngp-standards-and-specifications/national-hydrography-dataset-nhd-data-dictionary-feature-classes) | [National Hydrography Dataset](https://www.usgs.gov/national-hydrography/access-national-hydrography-products) | Flowing water data used to enhance analysis and improve algorithm performance | Shapefile | 1.[Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>[Data>](https://drive.google.com/drive/folders/1HnRyw0KoQEsYrYD9Uid-N08lBs0q-1jo?usp=sharing) |
+| [Sentinel-2 images](https://developers.google.com/earth-engine/datasets/catalog/sentinel-2) | [Sentinel-2 Level-2A](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED) | satellite images corresponding to the areas of interests and timeframes defined by high-water marks and levels | GeoTIFF | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>[Data>](https://drive.google.com/drive/folders/1HnRyw0KoQEsYrYD9Uid-N08lBs0q-1jo?usp=sharing) |
+| [Cloud and Shadow](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) masks | [s2cloudless](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) | cloud and shadow pixels to be removed | GeoTIFF | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>[Data>](https://drive.google.com/drive/folders/1HnRyw0KoQEsYrYD9Uid-N08lBs0q-1jo?usp=sharing) |
+| [NDWI](https://eos.com/make-an-analysis/ndwi/) masks | [Usage Description](https://medium.com/@melqkiades/water-detection-using-ndwi-on-google-earth-engine-2919a9bf1951) | water body pixels defined by Normalized Difference Water Index | GeoTIFF | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>[Data>](https://drive.google.com/drive/folders/1HnRyw0KoQEsYrYD9Uid-N08lBs0q-1jo?usp=sharing) |
+| [Flowlines](https://www.usgs.gov/ngp-standards-and-specifications/national-hydrography-dataset-nhd-data-dictionary-feature-classes) masks | [National Hydrography Dataset](https://www.usgs.gov/national-hydrography/access-national-hydrography-products) | routes that make up a linear surface water drainage network | Shapefile | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>[Data>](https://drive.google.com/drive/folders/1HnRyw0KoQEsYrYD9Uid-N08lBs0q-1jo?usp=sharing) |
 
 
-## Result and Discussion
+## Result
+This section presents the findings organized into three key parts: flood event data, Sentinel-2 imagery and masks analysis, and K-means clustering outcomes. 
 
 ### Flood Event Data
-Firstly, we can check the flood event data summary table below:
+Flood event data consists of high-water marks from USGS STN Flood Event Data Portal and high-water levels extracted from real-time gauge water levels provided by USGS Water Data Services. This data is essential for analyzing the distribution of flood events across the New England Region and it's used as a crucial input for retrieving corresponding Sentinel-2 satellite imagery.
+
+Below is a summary table outlining the key characteristics of the flood event data:
 | \ | **High-water marks** | **High-water levels** |
 |---|---|---|
-| **overview** | 889 observations | 218 observations |
-| **top 3 counts by event** | 2023 July MA NY VT Flood (641)<br>2018 March Extratropical Cyclone (115)<br>2018 January Extratropical Cyclone (81)| 2023-12 (64)<br>2023-07 (27)<br>2024-01 (18) |
-| **top 3 counts by state** | VT (646)<br>MA (282)<br>CT (72) | CT (57)<br>VT (56)<br>ME (40) |
-| **countplot** | <img src="figs/countplot/countplot_stn.png" width="500" alt="STN Flood Event Distribution">| <img src="figs/countplot/countplot_gauge.png" width="500" alt="Gauge Flood Event Distribution"> |
-| **map based on top 1 by state** | <img src="figs/map/map_VT_stn_gauge.png" width="500" alt="VT Flood Event Distribution"> | <img src="figs/map/map_CT_stn_gauge.png" width="500" alt="CT Flood Event Distribution"> |
+| **Count of unique values in each attribute** | id-889<br>event-5<br>state-6<br>county-28<br>latitude-863<br>longitude-860<br>note-837<br>source-1 | id-218<br>event-25<br>event_day-83<br>state-6<br>county-34<br>latitude-68<br>longitude-68<br>note-60<br>source-1 |
+| **Top 3 counts by event** | 2023 July MA NY VT Flood (641)<br>2018 March Extratropical Cyclone (115)<br>2018 January Extratropical Cyclone (81)| 2023-12 (64)<br>2023-07 (27)<br>2024-01 (18) |
+| **Top 3 counts by state** | VT (646)<br>MA (282)<br>CT (72) | CT (57)<br>VT (56)<br>ME (40) |
+
+#### High-water marks
+High-water marks are validated flood event observations published by the USGS. The original dataset has 53 attributes and 3502 observations. For this project, only 7 of these attributes and 889 observations were selected for the following reason:
+- This project focuses on the locations and dates of flood event observations so attributes such as `hwmTypeName` and `verticalDatumName` were excluded as they are not directly relevant;
+- Some of the flood events, such as the 1991 October Extratropical Cyclone, are too old to have corresponding Sentinel-2 imagery which has only been available since 2015. 
+- Some locations (`latitude`, `longitude`) have multiple high-water marks with different `elev_ft` measured.
+
+Below are two figures illustrating the distribution of high-water marks:
+| \ | **Figure** | **Note** |
+|---|---|---|
+| **Countplot** | <img src="figs/countplot/countplot_stn.png"> | Maine, the initial targeted state, has only 6 observations. Vermont is the state with the largest number of observations. The flood event `2023 July MA NY VT Flood` is the event with the largest number of observations (547). |
+| **Map (Top 1 counts by state)** | <img src="figs/map/map_VT_stn_gauge.png"> | In this map, triangle markers are high-water marks. Many high-water marks are clustered close to each other. The majority is from the flood event `2023 July MA NY VT Flood`. |
+
 
 **Discussion**
-- In Vermont, the 2023 July MA NY VT Flood event has the highest number of data points. Many of these points are clustered close to each other, with minimal overlap between STN and gauge data;
-- In Connecticut, there are fewer data points. STN data points are primarily located along the coast, while gauge data points are concentrated near the river. There is no overlap between the STN and gauge data.
+- Based on the distribution of high-water marks, the 2023 July MA NY VT flood event in Vermont potentially is the best ideal dataset for the satellite imagery collection because it has the largest number of data points. 
+- However, the close distance between some of the high-water marks poses a challenging for satellite imagery collection because the buffer region will share a larg overlap. This is considered when collecting satellite imagery in the next step.
+- The high-water marks are not assigned with exact dates meaning the happening date of flood event. Therefore, online reports are used to define the dates. This is included in [GUIDE](GUIDE.md).
 
-**Note**
-- No exact dates are assigned to the flood events. Therefore, to collect and distinguish the satellite imagery before/during/after flood events, I explored online reports to define the dates. This process will be included in [GUIDE](GUIDE.md);
-- High-water levels depends on the moderate flood stage threshold which can be adjusted.
-- (map color similarity)
+#### High-water levels
+
 
 ### Sentinel-2 True Color Imagery, Cloud Masks, NDWI Masks, and Flowline Masks
 The filtered dataset consists of 102 Sentinel-2 True Color images, each paired with corresponding masks for clouds, shadows, NDWI, and flowlines. 
@@ -109,3 +124,5 @@ Below is the result of 45358
 |---|---|---|---|
 | **44909** | <img src="figs/s2/44909_20230711T153821_20230711T154201_T18TXP_VIS_ndwi.png"> | <img src="figs/kmeans_clusters/44909_20230711_pca_ndwi_i.png"> | NDWI: 37389<br>Target Cluster: 36039 |
 | **45358** | <img src="figs/s2/45358_20230711T153821_20230711T154201_T18TXP_VIS_ndwi.png"> | <img src="figs/kmeans_clusters/45358_20230711_pca_ndwi_i.png"> | NDWI: 36823<br>Target Cluster: 36715 |
+
+### Future Work

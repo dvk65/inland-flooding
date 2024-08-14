@@ -31,7 +31,10 @@ def run_eda(df, var, area_list=None):
     '''
     print("\n" + "*" * 120)
     print(f'ANALYZE {var.upper()} FLOOD EVENT OBSERVATIONS')
-    title = f'{var} flood event observations'
+    if var == 'sentinel2':
+        title = f'{var} images'
+    else:
+        title = f'{var} flood event observations'
 
     if var == 'stn' or var == 'gauge':
         global_utils.describe_df(df, var)

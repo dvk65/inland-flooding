@@ -108,7 +108,7 @@ def add_image_data(df):
             image_path = os.path.join(row['dir'], row['filename'])
             ndwi_path = os.path.join(row['dir_ndwi'], row['filename_ndwi'])
             cloud_path = os.path.join(row['dir_cloud'], row['filename_cloud'])
-            sat_image, bounds, tiff_crs, transform, _  = read_tif(image_path) # shape (3, 1200, 1195) <- (channels, height, width)
+            sat_image, bounds, tiff_crs, transform, _  = read_tif(image_path) # example shape (3, 1201, 1195) <- (channels, height, width)
             ndwi_mask, _, _, _, _ = read_tif(ndwi_path)
             ndwi_mask = global_utils.read_ndwi_tif(ndwi_path)
             ndwi_mask = global_utils.apply_cloud_mask(ndwi_mask, cloud_path)

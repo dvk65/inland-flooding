@@ -1,7 +1,13 @@
-# Report
-This project focus on developing an algorithm for automated assessment of inland flooding from satellite observations. Specifically, this algorithm collects satellite images corresponding to before-, during-, and after-flood events and applies the K-means clustering technique to identify flooded areas. While the project initially targeted Maine, it has been expanded to include other states with similar flood characteristics due to limited observations in Maine.
+# Report - Automated Assessment of Inland Flooding From Satellite Observations
+This project focuses on developing an algorithm for automated assessment of inland flooding from satellite observations. Specifically, this algorithm collects satellite images before/during/after flood events and applies the K-means clustering algorithm to identify flooded areas. Satellite data is a straightforward method for observing flooded areas. Sentinel-2, with its 10-meter resolution, enables detailed analysis. Although weather conditions during flood events can be challenging, this project explores the possibility of utilizing satellite imagery and applying a machine learning algorithm named K-means clustering algorithm to automatically identify flooded areas. Additionally, this approach aims to offer insights into enhancing flood detection using drone measurements.  
 
-The ultimate goal is to enhance the accuracy of flooded area assessments, with potential applications in enhancing flood detection using drone measurements.
+**Area of Interests**: The project initially targeted Maine, but due to limited flood event observations in Maine, it has been expanded to include other states in the New England Region (primarily Vermont) which shares similar flood characteristics.
+
+## Method
+1. Collect flood event data from two sources: high-water marks available through the USGS STN Flood Event Data Portal and high-water levels extracted from real-time gauge data provided by USGS Water Data Services;
+2. Collect satellite images corresponding to before-, during-, and after-flood event data;
+3. Apply the K-means clustering technique to identify flooded areas
+<img src="figs/workflow.png" alt="workflow">
 
 ## Data
 The approach integrates the datasets described in the table below:
@@ -13,12 +19,6 @@ The approach integrates the datasets described in the table below:
 | [Cloud and Shadow](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) masks | [s2cloudless](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) | cloud and shadow pixels to be dropped | GeoTIFF | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>[Data>](https://drive.google.com/drive/folders/1HnRyw0KoQEsYrYD9Uid-N08lBs0q-1jo?usp=sharing) |
 | [Normalized Difference Water Index](https://eos.com/make-an-analysis/ndwi/) masks | [Example](https://medium.com/@melqkiades/water-detection-using-ndwi-on-google-earth-engine-2919a9bf1951) | water body pixels defined by NDWI index to refine the algorithm's accuracy | GeoTIFF | [Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>[Data>](https://drive.google.com/drive/folders/1HnRyw0KoQEsYrYD9Uid-N08lBs0q-1jo?usp=sharing) |
 | [Flowlines](https://www.usgs.gov/ngp-standards-and-specifications/national-hydrography-dataset-nhd-data-dictionary-feature-classes) | [National Hydrography Dataset](https://www.usgs.gov/national-hydrography/access-national-hydrography-products) | Flowing water data used to enhance analysis and improve algorithm performance | Shapefile | 1.[Report>](REPORT.md)<br>[Guide>](GUIDE.md)<br>[Data>](https://drive.google.com/drive/folders/1HnRyw0KoQEsYrYD9Uid-N08lBs0q-1jo?usp=sharing) |
-
-## Method
-1. Collect flood event data from two sources: high-water marks available through the USGS STN Flood Event Data Portal and high-water levels extracted from real-time gauge data provided by USGS Water Data Services;
-2. Collect satellite images corresponding to before-, during-, and after-flood event data;
-3. Apply the K-means clustering technique to identify flooded areas
-<img src="figs/workflow.png" width="800" alt="workflow">
 
 
 ## Result and Discussion

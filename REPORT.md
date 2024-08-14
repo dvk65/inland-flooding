@@ -123,7 +123,7 @@ Below is a table showing some of the collected images grouped by their ids (repr
 | **44909** | <img src="figs/s2_cleaned/44909_20230726_s2_cleaned.png"> | Ideal flood event observation (high-water mark) with numerous bright pixels, likely representing urban structures and roads |
 | **45358** | <img src="figs/s2_cleaned/45358_20230726_s2_cleaned.png"> | Ideal flood event observation (high-water mark) with less bright pixels |
 | **45501** | <img src="figs/s2_cleaned/45501_20230726_s2_cleaned.png"> | Ideal flood event observation (high-water mark) with fewest bright pixels |
-| **TMVC3_39** | <img src="figs/s2_cleaned/TMVC3_39_20230726_s2_cleaned.png"> | Ideal flood event observation (high-water level) |
+| **TMVC3_39** | <img src="figs/s2_cleaned/TMVC3_39_20230726_s2_cleaned.png"> | Ideal flood event observation (high-water level) with significant noise from color similarity and inconsistent colors across the image |
 | **CLMM3_97** | <img src="figs/s2_event_selected/CLMM3_97_20230711_s2_event_selected.png">| Cloud cover issue: The image collected on 2023-07-06 was excluded. In Google Earth Engine, the cloud cover threshold (`CLOUDY_PIXEL_PERCENTAGE`) is applied to the entire image, which spans a large area. As a result, an image may have a low overall cloud percentage but the targeted region still have significant cloud cover. |
 | **AUBM1_59** |<img src="figs/s2_raw_vis_by_id/AUBM1_59_20240102_s2_raw_vis_by_id.png">| Even though the river color is brown, the similarity in color between the river and the surrounding landscape suggests that this image may not be ideal for this project. |
 
@@ -137,49 +137,95 @@ To understand the distribution of the ideal image dataset, the countplot and map
 - The large number of Sentinel-2 images for Vermont for 2023 July flood event is reasonable when considering the large number of flood event observations for 2023 July flood event in Vermont. (Figures in Section 3.1.2)
 - The map illustrates the spatial distribution of flood event observation IDs. When compared with the Vermont flood event map in Section 3.1.2, it becomes evident that this distribution primarily includes observations in the southern part of the state. In contrast, the map in Section 3.1.2 shows that the 2023 July flood event affected both northern and southern regions of Vermont. This difference in the distribution pattern is interesting and it should be further investigated to understand the reason.
 
-#### 3.4 Cloud Masks and NDWI Masks from Google Earth Engine API
-When downloading Sentinel-2 images, [s2cloudless](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) is utilized to create cloud and shadow masks. This step is included to drop the cloud and shadow pixels. Pixels that are not cloud or shadow will be considered as valid pixels for K-means clustering algorithm. 
+### 3.4 Cloud Masks and NDWI Masks from Google Earth Engine API
 
-The cloud masked created using the s2cloudless algorithm can be influenced by high reflectance surfaces. Surfaces such as certain urban materials that reflect a great amount of sunlight can cause the s2cloudless algorithm to incorrectly identify them as clouds. In the [tutorial](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) published by Google Earth Engine, parameters used to filter the S2 image collection are introduced. It's possible to optimize the cloud detection. Due to time limitation, the optimization is not included in this project. Also, because the project focuses on the flooded area, the inaccuracy of dropping non-cloud and non-shadow pixels caused by high reflectance surfaces should not greatly affect the performance. 
+#### 3.4.1 Cloud Masks
+When downloading Sentinel-2 images, [s2cloudless](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) is utilized to collect cloud and shadow masks. This step is crucial for excluding the cloud and shadow pixels which are unrelevant pixels in this project. Pixels that are not cloud or shadow are considered as valid pixels for K-means clustering algorithm. 
 
-Below is a table showing the cloud masks.
+However, the cloud masked created using the s2cloudless algorithm can be influenced by high-reflectance surfaces. Surfaces such as certain urban materials that reflect a great amount of sunlight can cause the s2cloudless algorithm to incorrectly identify them as clouds. The [s2cloudless tutorial](https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless) published by Google Earth Engine introduces various parameters that can be adjusted to improve the accuracy in classifying cloud and shadow. 
+
+Due to time constraints, such optimization is not implemented in this project. Additionally, since the primary focus is on flooded areas, the minor inaccuracies resulting from incorrectly dropped non-cloud and non-shadow pixels due to high-reflectance surfaces are not expected to significantly impact the overall performance. Below are two sets of images illustrating the performance of s2cloudless approach in classifying cloud and shadows.Some of the road and urban structures are mistakenly considered as cloud or shadow (represented by white pixels).
+
 | \ | **True Color** | **Cloud Mask** |
 |---|---|---|
 | **44909** | <img src="figs/s2/44909_20230711_s2.png"> | <img src="figs/s2/44909_20230711_cloud.png"> |
 | **45358** | <img src="figs/s2/45358_20230711_s2.png"> | <img src="figs/s2/45358_20230711_cloud.png"> |
 
 To enhance the analysis and improve the performance of K-means clustering algorithm, additional masks (Cloud and Shadow mask, NDWI mask, and flowline mask) for these images are also introduced. 
-#### 3.3.3 Cloud Masks and NDWI Masks (from Earth Engine)
+#### 3.4.2 NDWI Masks from Earth Engine and Flowline Masks from National Hydrography Dataset
+To help map out the water bodies and flooded areas, especially when they are unclear, Normalized Difference Water Index and flowlines are introduced. Also, they are used as features to help optimize the performance of K-means clustering algorithm.
 
-Also, NDWI mask is collected when downloading Sentinel-2 images. After that, the NDWI threshold is selected by comparison. Below is a table showing the threshold selection. The selected threshold is -0.1.
+NDWI mask is collected when downloading Sentinel-2 images. After that, the NDWI threshold is selected by comparison. Below is a table showing the threshold selection. The selected threshold is -0.1.
 | \ | **NDWI thresholds**| **True Color** |
 |---|---|---|
 | **44909** | <img src="figs/s2_ndwi_test/44909_20230711_NDWI_test.png"> | <img src="figs/s2/44909_20230711_s2.png"> |
 | **45358** | <img src="figs/s2_ndwi_test/45358_20230711_NDWI_test.png"> | <img src="figs/s2/45358_20230711_s2.png"> |
 
-#### 3.3.4 Flowline Masks
-Flowlines from NHD is introduced to help identify the flooded areas and enhance KMeans clustering performance. In this project, the focus is major rivers based on the visual inspection. Therefore, the major rivers are selected from flowlines. However, there might be a better approach to idetify major rivers. 
+Flowlines are sourced from the National Hydrography Dataset, which includes all flowing water features. However, using the complete dataset can introduce unnecessary noise into the analysis. For this project, the focus is on major rivers, which were identified through visual inspection. As a result, only the major rivers were selected from the flowlines dataset.
+
+Currently, major rivers are defined by the criteria ftype == 558 and lengthkm >= 0.6. However, this method is not a widely accepted approach and may lack the precision needed for consistent results. Therefore, a more robust and standardized method should be considered.
+
+Below is a comparison between all flowlines and the selection of major rivers. 
 
 | \ | **Flowline**| **Major River** |
 |---|---|---|
 | **44909** | <img src="figs/flowline_no_filter.png"> | <img src="figs/s2/44909_20230706_s2_flowline.png"> |
 
-### 3.4 KMeans Clustering Result
+### 3.6 KMeans Clustering Algorithm
 
-Below is the result of 44909
+#### 3.6.1 Concepts
+
+#### 3.6.2 Result - ID: 44909
 | \ | **True Color**| **Result** |
 |---|---|---|
-| **Default** | <img src="figs/s2/44909_20230706_s2_flowline.png"> | <img src="figs/kmeans_default/44909_20230711_default.png"> |
-| **PCA** | <img src="figs/s2/44909_20230706_s2_flowline.png"> | <img src="figs/kmeans_pca/44909_20230711_pca_i.png"> |
-| **PCA with flowline** | <img src="figs/s2/44909_20230706_s2_flowline.png"> | <img src="figs/kmeans_flowline_pca/44909_20230711_flowline_pca_i.png"> |
-| **PCA with NDWI** | <img src="figs/s2/44909_20230706_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/44909_20230711_ndwi_pca_i.png"> |
-| **PCA with flowline and NDWI** | <img src="figs/s2/44909_20230706_s2_flowline.png"> | <img src="figs/kmeans_features_pca/44909_20230711_features_pca_i.png"> |
+| **Default** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/44909_20230711_default.png"> |
+| **PCA** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_pca/44909_20230711_pca_i.png"> |
+| **Flowline with PCA** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_flowline_pca/44909_20230711_flowline_pca_i.png"> |
+| **NDWI with PCA** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/44909_20230711_ndwi_pca_i.png"> |
+| **Flowline and NDWI with PCA** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/44909_20230711_features_pca_i.png"> |
 
-### Comparison between Target Cluster (Flooded Area) and NDWI
+#### 3.6.3 Result - ID: 45358
+| \ | **True Color**| **Result** |
+|---|---|---|
+| **Default** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/45358_20230711_default.png"> |
+| **PCA** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_pca/45358_20230711_pca_i.png"> |
+| **Flowline with PCA** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_flowline_pca/45358_20230711_flowline_pca_i.png"> |
+| **NDWI with PCA** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/45358_20230711_ndwi_pca_i.png"> |
+| **Flowline and NDWI with PCA** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/45358_20230711_features_pca_i.png"> |
+
+#### 3.6.4 Result - ID: 45501
+| \ | **True Color**| **Result** |
+|---|---|---|
+| **Default** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/45501_20230711_default.png"> |
+| **PCA** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_pca/45501_20230711_pca_i.png"> |
+| **Flowline with PCA** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_flowline_pca/45501_20230711_flowline_pca_i.png"> |
+| **NDWI with PCA** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/45501_20230711_ndwi_pca_i.png"> |
+| **Flowline and NDWI with PCA** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/45501_20230711_features_pca_i.png"> |
+
+#### 3.6.5 Result - ID: TMVC3_39
+| \ | **True Color**| **Result** |
+|---|---|---|
+| **Default** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/TMVC3_39_20230711_default.png"> |
+| **PCA** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_pca/TMVC3_39_20230711_pca_i.png"> |
+| **Flowline with PCA** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_flowline_pca/TMVC3_39_20230711_flowline_pca_i.png"> |
+| **NDWI with PCA** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/TMVC3_39_20230711_ndwi_pca_i.png"> |
+| **Flowline and NDWI with PCA** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/TMVC3_39_20230711_features_pca_i.png"> |
+
+#### 3.6.6 Comparison between Targeted Cluster (Flooded Area) and NDWI
 
 | \ | **NDWI**| **Best Cluster** | **Pixels** |
 |---|---|---|---|
 | **44909** | <img src="figs/s2/44909_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/44909_20230711_ndwi_pca_i.png"> | NDWI: 37389<br>Target Cluster: 36039 |
 | **45358** | <img src="figs/s2/45358_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/45358_20230711_ndwi_pca_i.png"> | NDWI: 36823<br>Target Cluster: 36715 |
+| **45501** | <img src="figs/s2/45501_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/45501_20230711_ndwi_pca_i.png"> | NDWI: 3035<br>Target Cluster: 2997 |
+| **TMVC3_39** | <img src="figs/s2/TMVC3_39_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/TMVC3_39_20230711_ndwi_pca_i.png"> | NDWI: 46531<br>Target Cluster: 42918 |
+
+#### 3.6.7 Explained Variance and Elbow Method
+| \ | **Natural Color Image** |**Explained Variance**| **Elbow Method** |
+|---|---|---|---|
+| **44909** | <img src="figs/s2/44909_20230711_s2.png"> |<img src="figs/kmeans_optimizing/44909_20230711T153821_20230711T154201_T18TXP_n_components.png"> | <img src="figs/kmeans_optimizing/44909_20230711T153821_20230711T154201_T18TXP_elbow.png"> | 
+| **45358** | <img src="figs/s2/45358_20230711_s2.png"> |<img src="figs/kmeans_optimizing/45358_20230711T153821_20230711T154201_T18TXP_n_components.png"> | <img src="figs/kmeans_optimizing/45358_20230711T153821_20230711T154201_T18TXP_elbow.png"> | 
+| **45501** | <img src="figs/s2/45501_20230711_s2.png"> |<img src="figs/kmeans_optimizing/45501_20230711T153821_20230711T154201_T18TXP_n_components.png"> | <img src="figs/kmeans_optimizing/45501_20230711T153821_20230711T154201_T18TXP_elbow.png"> | 
+| **TMVC3_39** | <img src="figs/s2/TMVC3_39_20230711_s2.png"> |<img src="figs/kmeans_optimizing/TMVC3_39_20230711T153821_20230711T154201_T18TXM_n_components.png"> | <img src="figs/kmeans_optimizing/TMVC3_39_20230711T153821_20230711T154201_T18TXM_elbow.png"> | 
 
 ### 4. Discussion and Future Work

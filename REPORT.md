@@ -120,11 +120,11 @@ With further exploration, 10 of these images were identified to show significant
 Below is a table showing some of the collected images grouped by their ids (representing flood event observation):
 | **ID** | **Figure** | **Note** |
 |---|---|---|
-| **44909** | <img src="figs/s2_cleaned/44909_20230726_s2_cleaned.png"> | Ideal flood event observation (high-water mark) |
-| **45358** | <img src="figs/s2_cleaned/45358_20230726_s2_cleaned.png"> | Ideal flood event observation (high-water mark) |
-| **45501** | <img src="figs/s2_cleaned/45501_20230726_s2_cleaned.png"> | Ideal flood event observation (high-water mark) |
+| **44909** | <img src="figs/s2_cleaned/44909_20230726_s2_cleaned.png"> | Ideal flood event observation (high-water mark) with numerous bright pixels, likely representing urban structures and roads |
+| **45358** | <img src="figs/s2_cleaned/45358_20230726_s2_cleaned.png"> | Ideal flood event observation (high-water mark) with less bright pixels |
+| **45501** | <img src="figs/s2_cleaned/45501_20230726_s2_cleaned.png"> | Ideal flood event observation (high-water mark) with fewest bright pixels |
 | **TMVC3_39** | <img src="figs/s2_cleaned/TMVC3_39_20230726_s2_cleaned.png"> | Ideal flood event observation (high-water level) |
-| **CLMM3_97** | <img src="figs/s2_event_selected/CLMM3_97_20230711_s2_event_selected.png">| The image with date 20230706 is dropped due to the cloud cover. |
+| **CLMM3_97** | <img src="figs/s2_event_selected/CLMM3_97_20230711_s2_event_selected.png">| Cloud cover issue: The image collected on 2023-07-06 was excluded. In Google Earth Engine, the cloud cover threshold (`CLOUDY_PIXEL_PERCENTAGE`) is applied to the entire image, which spans a large area. As a result, an image may have a low overall cloud percentage but the targeted region still have significant cloud cover. |
 | **AUBM1_59** |<img src="figs/s2_raw_vis_by_id/AUBM1_59_20240102_s2_raw_vis_by_id.png">| Even though the river color is brown, the similarity in color between the river and the surrounding landscape suggests that this image may not be ideal for this project. |
 
 #### 3.3.3 Dataset Visualization

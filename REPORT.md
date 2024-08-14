@@ -169,7 +169,7 @@ Below is a comparison between all flowlines and the selection of major rivers.
 
 | \ | **Flowline**| **Major River** |
 |---|---|---|
-| **44909** | <img src="figs/flowline_no_filter.png"> | <img src="figs/s2/44909_20230706_s2_flowline.png"> |
+| **44909** | <img src="figs/flowline_no_filter.png"> | <img src="figs/s2/44909_20230711_s2_flowline.png"> |
 
 ### 3.6 KMeans Clustering Algorithm
 

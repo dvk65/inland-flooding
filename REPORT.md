@@ -172,60 +172,79 @@ Below is a comparison between all flowlines and the selection of major rivers.
 | **44909** | <img src="figs/flowline_no_filter.png"> | <img src="figs/s2/44909_20230711_s2_flowline.png"> |
 
 ### 3.6 KMeans Clustering Algorithm
+To automate the assessment of flooded areas, I select the K-means clustering algorithm, a widely used method in image segmentation. The decision to use K-means clustering is influenced by three key factors: the small dataset size (69 images), the absence of ground truth for the flooded areas, and the unique visual characteristics of the flooded areas (brown water bodies caused by sediment). K-means clustering groups data points based on similarity—when only image data is used, this similarity is based on color; when additional features are introduced, the similarity is calculated based on the combination.
 
-#### 3.6.1 Concepts
+First, the default setting is executed in each image. `StandardScaler` is applied before K-means clustering algorithm to standardize the image color channels. This standardization not only speeds up convergence but also improves the accuracy and consistency of the clustering results. K-means is initialized with 3 clusters determined by visual inspection and the initialization method is set to`k-means++`. 
 
-#### 3.6.2 Result - ID: 44909
+During the optimization phase, Principal Component Analysis (PCA), a dimensionality reduction technique that reduces noise while capturing the most critical information, is applied. Additionally, additional masks are introduced as features. For each image, it goes through three types of optimizations. In this process, the selection of the optimal number of PCA components and clusters is guided by the explained variance and the elbow method.
+
+Three types of optimizations are:
+- Apply Principle Component Analysis to image data;
+- Add flowline mask as a feature and apply Principle Component Analysis to the combination of flowline mask and image data;
+- Add NDWI mask as a feature and apply Principle Component Analysis to the combination of NDWI mask and image data;
+- Add both flowline mask and NDWI mask as features and then apply Principle Component Analysis to the combination of flowline mask, NDWI mask, and image data.
+
+The following sections 3.6.1 to section 3.6.4 are the results of different images with flooded areas.
+
+#### 3.6.1 Result - ID: 44909
 | \ | **True Color**| **Result** |
 |---|---|---|
-| **Default** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/44909_20230711_default.png"> |
-| **PCA** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_pca/44909_20230711_pca_i.png"> |
-| **Flowline with PCA** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_flowline_pca/44909_20230711_flowline_pca_i.png"> |
-| **NDWI with PCA** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/44909_20230711_ndwi_pca_i.png"> |
-| **Flowline and NDWI with PCA** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/44909_20230711_features_pca_i.png"> |
+| **Default** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/44909_20230711_default.png"><br>In the default K-means clustering result, Cluster 1 includes the flooded area. However, some of other areas such as roads and urban structures are also considered as the flooded area. |
+| **PCA** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_pca/44909_20230711_pca_i.png"><br>Principle Component Analysis is applied to reduce the noise. Cluster 1 includes the flooded area. PCA effectively reduces the impact of noisy or irrelevant data. |
+| **Flowline with PCA** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_flowline_pca/44909_20230711_flowline_pca_i.png"><br>When the flowline mask is added as a feature and PCA is applied to the combination of image data and the flowline mask, the results are less accurate compared to when PCA is applied to the image data alone. |
+| **NDWI with PCA** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/44909_20230711_ndwi_pca_i.png"><br> When the NDWI mask is added as a feature and PCA is applied to the combined data, the result is the most accurate and effective outcome. |
+| **Flowline and NDWI with PCA** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/44909_20230711_features_pca_i.png"><br>When both the flowline mask and NDWI mask are added as features and PCA is applied, the outcome is similar to the result obtained using the flowline mask with PCA.  |
 
-#### 3.6.3 Result - ID: 45358
+#### 3.6.2 Result - ID: 45358
 | \ | **True Color**| **Result** |
 |---|---|---|
-| **Default** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/45358_20230711_default.png"> |
-| **PCA** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_pca/45358_20230711_pca_i.png"> |
-| **Flowline with PCA** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_flowline_pca/45358_20230711_flowline_pca_i.png"> |
-| **NDWI with PCA** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/45358_20230711_ndwi_pca_i.png"> |
-| **Flowline and NDWI with PCA** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/45358_20230711_features_pca_i.png"> |
+| **Default** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/45358_20230711_default.png"><br>Compared with the image with id 44909, this image has less urban structures. This is also reflected in the default K-means clustering result. Cluster 1 includes the flooded area and it has less noisy pixels. |
+| **PCA** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_pca/45358_20230711_pca_i.png"><br>With PCA applied, Cluster 2 includes the flooded area and the noise is reduced slightly. |
+| **Flowline with PCA** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_flowline_pca/45358_20230711_flowline_pca_i.png"><br>With flowline mask added as a feature and PCA applied, the result is not ideal. |
+| **NDWI with PCA** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/45358_20230711_ndwi_pca_i.png"><br>With NDWI mask added and PCA applied, the result is greatly improved. However, comparing this with PCA only result, this approach actually introduces new noisy pixels on the top left part. |
+| **Flowline and NDWI with PCA** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/45358_20230711_features_pca_i.png"><br>This result is similar to default result. |
 
-#### 3.6.4 Result - ID: 45501
+#### 3.6.3 Result - ID: 45501
 | \ | **True Color**| **Result** |
 |---|---|---|
-| **Default** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/45501_20230711_default.png"> |
-| **PCA** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_pca/45501_20230711_pca_i.png"> |
-| **Flowline with PCA** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_flowline_pca/45501_20230711_flowline_pca_i.png"> |
-| **NDWI with PCA** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/45501_20230711_ndwi_pca_i.png"> |
-| **Flowline and NDWI with PCA** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/45501_20230711_features_pca_i.png"> |
+| **Default** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/45501_20230711_default.png"><br>Cluster 1 includes the flooded area. Some landscapes with brown color are also included. |
+| **PCA** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_pca/45501_20230711_pca_i.png"><br>When PCA is applied, the improvement is minimal. |
+| **Flowline with PCA** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_flowline_pca/45501_20230711_flowline_pca_i.png"><br>The result is also not ideal. |
+| **NDWI with PCA** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/45501_20230711_ndwi_pca_i.png"><br>The flooded area (Cluster 2) is better. |
+| **Flowline and NDWI with PCA** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/45501_20230711_features_pca_i.png"><br>The result is similar to the result from NDWI with PCA. |
 
-#### 3.6.5 Result - ID: TMVC3_39
+#### 3.6.4 Result - ID: TMVC3_39
 | \ | **True Color**| **Result** |
 |---|---|---|
-| **Default** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/TMVC3_39_20230711_default.png"> |
-| **PCA** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_pca/TMVC3_39_20230711_pca_i.png"> |
-| **Flowline with PCA** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_flowline_pca/TMVC3_39_20230711_flowline_pca_i.png"> |
-| **NDWI with PCA** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/TMVC3_39_20230711_ndwi_pca_i.png"> |
-| **Flowline and NDWI with PCA** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/TMVC3_39_20230711_features_pca_i.png"> |
+| **Default** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/TMVC3_39_20230711_default.png"><br>This image includes many more noisy pixels; therefore, it's more challenging. Cluster 2 includes the flooded river. However, many other pixels are also included. |
+| **PCA** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_pca/TMVC3_39_20230711_pca_i.png"><br>When PCA is applied, there's no visual difference. |
+| **Flowline with PCA** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_flowline_pca/TMVC3_39_20230711_flowline_pca_i.png"><br>The improvement is minimal. |
+| **NDWI with PCA** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/TMVC3_39_20230711_ndwi_pca_i.png"><br> With NDWI and PCA applied together, the result is greatly improved. |
+| **Flowline and NDWI with PCA** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/TMVC3_39_20230711_features_pca_i.png"><br>The result is also not bad; however, adding flowline introduces additional pixels. |
 
-#### 3.6.6 Comparison between Targeted Cluster (Flooded Area) and NDWI
+#### 3.6.5 Comparison between Targeted Cluster (Flooded Area) and NDWI
 
-| \ | **NDWI**| **Best Cluster** | **Pixels** |
+| **S2** | **NDWI**| **Best Cluster** | **Info** |
 |---|---|---|---|
-| **44909** | <img src="figs/s2/44909_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/44909_20230711_ndwi_pca_i.png"> | NDWI: 37389<br>Target Cluster: 36039 |
-| **45358** | <img src="figs/s2/45358_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/45358_20230711_ndwi_pca_i.png"> | NDWI: 36823<br>Target Cluster: 36715 |
-| **45501** | <img src="figs/s2/45501_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/45501_20230711_ndwi_pca_i.png"> | NDWI: 3035<br>Target Cluster: 2997 |
-| **TMVC3_39** | <img src="figs/s2/TMVC3_39_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/TMVC3_39_20230711_ndwi_pca_i.png"> | NDWI: 46531<br>Target Cluster: 42918 |
+| <img src="figs/s2/44909_20230711_s2.png"> | <img src="figs/s2/44909_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/44909_20230711_ndwi_pca_i.png"><br>Comparing NDWI mask and Cluster 2, the noisy pixels and the water body with clear water pixels are reduced. The reduction is also reflected in the number of pixels. | NDWI pixels: 37389<br>Targeted Cluster pixels: 36039 |
+| <img src="figs/s2/45358_20230711_s2.png"> | <img src="figs/s2/45358_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/45358_20230711_ndwi_pca_i.png"><br>Compared with NDWI mask, Cluster 2 reduces the water bodies with clear water. However, new nosiy pixels are introduced. The number of pixels are similar. | NDWI pixels: 36823<br>Targeted Cluster pixels: 36715 |
+| <img src="figs/s2/45501_20230711_s2.png"> | <img src="figs/s2/45501_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/45501_20230711_ndwi_pca_i.png"><br>Compared with NDWI mask, the flooded area is reduced. | NDWI pixels: 3035<br>Targeted Cluster pixels: 2997 |
+| <img src="figs/s2/TMVC3_39_20230711_s2.png"> | <img src="figs/s2/TMVC3_39_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/TMVC3_39_20230711_ndwi_pca_i.png"><br>Compared with NDWI mask, the high-reflectance surface pixels are reduced. | NDWI pixels: 46531<br>Targeted Cluster pixels: 42918 |
 
-#### 3.6.7 Explained Variance and Elbow Method
-| \ | **Natural Color Image** |**Explained Variance**| **Elbow Method** |
-|---|---|---|---|
-| **44909** | <img src="figs/s2/44909_20230711_s2.png"> |<img src="figs/kmeans_optimizing/44909_20230711T153821_20230711T154201_T18TXP_n_components.png"> | <img src="figs/kmeans_optimizing/44909_20230711T153821_20230711T154201_T18TXP_elbow.png"> | 
-| **45358** | <img src="figs/s2/45358_20230711_s2.png"> |<img src="figs/kmeans_optimizing/45358_20230711T153821_20230711T154201_T18TXP_n_components.png"> | <img src="figs/kmeans_optimizing/45358_20230711T153821_20230711T154201_T18TXP_elbow.png"> | 
-| **45501** | <img src="figs/s2/45501_20230711_s2.png"> |<img src="figs/kmeans_optimizing/45501_20230711T153821_20230711T154201_T18TXP_n_components.png"> | <img src="figs/kmeans_optimizing/45501_20230711T153821_20230711T154201_T18TXP_elbow.png"> | 
-| **TMVC3_39** | <img src="figs/s2/TMVC3_39_20230711_s2.png"> |<img src="figs/kmeans_optimizing/TMVC3_39_20230711T153821_20230711T154201_T18TXM_n_components.png"> | <img src="figs/kmeans_optimizing/TMVC3_39_20230711T153821_20230711T154201_T18TXM_elbow.png"> | 
+#### 3.6.6 Explained Variance and Elbow Method
+| \ | **Natural Color Image** |**Explained Variance**| **Elbow Method** | **Note** |
+|---|---|---|---|---|
+| **44909** | <img src="figs/s2/44909_20230711_s2.png"> |<img src="figs/kmeans_optimizing/44909_20230711T153821_20230711T154201_T18TXP_n_components.png"> | <img src="figs/kmeans_optimizing/44909_20230711T153821_20230711T154201_T18TXP_elbow.png"> | n_clusters = 4 |
+| **45358** | <img src="figs/s2/45358_20230711_s2.png"> |<img src="figs/kmeans_optimizing/45358_20230711T153821_20230711T154201_T18TXP_n_components.png"> | <img src="figs/kmeans_optimizing/45358_20230711T153821_20230711T154201_T18TXP_elbow.png"> | n_clusters = 3 |
+| **45501** | <img src="figs/s2/45501_20230711_s2.png"> |<img src="figs/kmeans_optimizing/45501_20230711T153821_20230711T154201_T18TXP_n_components.png"> | <img src="figs/kmeans_optimizing/45501_20230711T153821_20230711T154201_T18TXP_elbow.png"> | n_clusters = 4 |
+| **TMVC3_39** | <img src="figs/s2/TMVC3_39_20230711_s2.png"> |<img src="figs/kmeans_optimizing/TMVC3_39_20230711T153821_20230711T154201_T18TXM_n_components.png"> | <img src="figs/kmeans_optimizing/TMVC3_39_20230711T153821_20230711T154201_T18TXM_elbow.png"> | n_clusters = 4 |
 
-### 4. Discussion and Future Work
+## 4. Discussion and Future Work
+
+### 4.1 Discussion
+
+### 4.2 Future Work
+
+### Acknowledgement
+
+### Reference

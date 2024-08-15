@@ -192,7 +192,7 @@ Three types of optimizations are:
 
 The following sections 3.6.1 to section 3.6.4 are the results of different images with flooded areas. These four images are selected because they are images with notable flooded areas and the distinct environmental characteristics, as discussed in Section 3.3.2 Image Exploration.
 
-#### 3.6.1 Result - ID: 44909
+#### 3.5.1 Result - ID: 44909
 | \ | **True Color**| **Result** |
 |---|---|---|
 | **Default** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/44909_20230711_default.png"><br>In the default K-means clustering result, Cluster 1 includes the flooded area. However, some of other areas such as roads and urban structures are also considered as the flooded area. |
@@ -201,7 +201,7 @@ The following sections 3.6.1 to section 3.6.4 are the results of different image
 | **NDWI with PCA** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/44909_20230711_ndwi_pca_i.png"><br> This result is the most accurate and effective outcome. Cluster 2 is the flooded area. |
 | **Flowline and NDWI with PCA** | <img src="figs/s2/44909_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/44909_20230711_features_pca_i.png"><br>This outcome is similar to the result obtained using the flowline mask with PCA.  |
 
-#### 3.6.2 Result - ID: 45358
+#### 3.5.2 Result - ID: 45358
 | \ | **True Color**| **Result** |
 |---|---|---|
 | **Default** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/45358_20230711_default.png"><br>Compared with the image with id 44909, this image has less urban structures. This is also reflected in the default K-means clustering result. Cluster 1 includes the flooded area and it has less noisy pixels. |
@@ -210,7 +210,7 @@ The following sections 3.6.1 to section 3.6.4 are the results of different image
 | **NDWI with PCA** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/45358_20230711_ndwi_pca_i.png"><br>The result is greatly improved. However, comparing this with PCA only result, this approach introduces new noisy pixels on the top left part. |
 | **Flowline and NDWI with PCA** | <img src="figs/s2/45358_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/45358_20230711_features_pca_i.png"><br>This result is similar to default result. |
 
-#### 3.6.3 Result - ID: 45501
+#### 3.5.3 Result - ID: 45501
 | \ | **True Color**| **Result** |
 |---|---|---|
 | **Default** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/45501_20230711_default.png"><br>Cluster 1 includes the flooded area. Some non-water areas with similar color are also included. |
@@ -219,7 +219,7 @@ The following sections 3.6.1 to section 3.6.4 are the results of different image
 | **NDWI with PCA** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/45501_20230711_ndwi_pca_i.png"><br>The flooded area (Cluster 2) is extracted more accurately in Cluster 2. |
 | **Flowline and NDWI with PCA** | <img src="figs/s2/45501_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/45501_20230711_features_pca_i.png"><br>The identified flooded area is similar to the results obtained from NDWI with PCA. However, it also outputs Cluster 1, which is difficult to define as a meaningful area. |
 
-#### 3.6.4 Result - ID: TMVC3_39
+#### 3.5.4 Result - ID: TMVC3_39
 | \ | **True Color**| **Result** |
 |---|---|---|
 | **Default** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_default/TMVC3_39_20230711_default.png"><br>This image includes many more noisy pixels; therefore, it's more challenging. Cluster 2 includes the flooded area. However, many other pixels are also included. |
@@ -228,7 +228,7 @@ The following sections 3.6.1 to section 3.6.4 are the results of different image
 | **NDWI with PCA** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_ndwi_pca/TMVC3_39_20230711_ndwi_pca_i.png"><br> With NDWI and PCA applied together, the result is greatly improved. |
 | **Flowline and NDWI with PCA** | <img src="figs/s2/TMVC3_39_20230711_s2_flowline.png"> | <img src="figs/kmeans_features_pca/TMVC3_39_20230711_features_pca_i.png"><br>The result is similar to the previous result; however, adding flowline introduces additional noisy pixels. |
 
-#### 3.6.5 Comparison between Targeted Cluster (Flooded Area) and NDWI
+#### 3.5.5 Comparison between Targeted Cluster (Flooded Area) and NDWI
 Based on the analysis of the clustered images, the combination of NDWI mask and PCA outputs the best result. Therefore, further analysis is conducted by comparing the best result and NDWI mask. 
 
 Because optimization of K-means clustering algorithms are applied to images individually, the selected optimal `n_components` and `n_clusters` clusters can vary between images. To automatically identify the cluster representing the flooded area, NDWI mask is used. The overlap between the NDWI mask and each cluster is calculated, with the cluster showing the highest overlap being identified as the flooded area. Below is comparison between NDWI and the best result. 
@@ -240,7 +240,7 @@ Because optimization of K-means clustering algorithms are applied to images indi
 | <img src="figs/s2/45501_20230711_s2.png"> | <img src="figs/s2/45501_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/45501_20230711_ndwi_pca_i.png"><br>Compared to the NDWI mask, the number of flooded area pixels in the best result is reduced. However, this reduction is not ideal, as it includes a decrease in the flooded river water on the top right part of the image. | NDWI pixels: 3035<br>Targeted Cluster pixels: 2997 |
 | <img src="figs/s2/TMVC3_39_20230711_s2.png"> | <img src="figs/s2/TMVC3_39_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/TMVC3_39_20230711_ndwi_pca_i.png"><br>Compared to NDWI mask, the high-reflectance surface pixels in the best result are reduced. | NDWI pixels: 46531<br>Targeted Cluster pixels: 42918 |
 
-#### 3.6.6 Explained Variance and Elbow Method
+#### 3.5.6 Explained Variance and Elbow Method
 During the optimization process, the number of components (`n_components`) in PCA and the number of clusters (`n_clusters`) in the K-means clustering algorithm are tested with different values to determine the optimal configuration.
 
 For PCA, the goal is to identify the minimum number of components that captures at least 90% of the variance in the data. After determining this optimal number of components, PCA is applied to the input data.

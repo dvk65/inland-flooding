@@ -115,7 +115,7 @@ Given that weather conditions during flood events are often poor, having a large
 The Sentinel-2 satellite is selected from various satellites because of its natural color visualization option and 10-meter resolution. It provides the high-quality input images for K-means clustering algorithm in the next step. To achieve the natural color visualization, the combination of bands B04, B03, and B02 is selected, as introduced in the [Sentinel Hub Guide](https://custom-scripts.sentinel-hub.com/custom-scripts/sentinel-2/composites/).
 
 #### 3.3.1 Introduction
- Initially, 379 images were downloaded using Google Earth Engine API. After necessary filtering steps, the dataset is refined to include 69 high-quality natural color images, captured before/during/after the 2023 July Flood Event. These 69 images belong to 25 flood event observations. The filtering process is illustrated below:
+ Initially, 379 images were downloaded using Google Earth Engine API. After necessary filtering steps, the dataset is filtered to include 69 high-quality natural color images, captured before/during/after the 2023 July Flood Event. These 69 images belong to 25 flood event observations. The filtering process is illustrated below:
 
 <img src="figs/s2_workflow.png">
 
@@ -180,9 +180,9 @@ Below is a comparison between all flowlines and the selection of major rivers.
 ### 3.5 KMeans Clustering Algorithm
 To automate the assessment of flooded areas, I select the K-means clustering algorithm, a commonly used method in image segmentation. The decision to use K-means clustering is based on three crucial factors: the small dataset size (69 images), the absence of ground truth for the flooded areas, and the unique visual characteristics of the flooded areas (brown water bodies caused by sediment). K-means clustering algorithm groups data points based on similarity. When only image data is used, this similarity is based on color; when additional features are introduced, the similarity is calculated based on the combination.
 
-First, the default setting is executed in each image. `StandardScaler` is applied before K-means clustering algorithm to standardize the image color channels. This standardization not only speeds up convergence but also improves the accuracy and consistency of the clustering results. K-means is initialized with 3 clusters determined by visual inspection and the initialization method is set to`k-means++`. 
+Firstly, the default setting is executed in each image. `StandardScaler` is applied before K-means clustering algorithm to standardize the image color channels. This standardization not only speeds up convergence but also improves the accuracy and consistency of the clustering results. K-means is initialized with 3 clusters determined by visual inspection and the initialization method is set to`k-means++`. 
 
-During the optimization phase, Principal Component Analysis (PCA), a dimensionality reduction technique that reduces noise while capturing the most important information, is applied. The [tutorial from Medium](https://towardsdatascience.com/k-means-and-pca-for-image-clustering-a-visual-analysis-8e10d4abba40) provides additional explanation of how to comebine K-means and PCA. Additionally, additional masks are introduced as features.Each image undergoes three types of optimization. In this process, the selection of the optimal number of PCA components and clusters is guided by the explained variance and the elbow method.
+During the optimization phase, Principal Component Analysis (PCA), a dimensionality reduction technique that reduces noise while capturing the most important information, is applied. The [tutorial from Medium](https://towardsdatascience.com/k-means-and-pca-for-image-clustering-a-visual-analysis-8e10d4abba40) provides additional explanation of how to combine K-means and PCA. Additionally, additional masks are introduced as features. Each image undergoes three types of optimization. In this process, the selection of the optimal number of PCA components and clusters is guided by the explained variance and the elbow method.
 
 Three types of optimizations are:
 - Apply Principle Component Analysis to image data;
@@ -259,7 +259,7 @@ The best combination of n_components and n_clusters is used to optimize the K-me
 ## 4. Discussion and Future Work
 
 ### 4.1 Discussion
-The New England region has experienced a significant number of recent flood events, with 1,107 observations highlighting the challenges of inland and coastal flooding. Therefore, developing effective methods for assessing flooded areas is critical. However, the weather conditions during flood events, particularly heavy cloud cover, pose challenges in collecting a large number of high-quality Sentinel-2 images. Additionally, the timing of Sentinel-2 image captures may not always align with the peak of flood events, further limiting the availability of high-quality satellite images. Based on these flood event observations, 379 images are collected, and only 69 of those are ideal.
+The New England region has experienced a significant number of recent flood events, with 1,107 observations highlighting the challenges of inland and coastal flooding. Therefore, developing effective methods for assessing flooded areas is critical. However, the weather conditions during flood events, particularly heavy cloud cover, pose challenges in collecting a large number of high-quality Sentinel-2 images. Additionally, due to the timing of Sentinel-2, flood events may not be captured. Based on these flood event observations, 379 images are collected, and only 69 of those are ideal.
 
 The analysis of the default K-means clustering algorithm across various images reveals that environmental characteristics significantly influence the results. When the features in an image are primarily flooded areas and green land, the default K-means algorithm can extract the majority of the flooded regions with relatively small noisy pixels. However, in more complex environments, optimizing the algorithm becomes crucial, as the flooded areas are more likely to be mixed with other noisy pixels.
 
@@ -268,14 +268,14 @@ Different optimization approaches have different results. For instance, when com
 ### 4.2 Future Work
 There're many aspects that can be further explored and improved.
 
-Firstly, the current approach to extracting major rivers from flowline datasets can be refined. Samuel Roy, a scientist from USGS, suggests that stream order selection is helpful in identifying major rivers. By incorporating this modification, the flowline mask used as a feature in the optimization process might see improvements. 
+Firstly, the current approach to extracting major rivers from flowline datasets can be improved. Samuel Roy, a scientist from USGS, suggests that stream order selection is helpful in identifying major rivers. By adding this modification, the flowline mask in the optimization process might be more helpful. 
 
-Secondly, the optimization process can be significantly improved by exploring various ways to combine the features and techniques currently in use, such as NDWI (Normalized Difference Water Index) and flowline data, along with StandardScaler and PCA (Principal Component Analysis). Each combination of these elements can produce different results, and selecting the optimal combination is crucial for enhancing the model's performance.
+Secondly, the optimization process can be improved by exploring various ways to combine the features (NDWI and flowline) and techniques (StandardScaler and PCA) currently in use. Each combination of these elements can produce different results, and selecting the optimal combination is crucial for enhancing the model's performance.
 
 Thirdly, one of the initial datasets included in this proposal is the Digital Elevation Model (DEM). Because flood event observations often come with elevation values, integrating DEM data can provide valuable insights. However, high-water marks from the STN (Short-Term Network) dataset need to be carefully processed. Some locations may have multiple high-water marks with different elevation values. Discussion with a professional will be necessary to ensure accuracy in the analysis. 
 
 ### Acknowledgement
-Great thanks to my supervisor, Philip Bogden, for his guidance and support throughout my research, especially in helping me navigate the challenges I faced.
+Great thanks to my supervisor, Philip Bogden, for his guidance and support throughout my research, especially in helping me solve the challenges I faced.
 
 Great thanks to Samuel Roy from USGS who provided many professional and valuable advices about the data sources and methodology. 
 

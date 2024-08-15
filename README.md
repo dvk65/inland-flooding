@@ -59,7 +59,7 @@ Before collecting Sentinel 2 imagery from [Google Earth Engine](https://develope
 
 The sections `Create a Cloud project` and `Enable the Earth Engine API` in [Set up your Earth Engine enabled Cloud Project](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup) should be completed. A step-by-step demonstration can be found in [GUIDE.md](GUIDE.md#google-earth-engine-setup). 
 
-To collect Sentinel 2 imagery from Google Earth Engine, use the following command (estimated runtime: 160 minutes): 
+Before collecting Sentinel-2 imagery with this approach, remember to replace the project ID in the Cloud project in `s2.py` (`ee.Initialize(project='demoflood0803')`) with your project ID. To collect Sentinel-2 imagery from Google Earth Engine, use the following command (estimated runtime: 160 minutes): 
 ```
 make s2
 ```
@@ -69,9 +69,9 @@ Before applying the KMeans clustering algorithm, necessary preprocessing steps a
 - extract the ideal dataset for KMeans clustering;
 - prepare all masks for KMeans clustering.
 
-Meanwhile, flowlines from National Hydrography Dataset are collected to enhance the analysis of flooded areas in Sentinel-2 images.
+Meanwhile, flowlines from National Hydrography Dataset are collected to enhance the analysis of flooded areas in Sentinel-2 images and improve the K-means clustering algorithm.
 
-To run analysis and preparation on the images, use the following command (estimated runtime: 10-15 minutes):
+To run analysis and preparation on the images, use the following command (estimated runtime: 15-20 minutes):
 ```
 make eda_s2
 ```

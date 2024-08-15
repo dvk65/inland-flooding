@@ -7,6 +7,7 @@ This document is a brief guide to help users set up the required environment, ut
     - [Creating the environment from the environment.yml](#setting-up-the-environment-from-the-environmentyml)
     - [Google Earth Engine Setup](#google-earth-engine-setup)
 - [Tools and Platforms](#tools-and-platforms)
+- [Data Folder Structure](#data-folder-structure)
 - [Dataset Documentation](#dataset-documentation)
     - [STN high-water marks](#stn-high-water-marks)
         - [Dataset overview](#hwm-dataset-overview)
@@ -29,7 +30,6 @@ conda env create -f environment.yml
 ```
 conda activate flood
 ```
-
 ### Google Earth Engine Setup
 Google Earth Engine has a guide about [setting up Earth Engine enabled Cloud Project](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup). Below is a step-by-step demonstration of the approach I selected to use Google Earth Engine.
 
@@ -65,7 +65,44 @@ When running `make s2`, you will receive the following output:
 
 <img src="/figs/guide/login.png" width="550" alt="login">
 
-## Tools and Platforms
+## Tools and Platforms (TODO)
+
+## Data Folder Structure
+```
+flood/ # store all datasets and figures in this projects
+│
+├── data/
+│   ├── df_gauge/ # datasets related to high-water levels
+│   ├── df_kmeans/ # datasets related to results of K-means clustering algorithm
+│   ├── df_s2/ # datasets related to the image information
+│   ├── df_stn/ # datasets related to high-water marks
+│   ├── img_s2/ # image GeoTIFFs
+│   ├── nhd/ # flowline shapefiles
+│   ├── flood_event.csv # ready-to-use flood event observations (high-water marks and levels combined)
+│   ├── kmeans.csv # ready-to-use kmeans clustering result
+│   ├── s2_id_with_flood.csv # image information dataset used in K-means clustering (69 instances)
+│   └── s2.csv # ideal image information dataset (102 instances)
+│
+├── figs/
+│   ├── countplot/ # all counplots
+│   ├── guide/ # google earth engine guide
+│   ├── kmeans_default/ # clustered image using default configuration
+│   ├── kmeans_feature_combination/ # clustered image using NDWI and flowline as features with PCA applied
+│   ├── kmeans_flowline/ # clustered image using flowline as a feature with PCA applied
+│   ├── kmeans_ndwi/ # clustered image using ndwi as a feature with PCA applied
+│   ├── kmeans_optimizing/ # explained variance figures and elbow figures for images with notable flooded areas
+│   ├── kmeans_pca/ # clustered image wih PCA applied
+│   ├── map/ # created static maps to show the distributions of data points
+│   ├── s2/ # Sentinel-2 natural color image with all its masks (images used for K-means) (69 * 4) - final image dataset
+│   ├── s2_cleaned/ # 102 images grouped by flood event observation ID (49 ids) 
+│   ├── s2_event_selected/ # images in the selected flood event 2023 July before s2_cleaned
+│   ├── s2_ndwi_test/ # ndwi threshold tested on s2 images
+│   ├── s2_raw_vis_by_id/ # image group by flood event observation ID (first step of filtering images) - identify the ideal flood event
+│   ├── flowline_no_filter.png # image with all flowlines
+│   ├── hwm_duplicate.png # multiple high-water marks in the same location
+│   ├── s2_workflow.png # image collection and filtering workflow
+│   └── workflow.png # entire workflow
+```
 
 ## Dataset Documentation
 
@@ -204,7 +241,7 @@ The last dataset `df_gauge_mod` represents the preprocessed dataset. This datase
 - `note` - the flood impact of different water level
 - `source`: a newly created label to identify the source of each high-water levels
 
-### Sentinel-2 imagery
+### Sentinel-2 imagery (TODO)
 
 ### [Flowline from National Hydrography Dataset](https://www.usgs.gov/national-hydrography)
 The ZIP file for a state's NHD dataset includes the following contents:

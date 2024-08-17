@@ -58,11 +58,14 @@ make eda_flood_event
 ```
 
 ### Step 3: Collect Sentinel-2 true color imagery, cloud masks, and NDWI masks corresponding to the flood event data
-Before collecting Sentinel 2 imagery from [Google Earth Engine](https://developers.google.com/earth-engine/datasets/catalog/sentinel-2), we need to set up our own Google Cloud Platform project and authenticate using either our personal Google account or a service account. 
+To collect Sentinel 2 imagery from [Google Earth Engine](https://developers.google.com/earth-engine/datasets/catalog/sentinel-2), you need to satisfy the following requirements, as listed in the [Google Earth Engine Tutorial](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup):
+- Ensure you have a **Google Account**;
+- Create or select an existing **Google Cloud Project**;
+- Enable the **Earth Engine API** within your Google Cloud Project. 
 
-The sections `Create a Cloud project` and `Enable the Earth Engine API` in [Set up your Earth Engine enabled Cloud Project](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup) should be completed. A step-by-step demonstration can be found in [GUIDE.md](GUIDE.md#google-earth-engine-setup). 
+To set up your Earth Engine-enabled Cloud Project, follow the steps in the [Google Earth Engine setup guide](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup). Ensure you complete the `Create a Cloud Project` and `Enable the Earth Engine API` sections. A step-by-step walkthrough can be found in [GUIDE.md](GUIDE.md#google-earth-engine-setup).
 
-Before collecting Sentinel-2 imagery with this approach, remember to replace the project ID in the Cloud project in `s2.py` (`ee.Initialize(project='demoflood0803')`) with your project ID. To collect Sentinel-2 imagery from Google Earth Engine, use the following command (estimated runtime: 160 minutes): 
+Before collecting Sentinel-2 imagery, make sure to update the project ID in `s2.py` by replacing `demoflood0803` with your own project ID (`ee.Initialize(project='your_project_id')`). Then, to start the collection process, run the following command (estimated runtime: 160 minutes):
 ```
 make s2
 ```

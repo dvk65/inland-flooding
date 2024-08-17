@@ -1,10 +1,10 @@
 # Environment Setup, Tools/Platforms, and Dataset Documentation
 
-This document is a brief guide to help users set up the required environment, utilize the tools and platforms utilized, and understand the datasets in this project. 
+This document is a brief guide to help users set up the required environment, utilize the tools involved, and understand the datasets in this project. 
 
 ## Table of Contents
 - [Environment Setup](#environment-setup)
-    - [Creating the environment from the environment.yml](#setting-up-the-environment-from-the-environmentyml)
+    - [Virtual Environment Setup from environment.yml](#virtual-environment-setup-from-environmentyml)
     - [Google Earth Engine Setup](#google-earth-engine-setup)
 - [Tools and Platforms](#tools-and-platforms)
 - [Data Folder Structure](#data-folder-structure)
@@ -20,91 +20,102 @@ This document is a brief guide to help users set up the required environment, ut
     - [Flowlines from NHD](#flowline-from-national-hydrography-dataset)
 
 ## Environment Setup
-### Setting up the environment from the environment.yml
-1. use the terminal to create the environment from the environment.yml:
+### Virtual Environment Setup from environment.yml
+1. Use the terminal to create the environment from `environment.yml`:
 ```
 conda env create -f environment.yml
 ```
 
-2. activate the environment (the environment's name can be found in the yml file):
+2. Activate the environment (environment's name can be found in `yml` file):
 ```
 conda activate flood
 ```
 ### Google Earth Engine Setup
 Google Earth Engine has a guide about [setting up Earth Engine enabled Cloud Project](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup). Below is a step-by-step demonstration of the approach I selected to use Google Earth Engine.
 
-#### step 1 - create a cloud project
-Create a Google Cloud Project using this [link](https://console.cloud.google.com/projectcreate) or clicking on the link in the official setup guide. 
+#### Step 1 - create a cloud project
+Create a Google Cloud Project [here](https://console.cloud.google.com/projectcreate) or by clicking on `Create a Cloud project` in the [official setup guide](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup). 
 
 <img src="/figs/guide/create_project.png" width="550" alt="create a project">
 
-#### step 2 - enable the Earth Engine API
-To enable the Earth Engine API, click on the link (Enable the Earth Engine API) in the offical setup guide or search for Earth Engine API in APIs & Services section. 
+#### Step 2 - enable the Earth Engine API
+To enable the Earth Engine API, click on `Enable the Earth Engine API` in the [official setup guide](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup) or search for `Earth Engine API` in APIs & Services section. 
 
 <img src="/figs/guide/enable_api.png" width="550" alt="enable api">
 
-To enable this API, setting up the credentials is required. If credentials are not set up, a warning will appear after you click the Enable button. 
+#### Step 3 - set up Credentials
+Enabling the API requires setting up credentials. If credentials aren't configured, a warning will appear at the top after clicking `Enable`. 
 
 <img src="/figs/guide/create_credentials.png" width="550" alt="create credentials">
 
-Clicking on the CREATE CREDENTIALS button, we'll move to the section of creating credentials. 
+#### Step 4 - create Credentials
+Click on `CREATE CREDENTIALS` to proceed to the credential creation section. 
 
 <img src="/figs/guide/set_credential_type.png" width="550" alt="credential type">
+
+#### Step 5 - configure OAuth Consent Screen
+During the credential setup process, the OAuth consent screen will need to be configured.
+
 <img src="/figs/guide/consent_screen.png" width="550" alt="consent screen">
+
+#### Step 6 - generate Client ID
+Finalize the setup by generating a Client ID for the application.
+
 <img src="/figs/guide/client_id.png" width="550" alt="client id">
 
-#### step 3 - register Earth Engine
-To use Earth Engine, we need to register the project [here](https://code.earthengine.google.com/register). 
+#### Step 7 - register the project
+To use Earth Engine API, register the project [here](https://code.earthengine.google.com/register). 
 
 <img src="/figs/guide/register_project.png" width="550" alt="get started">
 <img src="/figs/guide/select_use.png" width="550" alt="select use">
 <img src="/figs/guide/select_project.png" width="550" alt="select project">
 
-#### step 4 - fetch credentials using gcloud
-When running `make s2`, you will receive the following output:
+#### Step 8 - fetch credentials using gcloud
+When running `make s2`, the following output will prompt for authentication:
 
 <img src="/figs/guide/login.png" width="550" alt="login">
 
 ## Tools and Platforms (TODO)
 
-## Data Folder Structure
+## Dataset Documentation
+
+### [Data>](https://drive.google.com/drive/folders/1iFKHeHfNnRrpxUlsN3PIxYGxEh9IeB3n?usp=sharing) Folder Structure
+This project includes multiple folders organized as follows:
 ```
 flood/ # store all datasets and figures in this projects
 │
 ├── data/
-│   ├── df_gauge/ # datasets related to high-water levels
-│   ├── df_kmeans/ # datasets related to results of K-means clustering algorithm
-│   ├── df_s2/ # datasets related to the image information
-│   ├── df_stn/ # datasets related to high-water marks
-│   ├── img_s2/ # image GeoTIFFs
-│   ├── nhd/ # flowline shapefiles
-│   ├── flood_event.csv # ready-to-use flood event observations (high-water marks and levels combined)
-│   ├── kmeans.csv # ready-to-use kmeans clustering result
-│   ├── s2_id_with_flood.csv # image information dataset used in K-means clustering (69 instances)
-│   └── s2.csv # ideal image information dataset (102 instances)
+│   ├── df_gauge/                        # Datasets related to high-water levels
+│   ├── df_kmeans/                       # Datasets related to K-means clustering results
+│   ├── df_s2/                           # Datasets related to image information
+│   ├── df_stn/                          # Datasets related to high-water marks
+│   ├── img_s2/                          # GeoTIFF images
+│   ├── nhd/                             # Flowline shapefiles
+│   ├── flood_event.csv                  # Ready-to-use flood event observations (high-water marks and levels combined)
+│   ├── kmeans.csv                       # Ready-to-use K-means clustering results
+│   ├── s2_id_with_flood.csv             # Image information dataset used in K-means clustering (69 instances)
+│   └── s2.csv                           # Ideal image information dataset (102 instances)
 │
 ├── figs/
-│   ├── countplot/ # all counplots
-│   ├── guide/ # google earth engine guide
-│   ├── kmeans_default/ # clustered image using default configuration
-│   ├── kmeans_feature_combination/ # clustered image using NDWI and flowline as features with PCA applied
-│   ├── kmeans_flowline/ # clustered image using flowline as a feature with PCA applied
-│   ├── kmeans_ndwi/ # clustered image using ndwi as a feature with PCA applied
-│   ├── kmeans_optimizing/ # explained variance figures and elbow figures for images with notable flooded areas
-│   ├── kmeans_pca/ # clustered image wih PCA applied
-│   ├── map/ # created static maps to show the distributions of data points
-│   ├── s2/ # Sentinel-2 natural color image with all its masks (images used for K-means) (69 * 4) - final image dataset
-│   ├── s2_cleaned/ # 102 images grouped by flood event observation ID (49 ids) 
-│   ├── s2_event_selected/ # images in the selected flood event 2023 July before s2_cleaned
-│   ├── s2_ndwi_test/ # ndwi threshold tested on s2 images
-│   ├── s2_raw_vis_by_id/ # image group by flood event observation ID (first step of filtering images) - identify the ideal flood event
-│   ├── flowline_no_filter.png # image with all flowlines
-│   ├── hwm_duplicate.png # multiple high-water marks in the same location
-│   ├── s2_workflow.png # image collection and filtering workflow
-│   └── workflow.png # entire workflow
+│   ├── countplot/                       # All count plots
+│   ├── guide/                           # Google Earth Engine guide
+│   ├── kmeans_default/                  # Clustered images using default configuration
+│   ├── kmeans_feature_combination/      # Clustered images using NDWI and flowline as features with PCA applied
+│   ├── kmeans_flowline/                 # Clustered images using flowline as a feature with PCA applied
+│   ├── kmeans_ndwi/                     # Clustered images using NDWI as a feature with PCA applied
+│   ├── kmeans_optimizing/               # Explained variance figures and elbow plots for images with significant flooded areas
+│   ├── kmeans_pca/                      # Clustered images with PCA applied
+│   ├── map/                             # Static maps showing data point distributions
+│   ├── s2/                              # Sentinel-2 natural color images with all masks (used for K-means) (69 * 4) - final image dataset
+│   ├── s2_cleaned/                      # 102 images grouped by flood event observation ID (49 IDs)
+│   ├── s2_event_selected/               # Images from the selected July 2023 flood event, before cleaning
+│   ├── s2_ndwi_test/                    # NDWI threshold tests on Sentinel-2 images
+│   ├── s2_raw_vis_by_id/                # Images grouped by flood event observation ID (initial filtering step)
+│   ├── flowline_no_filter.png           # Image with all flowlines
+│   ├── hwm_duplicate.png                # Multiple high-water marks at the same location
+│   ├── s2_workflow.png                  # Image collection and filtering workflow
+│   └── workflow.png                     # Complete project workflow
 ```
-
-## Dataset Documentation
 
 ### [STN high-water marks](https://stn.wim.usgs.gov/STNDataPortal/)
 The USGS Short-Term Network (STN) Flood Event Data Portal includes high-water mark data which is the evidence of a flood event. USGS also provide an interactive website called [Flood Event Viewer](https://stn.wim.usgs.gov/FEV/) to explore the flood events. To understand more about high-water mark and its importance, we can check [High-Water Marks and Flooding](https://www.usgs.gov/special-topics/water-science-school/science/high-water-marks-and-flooding) and [A USGS guide for finding and interpreting high-water marks](https://www.youtube.com/watch?v=uZYRQLMcVOA).

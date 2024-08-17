@@ -79,7 +79,7 @@ When running `make s2`, the following output will prompt for authentication:
 
 ## Dataset Documentation
 
-### [Data>](https://drive.google.com/drive/folders/1iFKHeHfNnRrpxUlsN3PIxYGxEh9IeB3n?usp=sharing) Folder Structure
+### [Data](https://drive.google.com/drive/folders/1iFKHeHfNnRrpxUlsN3PIxYGxEh9IeB3n?usp=sharing) Folder Structure
 This project includes multiple folders organized as follows:
 ```
 flood/ # store all datasets and figures in this projects
@@ -117,8 +117,11 @@ flood/ # store all datasets and figures in this projects
 │   └── workflow.png                     # Complete project workflow
 ```
 
+### Area of interest selection `area_list`
+The area of interest is the New England Region, including Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island, and Vermont. Initially, the focus was on Maine; however, due to the limited availability of recent flood event observations when Sentinel-2 data became accessible, the focus was broadened. Under the guidance of Samuel Roy, a USGS scientist, Vermont was included in the area of interest, given its potentially similar flood characteristics. Other states in the New England Region are also being considered.
+
 ### [STN high-water marks](https://stn.wim.usgs.gov/STNDataPortal/)
-The USGS Short-Term Network (STN) Flood Event Data Portal includes high-water mark data which is the evidence of a flood event. USGS also provide an interactive website called [Flood Event Viewer](https://stn.wim.usgs.gov/FEV/) to explore the flood events. To understand more about high-water mark and its importance, we can check [High-Water Marks and Flooding](https://www.usgs.gov/special-topics/water-science-school/science/high-water-marks-and-flooding) and [A USGS guide for finding and interpreting high-water marks](https://www.youtube.com/watch?v=uZYRQLMcVOA).
+The USGS Short-Term Network (STN) Flood Event Data Portal includes high-water marks which are the evidence of a flood event. USGS also provide an interactive website called [Flood Event Viewer](https://stn.wim.usgs.gov/FEV/) to explore the flood events. To understand more about high-water mark and its importance, we can check [High-Water Marks and Flooding](https://www.usgs.gov/special-topics/water-science-school/science/high-water-marks-and-flooding) and [A USGS guide for finding and interpreting high-water marks](https://www.youtube.com/watch?v=uZYRQLMcVOA).
 
 #### HWM dataset overview
 In this project, the downloaded original dataset (53 x 3502) has 53 attributes:
@@ -141,7 +144,7 @@ The flood events in original STN dataset include:
 ['2021 Henri', '2012 Sandy', '2018 March Extratropical Cyclone', '2010 March - April RI MA Flood', '1978 Feb Extratropical Cyclone', '1991 October Extratropical Cyclone', '2018 January Extratropical Cyclone', '2011 Irene', '2023 July MA NY VT Flood', '2023 December East Coast Cyclone']
 ```
 
-However, the selected satellite is [Sentinel-2](https://developers.google.com/earth-engine/datasets/catalog/sentinel-2). Sentinel-2 (Level-1C) was launched in 2015. As a result, high-water marks before 2015 will not be included. Additionally, based on the previous output, the earliest flood event after 2015 occurred in 2018. Therefore, we can set the date threshold to 2017. This allows us to utilize the more precise Sentinel-2 Level-2A dataset, which has been available since March 28, 2017. This date (2017-03-28) will be used when collecting high-water levels.
+However, the selected satellite is [Sentinel-2](https://developers.google.com/earth-engine/datasets/catalog/sentinel-2). Sentinel-2 (Level-1C) was launched in 2015. As a result, high-water marks before 2015 will not be included. Additionally, based on the output above, the earliest flood event after 2015 occurred in 2018. Given this, we can focus on the more precise Sentinel-2 Level-2A dataset, which has been available since March 28, 2017. This date (2017-03-28) will be the starting point for collecting high-water levels.
 
 | Event | Date |
 |-------|------|
@@ -151,15 +154,12 @@ However, the selected satellite is [Sentinel-2](https://developers.google.com/ea
 | [2023 July MA NY VT Flood](https://www.weather.gov/btv/The-Great-Vermont-Flood-of-10-11-July-2023-Preliminary-Meteorological-Summary) | 2023-07-10 (formed) - 2023-07-11 (dissipated) |
 | [2023 December East Coast Cyclone](https://cw3e.ucsd.edu/wp-content/uploads/2023/12/20Dec2023_Summary/20231218EastCoast.pdf) | 2023-12-17 (formed) - 2023-12-18 (dissipated) |
 
-#### Area of Interest selection `area_list`
-The area of interest is the New England Region, including Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island, and Vermont. Initially, the focus was on Maine; however, due to the limited availability of recent flood event observations when Sentinel-2 data became accessible, the focus shifted. Under the guidance of Samuel Roy, a USGS scientist, the area of interest was expanded to include other states with potentially similar flood characteristics, particularly Vermont. Other states in the New England Region are also being considered.
-
 #### Duplicates check `latitude`, `longitude`, and `event`
 Firstly, around 200 observations were removed due to duplicates after dropping the `files` attribute representing high-water mark files (primarily photos). These files can be viewed on the [STN Flood Event Viewer](https://stn.wim.usgs.gov/FEV/#2023JulyMANYVTFlood), but cannot be downloaded directly using `requests`. 
 
 Secondly, approximately 2,400 observations were removed due to duplicate combinations of `latitude`, `longitude`, and `event`. A key task in using STN high-water marks is to retrieve corresponding satellite images based on the location and date of the high-water marks. Therefore, it's crucial to avoid collecting duplicate locations for the same flood event.
 
-Also, further exploration of the duplicates in `latitude`, `longitude`, and `event` revealed that a single location might have multiple high-water marks with different elevation values. Below is the first 4 rows of duplicate values:
+Also, further exploration of the duplicates in `latitude`, `longitude`, and `event` reveals that a single location might have multiple high-water marks with different `elevation` values. Below is the first 4 rows of duplicate values:
 ```
 duplicates in ['event', 'latitude', 'longitude']:
           id       event state      county   latitude  longitude                                               note source
@@ -208,6 +208,7 @@ hwm_id  40935  40936
 ```
 
 These high-water marks can also be examined from the [visualization on Flood Event Viewer](https://stn.wim.usgs.gov/FEV/#2021Henri):
+
 <img src="figs/hwm_duplicate.png" width="400" alt="high-water mark duplicate">
 
 
@@ -222,7 +223,7 @@ High-water levels from gauges are collected and preprocessed using four steps:
 Exemplar:
 1. [ME gauge list](https://hads.ncep.noaa.gov/charts/ME.shtml);
 2. [Flood-related Information - Kennecbec River at Augusta Information with NWSLI ASTM1](https://water.noaa.gov/gauges/ASTM1);
-3. [Water Levels - Kennebec River at Augusta with NWSLI ASTM1 and USGSID 01049320](https://waterdata.usgs.gov/monitoring-location/01049320/#parameterCode=00065&period=P7D&showMedian=false) and constructed [URL to retrieve data between 2017-03-28 and 2018-05-23](https://nwis.waterservices.usgs.gov/nwis/iv/?sites=01049320&parameterCd=00065&startDT=2017-03-28T00:00:00.000-05:00&endDT=2018-05-23T23:59:59.999-04:00&siteStatus=all&format=rdb) (shorter date range for demonstration only).
+3. [Water Levels - Kennebec River at Augusta with NWSLI ASTM1 and USGSID 01049320](https://waterdata.usgs.gov/monitoring-location/01049320/#parameterCode=00065&period=P7D&showMedian=false) and constructed [URL to retrieve data between 2017-03-28 and 2018-05-23](https://nwis.waterservices.usgs.gov/nwis/iv/?sites=01049320&parameterCd=00065&startDT=2017-03-28T00:00:00.000-05:00&endDT=2018-05-23T23:59:59.999-04:00&siteStatus=all&format=rdb) (date range for demonstration only).
 
 #### HWL dataset overview
 The first dataset `df_gauge_list` represents the gauges (names and nswli identifiers) in the New England Region. This dataset (3 x 515) has 3 attributes:
@@ -254,6 +255,10 @@ The last dataset `df_gauge_mod` represents the preprocessed dataset. This datase
 
 ### Sentinel-2 imagery (TODO)
 
+### Cloud and Shadow Mask
+
+### NDWI mask
+
 ### [Flowline from National Hydrography Dataset](https://www.usgs.gov/national-hydrography)
 The ZIP file for a state's NHD dataset includes the following contents:
 ```
@@ -281,12 +286,3 @@ Index(['permanent_', 'fdate', 'resolution', 'gnis_id', 'gnis_name', 'lengthkm',
 # fcode
 [55800, 46006, 46003, 33600, 33400, 42000, 33601, 46000, 42812, 42811, 42809, 42801, 42807]
 ```
-
-- `ftype`
-    - 334	  Connector
-    - 336	  Canal/Ditch
-    - 420	  Underground Conduit
-    - 428	  Pipeline
-    - 460	  Stream / River
-    - 558	  Artificial Path
-    - 566	  Coastline

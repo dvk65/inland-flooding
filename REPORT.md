@@ -5,6 +5,8 @@ Satellite data, particularly from Sentinel-2 with its 10-meter resolution, provi
 
 **Area of Interests**: The project initially focused on Maine. However, due to limited flood event observations in Maine, it has been expanded to include other states in the New England Region (primarily Vermont) which shares similar flood characteristics.
 
+_Note: Clicking on the images below will display them in full resolution._
+
 ## 1. Method
 1. Collect flood event observations from two sources: high-water marks available through the USGS STN Flood Event Data Portal and high-water levels extracted from real-time gauge water levels provided by USGS Water Data Services;
 2. Collect satellite images captured before, during, and after flood event observations;
@@ -28,13 +30,13 @@ _Note: The [data](https://drive.google.com/drive/folders/1iFKHeHfNnRrpxUlsN3PIxY
 
 ## 3. Result
 This section presents the work and findings organized into five key parts:
-- [3.1 Flood Event Observations (High-Water Marks)](#31-flood-event-observations-high-water-marks)
-- [3.2 Flood Event Observations (High-Water Levels)](#32-flood-event-observations-high-water-levels)
+- [3.1 Flood Event Observations (STN High-Water Marks)](#31-flood-event-observations-stn-high-water-marks)
+- [3.2 Flood Event Observations (High-Water Levels from Gauges)](#32-flood-event-observations-high-water-levels-from-gauges)
 - [3.3 Sentinel-2 Natural Color Imagery](#33-sentinel-2-natural-color-imagery)
 - [3.4 Cloud Masks, NDWI Masks, and Flowline Masks](#34-cloud-masks-ndwi-masks-and-flowline-masks)
 - [3.5 KMeans Clustering Algorithm](#35-kmeans-clustering-algorithm)
 
-### 3.1 Flood Event Observations (High-Water Marks)
+### 3.1 Flood Event Observations (STN High-Water Marks)
 High-water marks are validated flood event observations published by the USGS. The original dataset has 53 attributes and 3502 observations. Only 7 of these attributes and 889 observations are selected for the following reason:
 - This project focuses on the locations and dates of flood event observations so attributes such as `hwmTypeName` and `verticalDatumName` are excluded as they are not directly relevant;
 - Some of the flood events, such as the `1991 October Extratropical Cyclone`, occurred before the availability of Sentinel-2 imagery which has only been available since 2015;
@@ -43,24 +45,28 @@ High-water marks are validated flood event observations published by the USGS. T
 #### 3.1.1 Dataset Overview
 
 Below is a table summarizing the key characteristics of the filtered high-water marks:
-|**Atribute**|**Count of unique values**|**Top 3 event**|**Count**|**Top 3 state**|**Count**|
-|-|-|-|-|-|-|
-|id<br>event<br>state<br>county<br>latitude<br>longitude<br>note<br>source|889<br>5<br>6<br>28<br>863<br>860<br>837<br>1|2023 July MA NY VT Flood<br>2018 March Extratropical Cyclone<br>2018 January Extratropical Cyclone|641<br>115<br>81|VT<br>MA<br>CT|590<br>262<br>15|
+|**Attributes (Unique Values Count)**|**Top 3 Events (Observation Count)**|**Top 3 States (Observation Count)**|
+|-|-|-|
+|id: 889<br>event: 5<br>state: 6<br>county: 28<br>latitude: 863<br>longitude: 860<br>note: 837<br>source: 1|2023 July MA NY VT Flood: 641<br>2018 March Extratropical Cyclone: 115<br>2018 January Extratropical Cyclone: 81|VT: 590<br>MA: 262<br>CT: 15|
 
 **_Insight_**
-- The table indicates that all six states in the New England region were affected by five significant flood events, but the impact varied across the states.To explore the distribution of high-water marks across different states and events, visualization techniques including countplots and maps are necessary.
+- The first column lists all the attributes in the STN high-water marks, along with the number of unique values for each attribute. The data includes 6 New England states and records five significant flood events. 
+- The second column highlights the top 3 flood events, with the 2023 July MA NY VT Flood leading at 641 observations, significantly more than the next events.
+- The third column shows the top 3 states by observation count, with Vermont leading, followed by Massachusetts and Connecticut.
+- To explore the distribution of high-water marks across different states and events, visualization techniques including countplots and maps are necessary.
 
 #### 3.1.2 Dataset Visualization
 Below are two figures illustrating the distribution of high-water marks:
 |**Countplot**|**VT map (Top 1 state)**|
 |-|-|
-|<img src="figs/countplot/countplot_stn.png" width="500"><br>The countplot illustrates the distribution of flood event observations in each state. It's evident that Vermont has the highest number of observations, primarily from the `2023 July MA NY VT Flood` event (547 observations). In contrast, Maine, the initially targeted state, has only 6 observations.|<img src="figs/map/map_VT_stn_gauge.png" width="500"><br>The map represents the spatial distribution of high-water marks (triangle markers) in Vermont which has the highest number of observations. A significant number of high-water marks are clustered closely together and the majority is from the flood event `2023 July MA NY VT Flood`.|
+|<img src="figs/countplot/countplot_stn.png" width="500"><br>The countplot illustrates the distribution of flood event observations in each state. It's evident that Vermont has the largest number of observations, primarily from the `2023 July MA NY VT Flood` event (547 observations). In contrast, Maine, the initially targeted state, has only 6 observations.|<img src="figs/map/map_VT_stn_gauge.png" width="500"><br>The map represents the spatial distribution of high-water marks (triangle markers) in Vermont which has the largest number of observations. A significant number of high-water marks are clustered closely together and the majority is from the flood event `2023 July MA NY VT Flood`.|
 
 **_Insight_**
-- The distribution of high-water marks suggests that the `2023 July MA NY VT Flood` event in Vermont is likely the most suitable dataset for further analysis and satellite imagery collection since it has the largest number of observations. However, the close proximity of some high-water marks presents a challenge for satellite imagery collection, as the buffer regions around these points may significantly overlap. This issue will be carefully considered during the satellite imagery collection process.
+- The distribution of high-water marks suggests that the `2023 July MA NY VT Flood` event in Vermont is likely the most suitable dataset for further analysis and satellite imagery collection since it has the largest number of observations. 
+- However, the close proximity of some high-water marks, as seen on the Vermont map, poses a challenge for satellite imagery collection. When high-water marks are too close together, their defined areas of interest can overlap significantly, resulting in nearly identical satellite images. This overlap is carefully addressed during the collection process.
 
 #### 3.1.3 Flood Event Date Assignment
-This dataset has 5 flood events: `2018 January Extratropical Cyclone`, `2018 March Extratropical Cyclone`, `2021 Henri`, `2023 July MA NY VT Flood`, and `2023 December East Coast Cyclone`. However, it lacks precise timeframes, which are crucial for collecting corresponding satellite imagery. To resolve this, specific dates are identified through online reports and the reports are compared with the visualization in Section 3.1.2. 
+This dataset has 5 flood events: `2018 January Extratropical Cyclone`, `2018 March Extratropical Cyclone`, `2021 Henri`, `2023 July MA NY VT Flood`, and `2023 December East Coast Cyclone`. However, it lacks precise timeframes, which are crucial for collecting corresponding satellite imagery later. To resolve this, specific dates are identified through online reports and the reports are compared with the visualization in Section 3.1.2. 
 
 Below is the table with the dates assigned based on online reports:
 |**Event**|**Date**|**Discussion**|
@@ -71,7 +77,7 @@ Below is the table with the dates assigned based on online reports:
 |[2023 July MA NY VT Flood](https://www.weather.gov/btv/The-Great-Vermont-Flood-of-10-11-July-2023-Preliminary-Meteorological-Summary)|2023-07-10 to 2023-07-11|According to the report in Vermont from NOAA, Vermont experienced castastrophic flash flooding and river flooding during this event, with the affected areas widely spread across the state. Additionally, [Figure 4](https://www.weather.gov/images/btv/events/July2023Flood/Figure4.PNG) shows that Massachusetts was also impacted.<br>These observations are consistent with the countplot and the Vermont map presented in Section 3.1.2.|
 |[2023 December East Coast Cyclone](https://cw3e.ucsd.edu/wp-content/uploads/2023/12/20Dec2023_Summary/20231218EastCoast.pdf)|2023-12-17 to 2023-12-18|According to the report from Scripps Institution of Oceanography, widespread moderate to major flooding occurred across the New England Region, with Flash Flood Warnings and Flood Warnings active in most states.<br>However, the countplot reveals that only Vermont has recorded high-water marks for the `2023 December East Coast Cyclone`. This discrepancy arises because high-water mark datasets are not immediately available after flood events. The collected high-water marks undergo investigation and validation before being published. It is expected that in the near future, additional high-water marks from Maine and other affected areas will become available for analysis.|
 
-### 3.2 Flood Event Observations (High-Water Levels)
+### 3.2 Flood Event Observations (High-Water Levels from Gauges)
 The dataset of high-water levels has 9 attributes and 218 observations. This dataset is not directly downloaded. The collection of high-water levels consists of three steps:
 1. Collect NWSLI identifiers and descriptions for the gauges from NOAA
     - NOAA provides charts with National Weather Service Location Identifiers (NWSLI) for gauges in each state and the NWSLI is used to extract the gauge information in step 2 
@@ -90,23 +96,28 @@ The dataset of high-water levels has 9 attributes and 218 observations. This dat
 
 #### 3.2.2 Dataset Overview
 Below is a table summarizing the key characteristics of the high-water levels:
-|**Atribute**|**Count of unique values**|**Top 3 event**|**Count**|**Top 3 state**|**Count**|
-|-|-|-|-|-|-|
-|id<br>event<br>event_day<br>state<br>county<br>latitude<br>longitude<br>note<br>source|218<br>25<br>83<br>6<br>34<br>68<br>68<br>60<br>1| 2023-12<br>2023-07<br>2024-01|64<br>27<br>18|CT<br>VT<br>ME|57<br>56<br>40|
+|**Attributes (Unique Values Count)**|**Top 3 Events (Observation Count)**|**Top 3 States (Observation Count)**|
+|-|-|-|
+|id: 218<br>event: 25<br>event_day: 83<br>state: 6<br>county: 34<br>latitude: 68<br>longitude: 68<br>note: 60<br>source: 1|2023-12: 64<br>2023-07: 27<br>2024-01: 18|CT: 57<br>VT: 56<br>ME: 40|
 
 **_Insight_**
-- The table indicates that all six states in the New England region were affected by 25 flood events. However, the total number of high-water levels is 218. When compared to the 889 flood event observations discussed in Section 3.1, this number is relatively low. To understand more about the distribution of high-water marks, visualization techniques including countplot and map are added.
+- The first column provides a summary of the attributes in the high-water levels, along with the count of unique values for each. The data covers 25 flood events across 6 New England states. 
+- The second column highlights the top 3 flood events, with `2023-12` leading significantly with 64 observations, followed by `2023-07` with 27 and `2024-01` with 18.
+- The third column shows the top 3 states by observation count, with Connecticut at the top (57), closely followed by Vermont (56) and Maine (40).
+- Compared to the 889 flood event observations discussed in Section 3.1, this dataset has a relatively lower count of observations.
+- Visualization techniques like countplots and maps are used to better understand the distribution of high-water levels across states and events.
 
 #### 3.2.3 Dataset Visualization
 Below are two figures illustrating the distribution of high-water marks:
 |**Countplot**|**VT map (Top 1 state)**|
 |---|---|
-| <img src="figs/countplot/countplot_gauge.png" width="500"><br>The countplot shows the distribution of flood event observations across each state. The `2023-07` event in Vermont has the highest number of observations (20) across all states. | <img src="figs/map/map_CT_stn_gauge.png" width="500"><br>The map represents the spatial distribution of high-water levels in Connecticut which has the highest number of observations. All high-water levels (circle) are located inland, along the river. |
+| <img src="figs/countplot/countplot_gauge.png" width="500"><br>The countplot shows the distribution of flood event observations across each state. The `2023-07` event in Vermont has the largest number of observations (20) across all states. | <img src="figs/map/map_CT_stn_gauge.png" width="500"><br>The map represents the spatial distribution of high-water levels in Connecticut which has the largest number of observations. All high-water levels (circle) are located inland, along the river. |
 
 **_Insight_**
 - Comparison between high-water levels and high-water marks:
     - High-water levels are mostly located in inland areas. However, high-water marks are located in coastal and inland areas. The overlap between them is minimal.
     - High-water levels help fill gaps in the data. Some states affected by specific events, as discussed in the online reports, are not reflected in the high-water marks but they are captured in the high-water levels. For example, although `2023 December East Coast Cyclone` was reported to have impacted most states in the New England region, this is not evident in the distribution of high-water marks. However, the countplot of high-water levels shows that `2023-12` event (red) is present across all states, providing a more comprehensive picture of the affected areas.
+    - The initial plan to use STN high-water marks alone as ground truth for satellite measurements proved more challenging than anticipated. The difficulties arose due to a limited number of recent flood event observations, multiple observations at the same location, and the close proximity of some observations. As a result, not all STN high-water marks are suitable for use as inputs for satellite measurements.
     - **_Note_**: For high-water levels, the `event` attribute is defined by extracting the year and month (YYYY-MM) from the `event_day` attribute (YYYY-MM-DD). As a result, some observations categorized under the `2023-12` event may not actually fall within the specific period of the `2023 December East Coast Cyclone` (December 17-18, 2023). For instance, one high-water level with the ID `YTCC3_51` is recorded on 2023-12-11, which happened before the cyclone event. This indicates that careful consideration is needed when interpreting the data, as not all observations within the same month are related to the same flood event.
 
 ### 3.3 Sentinel-2 Natural Color Imagery
@@ -132,14 +143,16 @@ Below is a table showing some of the collected images grouped by their ids (repr
 | **CLMM3_97** | <img src="figs/s2_event_selected/CLMM3_97_20230711_s2_event_selected.png">| Cloud cover issue: The image collected on 2023-07-06 is excluded. In Google Earth Engine, the cloud cover threshold (`CLOUDY_PIXEL_PERCENTAGE`) is applied to the entire image to filter out images with cloud cover below the threshold. As a result, an image may have a low overall cloud percentage but the targeted region still have significant cloud cover. |
 | **AUBM1_59** |<img src="figs/s2_raw_vis_by_id/AUBM1_59_20240102_s2_raw_vis_by_id.png">| Color similarity issue: Even though the river color is brown, the similarity in color between the river and the surrounding non-water areas indicates that this image may not be ideal for this project. |
 
+_Note: The red dot in the image represents the location of the flood event observation used to define the area of interest (region) and collect this image._
+
 #### 3.3.3 Dataset Visualization
 To understand the distribution of the ideal image dataset, the countplot and map are utilized:
 |**Countplot**|**VT map (Top 1 state)**|
 |-|-|
-|<img src="figs/countplot/countplot_sentinel2.png" width="500"><br>The countplot groups the images by states and period labels (before/during/after flood). It shows the distribution of images across each state. The large number of Sentinel-2 images for Vermont for 2023 July flood event is reasonable when considering the high number of flood event observations for 2023 July flood event in Vermont. (Figures in Section 3.1.2)|<img src="figs/map/map_VT_sentinel2.png" width="500"><br>The map illustrates the spatial distribution of image IDs (representing the flood event observation). When compared with the Vermont flood event map in Section 3.1.2, it becomes evident that this distribution primarily includes observations in the southern part of the state. In contrast, the map in Section 3.1.2 shows that the 2023 July flood event affected both northern and southern regions of Vermont.|
+|<img src="figs/countplot/countplot_sentinel2.png">|<img src="figs/map/map_VT_sentinel2.png">|
 
 **_Insight_**
-- The large number of Sentinel-2 images for Vermont for 2023 July flood event is reasonable when considering the large number of flood event observations for 2023 July flood event in Vermont. (Figures in Section 3.1.2)
+- The countplot groups the images by states and period labels (before/during/after flood). It shows the distribution of images across each state. The large number of Sentinel-2 images for Vermont for 2023 July flood event is reasonable when considering the large number of flood event observations for 2023 July flood event in Vermont. (Figures in Section 3.1.2)
 - The map illustrates the spatial distribution of flood event observation IDs. When compared with the Vermont flood event map in Section 3.1.2, it becomes evident that this distribution primarily includes observations in the southern part of the state. In contrast, the map in Section 3.1.2 shows that the 2023 July flood event affected both northern and southern regions of Vermont. This difference in the distribution pattern is interesting and it should be further investigated to understand the reason.
 
 ### 3.4 Cloud Masks, NDWI Masks, and Flowline Masks
@@ -155,6 +168,8 @@ Due to time constraints, such optimization is not implemented in this project. A
 |---|---|---|
 | **44909** | <img src="figs/s2/44909_20230711_s2.png"> | <img src="figs/s2/44909_20230711_cloud.png"> |
 | **45358** | <img src="figs/s2/45358_20230711_s2.png"> | <img src="figs/s2/45358_20230711_cloud.png"> |
+
+_Note: The red dot in the image represents the location of the flood event observation used to define the area of interest (region) and collect this image._
 
 #### 3.4.2 NDWI Masks from Google Earth Engine
 To help analyze the flooded areas and optimize the performance of K-means clustering algorithm, Normalized Difference Water Index is introduced. Based on the [explanation from EOS Data Analytics](https://eos.com/make-an-analysis/ndwi/), the NDWI is calculated using the reflectance values captured by specific bands in satellite data. For Sentinel-2 data, the equation is **NDWI = (Band 3 – Band 8)/(Band 3 + Band 8)**. Band 3 (corresponding to the green portion of the visible light spectrum) is reflected by water surfaces and Band 8 (corresponding to near-infrared light) is strongly reflected by vegetation and soil but not by water. This difference helps to clearly highlight water bodies in the images.
@@ -231,7 +246,7 @@ The following sections 3.6.1 to section 3.6.4 are the results of different image
 #### 3.5.5 Comparison between Targeted Cluster (Flooded Area) and NDWI
 Based on the analysis of the clustered images, the combination of NDWI mask and PCA outputs the best result. Therefore, further analysis is conducted by comparing the best result and NDWI mask. 
 
-Because optimization of K-means clustering algorithms are applied to images individually, the selected optimal `n_components` and `n_clusters` clusters can vary between images. To automatically identify the cluster representing the flooded area, NDWI mask is used. The overlap between the NDWI mask and each cluster is calculated, with the cluster showing the highest overlap being identified as the flooded area. Below is comparison between NDWI and the best result. 
+Because optimization of K-means clustering algorithms are applied to images individually, the selected optimal `n_components` and `n_clusters` clusters can vary between images. To automatically identify the cluster representing the flooded area, NDWI mask is used. The overlap between the NDWI mask and each cluster is calculated, with the cluster showing the largest overlap being identified as the flooded area. Below is comparison between NDWI and the best result. 
 
 | **S2** | **NDWI**| **Best Cluster** | **Pixel Count** |
 |---|---|---|---|
@@ -239,6 +254,8 @@ Because optimization of K-means clustering algorithms are applied to images indi
 | <img src="figs/s2/45358_20230711_s2.png"> | <img src="figs/s2/45358_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/45358_20230711_ndwi_pca_i.png"><br>Compared to NDWI mask, Cluster 2 reduces the water bodies with clear water. However, new nosiy pixels are introduced. The number of pixels are similar. | NDWI pixels: 36823<br>Targeted Cluster pixels: 36715 |
 | <img src="figs/s2/45501_20230711_s2.png"> | <img src="figs/s2/45501_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/45501_20230711_ndwi_pca_i.png"><br>Compared to the NDWI mask, the number of flooded area pixels in the best result is reduced. However, this reduction is not ideal, as it includes a decrease in the flooded river water on the top right part of the image. | NDWI pixels: 3035<br>Targeted Cluster pixels: 2997 |
 | <img src="figs/s2/TMVC3_39_20230711_s2.png"> | <img src="figs/s2/TMVC3_39_20230711_ndwi.png"> | <img src="figs/kmeans_ndwi_pca/TMVC3_39_20230711_ndwi_pca_i.png"><br>Compared to NDWI mask, the high-reflectance surface pixels in the best result are reduced. | NDWI pixels: 46531<br>Targeted Cluster pixels: 42918 |
+
+_Note: The red dot in the image represents the location of the flood event observation used to define the area of interest (region) and collect this image._
 
 #### 3.5.6 Explained Variance and Elbow Method
 During the optimization process, the number of components (`n_components`) in PCA and the number of clusters (`n_clusters`) in the K-means clustering algorithm are tested with different values to determine the optimal configuration.
@@ -256,6 +273,8 @@ The best combination of n_components and n_clusters is used to optimize the K-me
 | **45501** | <img src="figs/s2/45501_20230711_s2.png"> |<img src="figs/kmeans_optimizing/45501_20230711T153821_20230711T154201_T18TXP_n_components.png"> | <img src="figs/kmeans_optimizing/45501_20230711T153821_20230711T154201_T18TXP_elbow.png"> | n_components = 2<br>n_clusters = 4 |
 | **TMVC3_39** | <img src="figs/s2/TMVC3_39_20230711_s2.png"> |<img src="figs/kmeans_optimizing/TMVC3_39_20230711T153821_20230711T154201_T18TXM_n_components.png"> | <img src="figs/kmeans_optimizing/TMVC3_39_20230711T153821_20230711T154201_T18TXM_elbow.png"> | n_components = 2<br>n_clusters = 4 |
 
+_Note: The red dot in the image represents the location of the flood event observation used to define the area of interest (region) and collect this image._
+
 ## 4. Discussion and Future Work
 
 ### 4.1 Discussion
@@ -266,7 +285,7 @@ The analysis of the default K-means clustering algorithm across various images r
 Different optimization approaches have different results. For instance, when combining the NDWI mask with PCA, NDWI tends to dominate the outcome, having a strong influence on the result. Additionally, the same optimization technique can produce different effects depending on the environmental characteristics of the images. These results need to further investigated to understand the process and improve the optimization approach used.
 
 ### 4.2 Future Work
-There're many aspects that can be further explored and improved.
+There are many aspects that can be further explored and improved.
 
 Firstly, the current approach to extracting major rivers from flowline datasets can be improved. Samuel Roy, a scientist from USGS, suggests that stream order selection is helpful in identifying major rivers. By adding this modification, the flowline mask in the optimization process might be more helpful. 
 

@@ -1,8 +1,8 @@
 # Automated Assessment of Inland flooding from Satellite Observations
 
-This project focus on developing an algorithm for automated assessment of inland flooding from satellite observations. Specifically, this algorithm collects satellite images corresponding to before-, during-, and after-flood events and applies the K-means clustering technique to identify flooded areas. The ultimate goal is to enhance flood detection capabilities, providing insights that can be applied to flood detection using drone measurements.
+This project focuses on developing an algorithm for automated assessment of inland flooding from satellite observations. Specifically, this algorithm collects satellite images corresponding to before-, during-, and after-flood events and applies the K-means clustering technique to identify flooded areas. The ultimate goal is to enhance flood detection capabilities, providing insights that can be applied to flood detection using drone measurements.
 
-While the project initially targeted Maine, it has been expanded to include other states with similar flood characteristics. 
+While the project initially targeted Maine, it has been expanded to include in the New England Region with similar flood characteristics. 
 
 <img src="figs/workflow.png" width="800" alt="workflow">
 

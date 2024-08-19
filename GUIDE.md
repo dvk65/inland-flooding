@@ -1,12 +1,11 @@
-# Environment Setup, Tools/Platforms, and Dataset Documentation
+# Environment Setup and Dataset Documentation
 
-This document is a brief guide to help users set up the required environment, utilize the tools involved, and understand the datasets in this project. 
+This document is a brief guide to help users set up the required environment and understand the datasets in this project. 
 
 ## Table of Contents
 - [Environment Setup](#environment-setup)
     - [Virtual Environment Setup from environment.yml](#virtual-environment-setup-from-environmentyml)
     - [Google Earth Engine Setup](#google-earth-engine-setup)
-- [Tools and Platforms](#tools-and-platforms)
 - [Data Folder Structure](#data-folder-structure)
 - [Dataset Documentation](#dataset-documentation)
     - [STN high-water marks](#stn-high-water-marks)
@@ -74,8 +73,6 @@ To use Earth Engine API, register the project [here](https://code.earthengine.go
 When running `make s2`, the following output will prompt for authentication:
 
 <img src="/figs/guide/login.png" width="550" alt="login">
-
-## Tools and Platforms (TODO)
 
 ## Dataset Documentation
 
@@ -253,11 +250,12 @@ The last dataset `df_gauge_mod` represents the preprocessed dataset. This datase
 - `note` - the flood impact of different water level
 - `source`: a newly created label to identify the source of each high-water levels
 
-### Sentinel-2 imagery (TODO)
+### Sentinel-2 imagery
+The article named [A multi-sensor approach for increased measurements of floods and their societal impacts from space](https://www.nature.com/articles/s43247-023-01129-1) introduces flood detectability using satellites. Based on this article, Sentinel-2 can be a valuable source for flood detection. 
 
-### Cloud and Shadow Mask
-
-### NDWI mask
+Below are the resources related to Sentinel-2 imagery:
+- [Sentinel-2 from Google Earth Engine](https://developers.google.com/earth-engine/datasets/catalog/sentinel-2)
+- [Sentinel-2 from Copernicus](https://dataspace.copernicus.eu/explore-data/data-collections/sentinel-data/sentinel-2)
 
 ### [Flowline from National Hydrography Dataset](https://www.usgs.gov/national-hydrography)
 The ZIP file for a state's NHD dataset includes the following contents:

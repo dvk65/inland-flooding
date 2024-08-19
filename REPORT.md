@@ -51,8 +51,8 @@ Below is a table summarizing the key characteristics of the filtered high-water 
 
 **_Insight_**
 - The first column lists all the attributes in the STN high-water marks, along with the number of unique values for each attribute. The data includes 6 New England states and records five significant flood events. 
-- The second column highlights the top 3 flood events, with the 2023 July MA NY VT Flood leading at 641 observations, significantly more than the next events.
-- The third column shows the top 3 states by observation count, with Vermont leading, followed by Massachusetts and Connecticut.
+- The second column highlights the top 3 flood events, with the 2023 July MA NY VT Flood leading at 641 observations, significantly more than the next events. The other 2 events, except for the top 3, are not shown because they have few observations. 
+- The third column shows the top 3 states by observation count, with Vermont leading, followed by Massachusetts and Connecticut. The remaining two events, outside of the top 3, are not shown due to their small number of observations.
 - To explore the distribution of high-water marks across different states and events, visualization techniques including countplots and maps are necessary.
 
 #### 3.1.2 Dataset Visualization
@@ -63,7 +63,7 @@ Below are two figures illustrating the distribution of high-water marks:
 
 **_Insight_**
 - The distribution of high-water marks suggests that the `2023 July MA NY VT Flood` event in Vermont is likely the most suitable dataset for further analysis and satellite imagery collection since it has the largest number of observations. 
-- However, the close proximity of some high-water marks, as seen on the Vermont map, poses a challenge for satellite imagery collection. When high-water marks are too close together, their defined areas of interest can overlap significantly, resulting in nearly identical satellite images. This overlap is carefully addressed during the collection process.
+- However, some high-water marks are located close to each other. Since these locations are used to define regions (areas of interest) for satellite imagery collection, their proximity leads to significant overlap in these regions. This overlap then results in collecting nearly identical images, which are not particularly useful. Therefore, not all high-water marks will be used for image collection.
 
 #### 3.1.3 Flood Event Date Assignment
 This dataset has 5 flood events: `2018 January Extratropical Cyclone`, `2018 March Extratropical Cyclone`, `2021 Henri`, `2023 July MA NY VT Flood`, and `2023 December East Coast Cyclone`. However, it lacks precise timeframes, which are crucial for collecting corresponding satellite imagery later. To resolve this, specific dates are identified through online reports and the reports are compared with the visualization in Section 3.1.2. 
@@ -102,8 +102,8 @@ Below is a table summarizing the key characteristics of the high-water levels:
 
 **_Insight_**
 - The first column provides a summary of the attributes in the high-water levels, along with the count of unique values for each. The data covers 25 flood events across 6 New England states. 
-- The second column highlights the top 3 flood events, with `2023-12` leading significantly with 64 observations, followed by `2023-07` with 27 and `2024-01` with 18.
-- The third column shows the top 3 states by observation count, with Connecticut at the top (57), closely followed by Vermont (56) and Maine (40).
+- The second column highlights the top 3 flood events, with `2023-12` leading significantly with 64 observations, followed by `2023-07` with 27 and `2024-01` with 18. These top 3 events account for the majority of the total observations, indicating an uneven distribution across all events. 
+- The third column shows the top 3 states by observation count, with Connecticut at the top (57), closely followed by Vermont (56) and Maine (40). These 3 states are the most affected, collectively representing more than half of the total observations.
 - Compared to the 889 flood event observations discussed in Section 3.1, this dataset has a relatively lower count of observations.
 - Visualization techniques like countplots and maps are used to better understand the distribution of high-water levels across states and events.
 

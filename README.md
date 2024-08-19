@@ -4,6 +4,14 @@ This project focuses on developing an algorithm for automated assessment of inla
 
 While the project initially targeted Maine, it has been expanded to include in the New England Region with similar flood characteristics. 
 
+## Primary Deliverables
+- [README.md](README.md) - An overview of the project, including step-by-step [instructions](README.md#instruction) to replicate the results;
+- [REPORT.md](REPORT.md) - A detailed report on the project's objectives, methodology, and results;
+- [GUIDE.md](GUIDE.md) - A guide to help users set up the required environment and explore relevant details about the datasets in this project. 
+
+## Workflow and Datasets
+Below is the workflow for the project:
+
 <img src="figs/workflow.png" width="800" alt="workflow">
 
 The approach integrates the datasets described in the table below:

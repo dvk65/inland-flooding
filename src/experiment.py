@@ -1,9 +1,5 @@
 """
-This script is used to implement some experiments.
-"""
-
-"""
-This script is used to implement some experiments.
+This script is used to implement some experiments. Currently, this is an experiment about using the stream oder in NHDFlowlineVAA to identify the major rivers.
 """
 
 import os
@@ -52,6 +48,3 @@ ax.set_ylim(sat_bounds.bottom, sat_bounds.top)
 
 plt.tight_layout()
 plt.show()
-
-
-# PCA demonstration - image reconstruction

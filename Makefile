@@ -31,3 +31,19 @@ kmeans:
 # run experiment (currently code used to explore the flowline features)
 experiment:
 	python -B src/experiment.py
+
+# use .tif from data folder for GitHub page
+page:
+	gdalwarp -t_srs EPSG:3857 -r near data/img_s2/2023-07/45358_20230711T153821_20230711T154201_T18TXP_VIS.tif data/45358_webmap.tif
+	gdal2tiles.py -p mercator -z 0-18 -w none data/45358_webmap.tif docs/45358_tiles
+
+# use flood_event.csv for GitHub page
+csvjson:
+	python -c " \
+	import csv, json; \
+	with open('data/flood_event.csv', 'r') as f: \
+	    reader = csv.DictReader(f); \
+	    rows = list(reader); \
+	with open('docs/flood_event.json', 'w') as f: \
+	    json.dump(rows, f, indent=4) \
+	"

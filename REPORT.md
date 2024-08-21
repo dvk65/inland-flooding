@@ -197,9 +197,9 @@ To automate the assessment of flooded areas, I select the K-means clustering alg
 
 Firstly, the default setting is executed in each image. `StandardScaler` is applied before K-means clustering algorithm to standardize the image color channels. This standardization not only speeds up convergence but also improves the accuracy and consistency of the clustering results. K-means is initialized with 3 clusters determined by visual inspection and the initialization method is set to`k-means++`. 
 
-During the optimization phase, Principal Component Analysis (PCA), a dimensionality reduction technique that reduces noise while capturing the most important information, is applied. The [tutorial from Medium](https://towardsdatascience.com/k-means-and-pca-for-image-clustering-a-visual-analysis-8e10d4abba40) provides additional explanation of how to combine K-means and PCA. Additionally, additional masks are introduced as features. Each image undergoes three types of optimization. In this process, the selection of the optimal number of PCA components and clusters is guided by the explained variance and the elbow method.
+During the optimization phase, Principal Component Analysis (PCA), a dimensionality reduction technique that reduces noise while capturing the most important information, is applied. The [tutorial from Medium](https://towardsdatascience.com/k-means-and-pca-for-image-clustering-a-visual-analysis-8e10d4abba40) provides additional explanation of how to combine K-means and PCA. Additionally, additional masks are introduced as features. Each image undergoes four types of optimization. In this process, the selection of the optimal number of PCA components and clusters is guided by the explained variance and the elbow method.
 
-Three types of optimizations are:
+Four types of optimizations are:
 - Apply Principle Component Analysis to image data;
 - Add flowline mask as a feature and apply Principle Component Analysis to the combination of flowline mask and image data;
 - Add NDWI mask as a feature and apply Principle Component Analysis to the combination of NDWI mask and image data;

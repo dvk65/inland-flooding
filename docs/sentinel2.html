@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Automated Assessment of Inland Flooding</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        .container-fluid {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        .sidebar {
+            min-height: 100vh; 
+            background-color: #f8f9fa;
+        }
+
+        .nav {
+            padding-top: 20px; 
+        }
+
+        .nav-link.active {
+            background-color: #007bff; 
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .section {
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px;
+            background-color: #f8f9fa; 
+        }
+
+        .header {
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+
+        #map {
+            height: 500px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                min-height: auto;
+            }
+        }
+    </style>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/esri-leaflet@3.0.0/dist/esri-leaflet.js"></script>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://github.com/ds5500/flooding-project-PennyY1103.git" target="_blank">GitHub Repo</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Overview</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="flood_event.html">Flood Event</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="sentinel2.html">Satellite Image</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="kmeans.html">Image Segmentation</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="documentation.html">Data and Workflow Documentation</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <h2 class="header mt-4">Sentinel-2 Image</h2>
+                <h6 class="header" style="margin-top: -10px; font-style: italic;">with cloud mask and NDWI mask</h6>
+                <div class="section">
+                    <h5>Overview</h5>
+                    <p>Given that weather conditions during flood events are often poor, having a large number of flood event observations is important for collecting high-quality images. In this project, both high-water marks and high-water levels are utilized to collect Sentinel-2 imagery and corresponding masks. 1,107 flood event observations are used to collect images. Based on the analysis of flood event data, most images will be associated with <strong>2023 July flood event</strong> (641 high-water marks from 2023 July MA NY VT Flood and 27 high-water levels from 2023-07).</p>
+                    <p>Initially, 379 images were downloaded using Google Earth Engine API. After necessary filtering steps, the dataset is filtered to include 69 high-quality natural color images, captured before/during/after the 2023 July Flood Event. These 69 images belong to 25 flood event observations.</p>
+                    <p>10 of these images have significant flooded areas through visual inspection (brown water bodies caused by sediment). The flood event observation IDs of these images are 44909, 44929, 45067, 45237, 45321, 45358, 45427, 45501, MNTM3_114, and TMVC3_39.</p>
+                </div>
+                <div class="section">
+                    <h5>Image with Significant Flooded Area (High-Water Mark ID: 45358)</h5>
+                    <p>Red dot marker: high-water mark located on US side of covered bridge on RB in wood structure of bridge wall</p>
+                    <div id="map"></div>
+                    <script>
+                        var map = L.map('map').setView([43.68000807, -73.03732679], 12);
+                    
+                        var baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        }).addTo(map);
+                    
+                        var sentinelLayer = L.tileLayer('45358_tiles/{z}/{x}/{y}.png', {
+                            tms: true,  
+                            attribution: 'Generated from Sentinel-2 data'
+                        }).addTo(map);
+                    
+                        var googleStreetLayer = L.tileLayer('http://{s}.google.com/vt/lyrs=h&x={x}&y={y}&z={z}', {
+                            name: 'Street Names',
+                            attribution: '&copy; <a href="https://www.google.com/permissions/geoguidelines/attr-guide/">Google</a>',
+                            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                            opacity: 0.8
+                        }).addTo(map);
+
+                        var nhdLayer = L.esri.tiledMapLayer({
+                            url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSHydroCached/MapServer',
+                            attribution: 'NHD Data © USGS',
+                            opacity: 0.5
+                        }).addTo(map);
+
+                        var redDot = L.circleMarker([43.68000807, -73.03732679], {
+                            radius: 2,
+                            color: '#ff0000',
+                            fillColor: '#ff0000',
+                            fillOpacity: 1
+                        }).addTo(map);
+                    
+                        var overlayLayers = {
+                            "Sentinel-2": sentinelLayer,
+                            "Google Streets": googleStreetLayer
+                        };
+                    
+                        L.control.layers(null, overlayLayers, {
+                            collapsed: false
+                        }).addTo(map);
+
+                        map.on('overlayadd', function(eventLayer) {
+                            if (eventLayer.layer === sentinelLayer) {
+                                nhdLayer.bringToFront();
+                            }
+                        });
+                    
+                    </script>
+                </div>
+                <p style="font-style: italic; margin: 20px">
+                    * More details can be found in the <a href="https://github.com/ds5500/flooding-project-PennyY1103/blob/52f91c699eb64585beedc11f969c683abf81eec2/REPORT.md" target="_blank">report</a>.<br>
+                    * Guide to put a GeoTIFF image on Map can be found in the <a href="https://github.com/pbogden/framework-map" target="_blank">tutorial</a> provided by Prof. Philip.
+                </p>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Automated Assessment of Inland Flooding</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container-fluid {
+            display: flex;
+            flex-wrap: nowrap;
+        }
+
+        .sidebar {
+            min-height: 100vh; 
+            background-color: #f8f9fa;
+        }
+
+        .nav {
+            padding-top: 20px; 
+        }
+
+        .nav-link.active {
+            background-color: #007bff; 
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .section {
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px;
+            background-color: #f8f9fa; 
+        }
+        
+        .header {
+            margin-left: 20px;
+            margin-right: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                min-height: auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="https://github.com/ds5500/flooding-project-PennyY1103.git" target="_blank">GitHub Repo</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Overview</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="flood_event.html">Flood Event</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="sentinel2.html">Satellite Image</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="kmeans.html">Image Segmentation</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="documentation.html">Data and Workflow Documentation</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <h2 class="header mt-4">Data and Workflow Documentation</h2>
+                <h6 class="header" style="margin-top: -10px; font-style: italic;">Guide to the project's data and workflow</h6>
+                <div class="section">
+                    <h5>Data</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Source</th>
+                                    <th>Description</th>
+                                    <th>Format</th>
+                                    <th>Links</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><a href="https://www.usgs.gov/special-topics/water-science-school/science/high-water-marks-and-flooding" target="_blank">High-water marks</a></td>
+                                    <td><a href="https://stn.wim.usgs.gov/STNDataPortal/" target="_blank">STN flood event data</a></td>
+                                    <td>Validated flood event observations from USGS</td>
+                                    <td>CSV</td>
+                                    <td><a href="https://github.com/ds5500/flooding-project-PennyY1103/blob/52f91c699eb64585beedc11f969c683abf81eec2/REPORT.md" target="_blank">Report</a><br><a href="https://github.com/ds5500/flooding-project-PennyY1103/blob/52f91c699eb64585beedc11f969c683abf81eec2/GUIDE.md" target="_blank">Guide</a><br><a href="https://drive.google.com/drive/folders/1iFKHeHfNnRrpxUlsN3PIxYGxEh9IeB3n?usp=sharing" target="_blank">Data</a></td>
+                                </tr>
+                                <tr>
+                                    <td><a href="https://www.weather.gov/aprfc/terminology" target="_blank">High-water levels</a></td>
+                                    <td><a href="https://waterdata.usgs.gov/nwis/rt" target="_blank">USGS Water Data Services</a></td>
+                                    <td>Real-time gauge water levels above moderate flood stage</td>
+                                    <td>CSV</td>
+                                    <td><a href="https://github.com/ds5500/flooding-project-PennyY1103/blob/52f91c699eb64585beedc11f969c683abf81eec2/REPORT.md" target="_blank">Report</a><br><a href="https://github.com/ds5500/flooding-project-PennyY1103/blob/52f91c699eb64585beedc11f969c683abf81eec2/GUIDE.md" target="_blank">Guide</a><br><a href="https://drive.google.com/drive/folders/1iFKHeHfNnRrpxUlsN3PIxYGxEh9IeB3n?usp=sharing" target="_blank">Data</a></td>
+                                </tr>
+                                <tr>
+                                    <td><a href="https://developers.google.com/earth-engine/datasets/catalog/sentinel-2" target="_blank">Sentinel-2 images</a></td>
+                                    <td><a href="https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED" target="_blank">Sentinel-2 Level-2A</a></td>
+                                    <td>Satellite images corresponding to the areas of interests and timeframes defined by high-water marks and levels</td>
+                                    <td>GeoTIFF</td>
+                                    <td><a href="https://github.com/ds5500/flooding-project-PennyY1103/blob/52f91c699eb64585beedc11f969c683abf81eec2/REPORT.md" target="_blank">Report</a><br><a href="https://github.com/ds5500/flooding-project-PennyY1103/blob/52f91c699eb64585beedc11f969c683abf81eec2/GUIDE.md" target="_blank">Guide</a><br><a href="https://drive.google.com/drive/folders/1iFKHeHfNnRrpxUlsN3PIxYGxEh9IeB3n?usp=sharing" target="_blank">Data</a></td>
+                                </tr>
+                                <tr>
+                                    <td><a href="https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless" target="_blank">Cloud and Shadow masks</a></td>
+                                    <td><a href="https://developers.google.com/earth-engine/tutorials/community/sentinel-2-s2cloudless" target="_blank">s2cloudless</a></td>
+                                    <td>Cloud and shadow pixels to be removed</td>
+                                    <td>GeoTIFF</td>
+                                    <td><a href="https://github.com/ds5500/flooding-project-PennyY1103/blob/52f91c699eb64585beedc11f969c683abf81eec2/REPORT.md" target="_blank">Report</a><br><a href="https://github.com/ds5500/flooding-project-PennyY1103/blob/52f91c699eb64585beedc11f969c683abf81eec2/GUIDE.md" target="_blank">Guide</a><br><a href="https://drive.google.com/drive/folders/1iFKHeHfNnRrpxUlsN3PIxYGxEh9IeB3n?usp=sharing" target="_blank">Data</a></td>
+                                </tr>
+                                <tr>
+                                    <td><a href="https://eos.com/make-an-analysis/ndwi/" target="_blank">NDWI masks</a></td>
+                                    <td><a href="https://medium.com/@melqkiades/water-detection-using-ndwi-on-google-earth-engine-2919a9bf1951" target="_blank">NDWI tutorial</a></td>
+                                    <td>Water body pixels defined by Normalized Difference Water Index</td>
+                                    <td>GeoTIFF</td>
+                                    <td><a href="https://github.com/ds5500/flooding-project-PennyY1103/blob/52f91c699eb64585beedc11f969c683abf81eec2/REPORT.md" target="_blank">Report</a><br><a href="https://github.com/ds5500/flooding-project-PennyY1103/blob/52f91c699eb64585beedc11f969c683abf81eec2/GUIDE.md" target="_blank">Guide</a><br><a href="https://drive.google.com/drive/folders/1iFKHeHfNnRrpxUlsN3PIxYGxEh9IeB3n?usp=sharing" target="_blank">Data</a></td>
+                                </tr>
+                                <tr>
+                                    <td><a href="https://www.usgs.gov/ngp-standards-and-specifications/national-hydrography-dataset-nhd-data-dictionary-feature-classes" target="_blank">Flowlines masks</a></td>
+                                    <td><a href="https://www.usgs.gov/national-hydrography/access-national-hydrography-products" target="_blank">National Hydrography Dataset</a></td>
+                                    <td>Routes that make up a linear surface water drainage network</td>
+                                    <td>Shapefile</td>
+                                    <td><a href="https://github.com/ds5500/flooding-project-PennyY1103/blob/52f91c699eb64585beedc11f969c683abf81eec2/REPORT.md" target="_blank">Report</a><br><a href="https://github.com/ds5500/flooding-project-PennyY1103/blob/52f91c699eb64585beedc11f969c683abf81eec2/GUIDE.md" target="_blank">Guide</a><br><a href="https://drive.google.com/drive/folders/1iFKHeHfNnRrpxUlsN3PIxYGxEh9IeB3n?usp=sharing" target="_blank">Data</a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="section">
+                    <h5>Workflow</h5>
+                    <img src="../figs/workflow.png" alt="Workflow Diagram" class="img-fluid">
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>

@@ -86,20 +86,13 @@
 
                 <div class="section">
                     <h5>Overview</h5>
-                    <p>To automate the assessment of flooded areas, I select the K-means clustering algorithm, a commonly used method in image segmentation. The decision to use K-means clustering is based on three crucial factors: the small dataset size (69 images), the absence of ground truth for the flooded areas, and the unique visual characteristics of the flooded areas (brown water bodies caused by sediment). K-means clustering algorithm groups data points based on similarity. When only image data is used, this similarity is based on color; when additional features are introduced, the similarity is calculated based on the combination.</p>
-                    <p>
-                        Each image undergoes the default K-means clustering configuration and four types of optimization. Four types of optimizations are:
-                        <ul>
-                            <li>Apply Principle Component Analysis to image data;</li>
-                            <li>Add flowline mask as a feature and apply Principle Component Analysis to the combination of flowline mask and image data;</li>
-                            <li>Add NDWI (Normalized Difference Water Index) mask as a feature and apply Principle Component Analysis to the combination of NDWI mask and image data;</li>
-                            <li>Add both flowline mask and NDWI mask as features and then apply Principle Component Analysis to the combination of flowline mask, NDWI mask, and image data.</li>
-                        </ul>
-                    </p>
+                    <p>K-means clustering was chosen to automatically identify flooded areas due to the small dataset size (69 images), lack of ground truth, and distinct visual features of flooded areas (brown sediment-laden water).</p>
+                    <p>The algorithm groups data points based on similarity. When only image data is used, this similarity is based on color; when additional features are introduced, the similarity is calculated based on the combination.</p>
+                    <p>Each image undergoes default K-means clustering with standardized data after removing invalid pixels (clouds and shadows). Four optimizations are then applied, utilizing combinations of <a href="https://towardsdatascience.com/k-means-and-pca-for-image-clustering-a-visual-analysis-8e10d4abba40" target="_blank" title="Principle Component Analysis">PCA</a>, <a href="https://www.usgs.gov/ngp-standards-and-specifications/national-hydrography-dataset-nhd-data-dictionary-feature-classes" target="_blank" title="flowline documentation">NHD flowline data</a> and <a href="https://eos.com/make-an-analysis/ndwi/" target="_blank" title="NDWI guide">NDWI data</a></p>
                 </div>
 
                 <div class="section">
-                    <h5>Result (Default vs. Best Optimization)</h5>
+                    <h5>Result ID: 45358 (Default vs. Best Optimization)</h5>
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>

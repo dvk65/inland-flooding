@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>Automated Assessment of Inland Flooding</title>
+    <title>Flood Event - Flooded Area Detection</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <style>
@@ -52,7 +52,9 @@
         }
     </style>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster-src.js"></script>
 </head>
 
 <body>
@@ -85,11 +87,14 @@
 
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <h2 class="header mt-4">Flood Event Observations</h2>
-                <h6 class="header" style="margin-top: -10px; font-style: italic;">high-water marks from <a href="https://stn.wim.usgs.gov/STNDataPortal/" target="_blank">STN flood event data</a> and high-water levels from gauges in <a href="https://waterdata.usgs.gov/nwis/rt" target="_blank">USGS Water Data Services</a></h6>
+                <div class="section">
+                    <h5>Overview</h5>
+                    <p>Flood event observations are derived from two primary sources: <a href="https://www.usgs.gov/special-topics/water-science-school/science/high-water-marks-and-flooding" target="_blank">high-water marks</a> available through <a href="https://stn.wim.usgs.gov/STNDataPortal/" target="_blank">USGS STN flood event data</a> and <a href="https://www.weather.gov/aprfc/terminology" target="_blank">high-water levels</a> above moderate flood stage from real-time gauge data provided by <a href="https://waterdata.usgs.gov/nwis/rt" target="_blank">USGS Water Data Services</a>.</p>
+                </div>
                 <div class="section">
                     <h5>Distribution</h5>
-                    <p>(left) In the <a href="https://www.usgs.gov/special-topics/water-science-school/science/high-water-marks-and-flooding" target="_blank">high-water marks</a> countplot, it's evident that Vermont has the largest number of observations, primarily from the 2023 July MA NY VT Flood event (547 observations). In contrast, Maine, the initially targeted state, has only 6 observations.</p>
-                    <p>(right) In the <a href="https://www.weather.gov/aprfc/terminology" target="_blank">high-water levels</a> countplot, the 2023-07 event in Vermont has the largest number of observations (20) across all states. High-water levels help fill gaps in the data. Some states affected by specific events are not reflected in the high-water marks but captured in the high-water levels.</p>
+                    <p>(left) Vermont has the largest number of observations, primarily from the 2023 July MA NY VT Flood event (547 observations). In contrast, Maine, the initially targeted state, has only 6 observations.</p>
+                    <p>(right) The 2023-07 event in Vermont has the largest number of observations (20) across all states. High-water levels help fill gaps in the data. For example, Connecticut experienced the July 2023 Flood Event, but this is captured solely through the high-water level data.</p>
                     <div class="table-responsive">
                         <table class="table table-striped">
                             <thead>
@@ -106,6 +111,54 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                <div class="section">
+                    <h5>Interactive Map</h5>
+                    <input type="text" id="eventID" placeholder="Enter ID" class="form-control">
+                    <button onclick="searchByID()" class="btn btn-primary mt-2">Search</button>
+                    <div id="map"></div>
+                    <script>
+                        var map = L.map('map').setView([43.9654, -70.8227], 8);
+                    
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            maxZoom: 19,
+                            attribution: '© OpenStreetMap'
+                        }).addTo(map);
+                    
+                        var markers = L.markerClusterGroup();
+                        var markerList = [];
+
+                        fetch('flood_event.json')
+                            .then(response => response.json())
+                            .then(data => {
+                                data.forEach(function(item) {
+                                    var marker = L.marker([item.latitude, item.longitude]);
+                                    marker.bindPopup("<b>ID:</b> " + item.id + "<br><b>Event:</b> " + item.event + "<br><b>Latitude:</b> " + item.latitude + "<br><b>Longitude:</b> " + item.longitude + "<br><b>Date:</b> " + item.event_day + "<br><b>Source:</b> " + item.source);
+                                    marker.eventID = item.id; 
+                                    markerList.push(marker); 
+                                    markers.addLayer(marker); 
+                                });
+                                map.addLayer(markers); 
+                            });
+
+                        function searchByID() {
+                            var inputID = document.getElementById('eventID').value.trim();
+                            var found = false;
+
+                            markerList.forEach(function(marker) {
+                                if (marker.eventID === inputID) {
+                                    map.setView(marker.getLatLng(), 12); 
+                                    marker.openPopup(); 
+                                    found = true;
+                                }
+                            });
+
+                            if (!found) {
+                                alert('ID not found.');
+                            }
+                        }
+                    </script>
                 </div>
                 <p style="font-style: italic; margin: 20px">* More details can be found in the <a href="https://github.com/ds5500/flooding-project-PennyY1103/blob/52f91c699eb64585beedc11f969c683abf81eec2/REPORT.md" target="_blank">report</a>.</p>
             </main>

@@ -39,11 +39,4 @@ page:
 
 # use flood_event.csv for GitHub page
 csvjson:
-	python -c " \
-	import csv, json; \
-	with open('data/flood_event.csv', 'r') as f: \
-	    reader = csv.DictReader(f); \
-	    rows = list(reader); \
-	with open('docs/flood_event.json', 'w') as f: \
-	    json.dump(rows, f, indent=4) \
-	"
+	python -c "import csv, json; f=open('data/flood_event.csv', 'r'); reader=csv.DictReader(f); rows=list(reader); f.close(); f=open('docs/flood_event.json', 'w'); json.dump(rows, f, indent=4); f.close()"

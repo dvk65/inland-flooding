@@ -85,22 +85,24 @@
 
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <h2 class="header mt-4">Sentinel-2 Image</h2>
-                <h6 class="header" style="margin-top: -10px; font-style: italic;">with cloud mask and NDWI mask</h6>
                 <div class="section">
                     <h5>Overview</h5>
-                    <p>Given that weather conditions during flood events are often poor, having a large number of flood event observations is important for collecting high-quality images. In this project, both high-water marks and high-water levels are utilized to collect Sentinel-2 imagery and corresponding masks. 1,107 flood event observations are used to collect images. Based on the analysis of flood event data, most images will be associated with <strong>2023 July flood event</strong> (641 high-water marks from 2023 July MA NY VT Flood and 27 high-water levels from 2023-07).</p>
+                    <p>1,107 flood event observations are used to collect <a href="https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED" target="_blank">Sentinel-2</a> satellite images. Based on the analysis of flood event data, most images will be associated with <strong>2023 July flood event</strong> (641 high-water marks from 2023 July MA NY VT Flood and 27 high-water levels from 2023-07).</p>
                     <p>Initially, 379 images were downloaded using Google Earth Engine API. After necessary filtering steps, the dataset is filtered to include 69 high-quality natural color images, captured before/during/after the 2023 July Flood Event. These 69 images belong to 25 flood event observations.</p>
                     <p>10 of these images have significant flooded areas through visual inspection (brown water bodies caused by sediment). The flood event observation IDs of these images are 44909, 44929, 45067, 45237, 45321, 45358, 45427, 45501, MNTM3_114, and TMVC3_39.</p>
                 </div>
                 <div class="section">
                     <h5>Image with Significant Flooded Area (High-Water Mark ID: 45358)</h5>
-                    <p>Red dot marker: high-water mark located on US side of covered bridge on RB in wood structure of bridge wall</p>
+                    <p style="font-style: italic; margin: 20px">
+                        * Red dot marker: high-water mark located on US side of covered bridge on RB in wood structure of bridge wall.<br>
+                        * The light blue lines and areas represent the network of rivers, streams, and water bodies defined by the <a href="https://www.usgs.gov/national-hydrography/national-hydrography-dataset" target="_blank">National Hydrography Dataset</a>.
+                    </p>
                     <div id="map"></div>
                     <script>
                         var map = L.map('map').setView([43.68000807, -73.03732679], 12);
                     
                         var baseLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                         }).addTo(map);
                     
                         var sentinelLayer = L.tileLayer('45358_tiles/{z}/{x}/{y}.png', {
@@ -117,7 +119,7 @@
 
                         var nhdLayer = L.esri.tiledMapLayer({
                             url: 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSHydroCached/MapServer',
-                            attribution: 'NHD Data © USGS',
+                            attribution: '&copy; <a href="https://basemap.nationalmap.gov/arcgis/rest/services/USGSHydroCached/MapServer">USGS NHD</a>',
                             opacity: 0.5
                         }).addTo(map);
 

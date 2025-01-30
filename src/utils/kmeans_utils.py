@@ -90,6 +90,9 @@ def add_image_data(df):
     # load the dictionary mapping full state names to their abbreviations
     area_abbr_list = global_utils.area_abbr_list
 
+    if "New Hampshire" in area_abbr_list:
+        area_abbr_list["New_Hampshire"] = area_abbr_list.pop("New Hampshire")
+
     area_exist = df_mod['state'].unique().tolist()
     for i in area_exist:
 

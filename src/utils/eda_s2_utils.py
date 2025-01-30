@@ -348,20 +348,16 @@ def download_nhd_shape(area_list, content_list):
         print(f'download NHD for {i} - {name}')
 
         # extract the flowline-related files
-        if zipfile.is_zipfile(file_path):
-            print(f'File {name} is a valid Zip')
-            with zipfile.ZipFile(file_path, 'r') as z:
-                contents = z.namelist()
-                
-                for item in content_list:
-                    if item in contents:
-                        z.extract(item, dir)
-                        print(f'\nextract {i} {item}')
+        with zipfile.ZipFile(file_path, 'r') as z:
+            contents = z.namelist()
+            
+            for item in content_list:
+                if item in contents:
+                    z.extract(item, dir)
+                    print(f'\nextract {i} {item}')
 
-            # delete the ZIP file
-            os.remove(file_path)
-        else:
-            print("Not a zip file")
+        # delete the ZIP file
+        os.remove(file_path)
 
     # explore the contents within the ZIP file
     print(f'list all contents within the ZIP file for {i}')

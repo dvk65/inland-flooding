@@ -25,7 +25,10 @@ print('\nSTART - NHD DATA COLLECTION AND PLOTTING\n')
 # set variable
 area_abbr_list = global_utils.area_abbr_list
 
-# # load the dataset
+if "New Hampshire" in area_abbr_list:
+    area_abbr_list["New_Hampshire"] = area_abbr_list.pop("New Hampshire")
+
+# load the dataset
 df = pd.read_csv('data/flood_event.csv')
 stn = pd.read_csv('data/df_stn/df_stn_mod.csv')
 gauge = pd.read_csv('data/df_gauge/df_gauge_mod.csv')

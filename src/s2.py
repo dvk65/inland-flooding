@@ -25,7 +25,7 @@ flood_event_periods = global_utils.flood_event_periods
 
 # step 1 - run the authentication flow
 ee.Authenticate()
-ee.Initialize(project='demoflood0803')
+ee.Initialize(project='inland-flooding-42317')
 # load STN high-water mark data
 stn = pd.read_csv('data/df_stn/df_stn_mod.csv')
 gauge = pd.read_csv('data/df_gauge/df_gauge_mod.csv')

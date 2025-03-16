@@ -27,8 +27,9 @@ flood_event_periods = {'2021 Henri': ['2021-08-15', '2021-08-23'],
 
 # new england state list
 area_abbr_list = {'Connecticut': 'CT', 'Maine': 'ME', 
-                  'Massachusetts': 'MA', 'New Hampshire': 'NH', 
-                  'Rhode Island': 'RI', 'Vermont': 'VT'}
+                  'Massachusetts': 'MA', 'New_Hampshire': 'NH', 
+                  'Rhode Island': 'RI', 'Vermont': 'VT',
+                  'Maine': 'ME'}
 
 def print_func_header(var):
     """

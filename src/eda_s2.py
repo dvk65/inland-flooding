@@ -24,14 +24,14 @@ print('\nSTART - NHD DATA COLLECTION AND PLOTTING\n')
 
 # set variable
 area_abbr_list = global_utils.area_abbr_list
-
-if "New Hampshire" in area_abbr_list:
-    area_abbr_list["New_Hampshire"] = area_abbr_list.pop("New Hampshire")
+area_list = ["ME"]
 
 # load the dataset
-df = pd.read_csv('data/flood_event.csv')
+df = pd.read_csv('data/flood_event_ME.csv')
 stn = pd.read_csv('data/df_stn/df_stn_mod.csv')
+stn = pd.DataFrame(stn[stn['state'] == 'ME'])
 gauge = pd.read_csv('data/df_gauge/df_gauge_mod.csv')
+gauge = pd.DataFrame(gauge[gauge['state'] == 'ME'])
 
 # step 1 - delete empty folders
 eda_s2_utils.check_s2_folder(df)
@@ -48,10 +48,12 @@ df_s2_mod = eda_s2_utils.add_metadata_flood_event(df, df_s2, attr_list, flood_da
 eda_s2_utils.plot_s2(df_s2_mod)
 
 # step 5 - drop images based on step 5 (two steps - select event and drop unwanted image)
-selected_event = ['2023-07']
-date_drop = ['20230619', '20230701', '20230719', '20230731', '20230805']
+selected_event = ['2018-03', '2021-05', '2020-02', '2023-12', '2020-09', '2019-09', '2021-08', '2020-03', '2024-01', '2020-10', '2019-10', '2021-09', '2020-04', '2024-03', '2020-11', '2019-11', '2022-10', '2020-05', '2024-04', '2021-03', '2019-12', '2023-05', '2020-06', '2021-04', '2020-01', '2023-08', '2020-07']
+# date_drop = ['20230619', '20230701', '20230719', '20230731', '20230805'] 2021-05, 2018-03, 
+date_drop = []
 cloud_threshold = 50
 flood_day_adjust_dict = {'gauge': (1, 1), 'stn': (0, 0)}
+# eda_s2_utils.select_s2(df_s2_mod, selected_event, cloud_threshold, date_drop, flood_day_adjust_dict, explore='complete')
 df_selected = eda_s2_utils.select_s2(df_s2_mod, selected_event, cloud_threshold, date_drop, flood_day_adjust_dict, explore='complete') 
 
 # step 6 - extract images where their ids have a during flood period label (the flood event observation is captured by Sentinel-2)
@@ -60,7 +62,7 @@ df_id_with_flood = df_selected[df_selected['id'].isin(flood_ids)].copy()
 df_id_with_flood.to_csv('data/s2_id_with_flood.csv', index=False)
 
 # step 7 - plot the distribution 
-eda_flood_event_utils.run_eda(df_id_with_flood, 'sentinel2')
+eda_flood_event_utils.run_eda(df_id_with_flood, 'sentinel2', area_list)
 
 # step 8 - explore ndwi threshold
 threshold_list = [-0.15, -0.1, -0.05, 0.0, 0.05, 0.1]

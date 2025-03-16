@@ -253,42 +253,44 @@ def select_s2(df, event_selection, cloud_threshold, date_drop, flood_day_adjust_
         event 2024-01 - not ideal (the change not notable)
         (event 2023-07 is the best event currently - if enough time, consider other events as well)
     '''
-    global_utils.print_func_header('select the ideal event based on plots')
-    df_mod = df[df['event'].isin(event_selection)].copy()
-    df_mod = df_mod.drop_duplicates(subset=['id', 'date'])
-    df_mod = df_mod.reset_index(drop=True)
-    unique_ids = df_mod['id'].unique()
-    global_utils.describe_df(df_mod, 'selected image dataset')
 
-    print(f'\nplot the selected images for further inspection')
-    global_utils.plot_helper(unique_ids, df_mod, 's2_event_selected')
+    for i in event_selection:
+        global_utils.print_func_header('select the ideal event based on plots')
+        df_mod = df[df['event'].isin(event_selection)].copy()
+        df_mod = df_mod.drop_duplicates(subset=['id', 'date'])
+        df_mod = df_mod.reset_index(drop=True)
+        unique_ids = df_mod['id'].unique()
+        global_utils.describe_df(df_mod, 'selected image dataset')
 
-    if explore == 'complete':
-        df_mod['period'] = df_mod.apply(assign_period_label, axis=1, day_adjust_dict=flood_day_adjust_dict)
-        df_ready = df_mod[~df_mod['date'].isin(date_drop)].copy()
-        drop_list = []
-        for index, row in df_ready.iterrows():
-            cloud_mask_path = os.path.join(row['dir_cloud'], row['filename_cloud'])
-            cloud_percentage = check_cloud_cover(cloud_mask_path)
-            if cloud_percentage > cloud_threshold:
-                drop_list.append(index)
-        
-        df_ready.drop(drop_list, inplace=True)
-        df_ready.reset_index(drop=True, inplace=True)
-        unique_ids = df_ready['id'].unique()
-        global_utils.describe_df(df_ready, 'ready-to-use image dataset')
+        print(f'\nplot the selected images for further inspection')
+        global_utils.plot_helper(unique_ids, df_mod, 's2_event_selected')
 
-        # check the images during flood
-        df_during_flood = df_ready[df_ready['period'] == 'during flood']
-        print("\nnumber of images collected during flood:\n", df_during_flood.shape[0])
-        print("\nimages collected during flood:\n", df_during_flood['id'].tolist())
-        print(f'\nplot the ready-to-use images for verification')
-        global_utils.plot_helper(unique_ids, df_ready, 's2_cleaned')
+        if explore == 'complete':
+            df_mod['period'] = df_mod.apply(assign_period_label, axis=1, day_adjust_dict=flood_day_adjust_dict)
+            df_ready = df_mod[~df_mod['date'].isin(date_drop)].copy()
+            drop_list = []
+            for index, row in df_ready.iterrows():
+                cloud_mask_path = os.path.join(row['dir_cloud'], row['filename_cloud'])
+                cloud_percentage = check_cloud_cover(cloud_mask_path)
+                if cloud_percentage > cloud_threshold:
+                    drop_list.append(index)
+            
+            df_ready.drop(drop_list, inplace=True)
+            df_ready.reset_index(drop=True, inplace=True)
+            unique_ids = df_ready['id'].unique()
+            global_utils.describe_df(df_ready, 'ready-to-use image dataset')
 
-        df_ready.to_csv('data/s2.csv', index=False)
-        return df_ready
-    else:
-        return df_mod
+            # check the images during flood
+            df_during_flood = df_ready[df_ready['period'] == 'during flood']
+            print("\nnumber of images collected during flood:\n", df_during_flood.shape[0])
+            print("\nimages collected during flood:\n", df_during_flood['id'].tolist())
+            print(f'\nplot the ready-to-use images for verification')
+            global_utils.plot_helper(unique_ids, df_ready, 's2_cleaned')
+
+            df_ready.to_csv('data/s2_ME.csv', index=False)
+            return df_ready
+        else:
+            return df_mod
 
 def test_ndwi_tif(df, threshold_list):
     """
@@ -355,13 +357,13 @@ def download_nhd_shape(area_list, content_list):
                 if item in contents:
                     z.extract(item, dir)
                     print(f'\nextract {i} {item}')
+            print(contents)
 
         # delete the ZIP file
         os.remove(file_path)
 
-    # explore the contents within the ZIP file
-    print(f'list all contents within the ZIP file for {i}')
-    print(contents)
+        # explore the contents within the ZIP file
+        print(f'list all contents within the ZIP file for {i}')
 
 def add_nhd_layer_s2(df, area, area_abbr_list):
     '''

@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 from shapely.geometry import Point, shape
 from utils import global_utils
 
-def run_eda(df, var, area_list=None):
+def run_eda(df, var, area_list):
     '''
     Run an Exploratory Data Analysis (EDA) on the specified flood event data
 

@@ -151,7 +151,16 @@ make kmeans
 - [National Water Prediction Service](https://water.noaa.gov/#@=-96.401081,38.1465724,3.3479233&b=topographic&g=obsFcst,1!1!1!1!1!1!1!1!1!1!1!1!1!1!1!0!0!0!0!0,0.5,1!1!1!1!0,0,0&ab=0,0,#D94B4A,1,1,1,#cccccc,1,0,0,#B243B1,1,0,0,#98E09A,1&a=hydrologic,0.35&s=0,0,0.9,0.9&n=false,#72afe9,0.9,0,0.9,0,0.9&p=false,0.75,0,7,0,1,2024,8,15,0&d=0,0,1,1,1,1,1,1,#006EFF,1,#006EFF,1,#006EFF&q=)
 - [Sentinel-2 Level-2A](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED)
 - [National Hydrography Dataset](https://www.usgs.gov/national-hydrography/national-hydrography-dataset)
+- https://observablehq.com/@martien/fix-circular-references
+- https://observablehq.com/@paulplew/mapping-and-filtering-data
+- https://snailbones.medium.com/styling-oceans-with-bathymetry-in-maplibre-a326e912e02f
+- https://observablehq.com/@neocartocnrs/hello-maplibre
+- https://github.com/geotiffjs/geotiff.js/
+
 
 ### Paper
 - [A multi-sensor approach for increased measurements of floods and their societal impacts from space](https://www.nature.com/articles/s43247-023-01129-1)
 - [Remote sensing for flood inundation mapping using various processing methods with Sentinel-1 and Sentinel-2](https://isprs-archives.copernicus.org/articles/XLVIII-M-1-2023/339/2023/isprs-archives-XLVIII-M-1-2023-339-2023.pdf)
+- [GIS and remote sensing based flood risk assessment and mapping: The case of Dikala Watershed in Kobo Woreda Amhara Region, Ethiopia](https://www.sciencedirect.com/science/article/pii/S266597272300020X)
+- [Deep Convolutional Neural Network for Flood Extent Mapping Using Unmanned Aerial Vehicles Data](https://www.mdpi.com/1424-8220/19/7/1486)
+- [Flood Mapping with Convolutional Neural Networks Using Spatio-Contextual Pixel Information](https://www.mdpi.com/2072-4292/11/19/2331)

@@ -43,8 +43,7 @@ gauge['end_day'] = pd.to_datetime(gauge['event_day']) + pd.Timedelta(days=16)
 
 attr_list = ['id', 'event', 'state', 'county', 'latitude', 'longitude', 'note', 'event_day', 'start_day', 'end_day', 'source']
 df = pd.concat([stn[attr_list], gauge[attr_list]])
-df = df[df['state'] == 'ME']
-df.to_csv('data/flood_event_ME.csv', index=False)
+df.to_csv('data/flood_event.csv', index=False)
 
 # step 3 - collect the corresponding sentinel imagery (STN and Gauge combined)
 s2_utils.collect_sentinel2_by_event(df, buffer_dis, overlap_threshold, pixel_threshold, 10)

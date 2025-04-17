@@ -25,11 +25,10 @@ flood_event_periods = {'2021 Henri': ['2021-08-15', '2021-08-23'],
               '2023 July MA NY VT Flood': ['2023-07-10', '2023-07-11'],
               '2023 December East Coast Cyclone': ['2023-12-17', '2023-12-18']}
 
+# flood_event_periods = {}
+
 # new england state list
-area_abbr_list = {'Connecticut': 'CT', 'Maine': 'ME', 
-                  'Massachusetts': 'MA', 'New_Hampshire': 'NH', 
-                  'Rhode Island': 'RI', 'Vermont': 'VT',
-                  'Maine': 'ME'}
+area_abbr_list = {'Maine': 'ME'}
 
 def print_func_header(var):
     """

@@ -29,6 +29,9 @@ from sklearn.decomposition import PCA
 from rasterio.features import geometry_mask
 from sklearn.preprocessing import StandardScaler
 from matplotlib.colors import Normalize, ListedColormap
+from pyproj import Transformer
+from shapely.geometry import Point
+from sklearn.neighbors import NearestNeighbors
 
 def read_tif(file_path):
     """
@@ -90,9 +93,6 @@ def add_image_data(df):
     # load the dictionary mapping full state names to their abbreviations
     area_abbr_list = global_utils.area_abbr_list
 
-    if "New Hampshire" in area_abbr_list:
-        area_abbr_list["New_Hampshire"] = area_abbr_list.pop("New Hampshire")
-
     area_exist = df_mod['state'].unique().tolist()
     for i in area_exist:
 
@@ -112,6 +112,7 @@ def add_image_data(df):
             ndwi_path = os.path.join(row['dir_ndwi'], row['filename_ndwi'])
             cloud_path = os.path.join(row['dir_cloud'], row['filename_cloud'])
             sat_image, bounds, tiff_crs, transform, _  = read_tif(image_path) # example shape (3, 1201, 1195) <- (channels, height, width)
+            print(f"Loaded image shape for {row['filename']}: {sat_image.shape}")  # (channels, height, width)
             ndwi_mask, _, _, _, _ = read_tif(ndwi_path)
             ndwi_mask = global_utils.read_ndwi_tif(ndwi_path)
             ndwi_mask = global_utils.apply_cloud_mask(ndwi_mask, cloud_path)
@@ -158,6 +159,7 @@ def preprocess_data(df):
     global_utils.print_func_header('preprocess the image data')
     scaled_image_list = []
     valid_pixels_list = []
+    inverse_distance_list = []
 
     for _, row in df_mod.iterrows():
         # load the valid image data
@@ -172,16 +174,80 @@ def preprocess_data(df):
         scaler = StandardScaler()
         scaled_data = scaler.fit_transform(valid_data)
 
+        distances = np.full(reshaped_image.shape[0], np.nan)
+        shp_path = f'data/nhd/Maine/Shape/NHDFlowline.shp'
+        
+        # flowline['ftype'] or ['y
+        # fcode'] (might be helpful for extracting major river?) 
+        major_river = [558]
+        flowline = gpd.read_file(shp_path)
+        major_rivers = flowline[(flowline['ftype'].isin(major_river)) & (flowline['lengthkm'] >= 0.6)]
+
+        image_path = os.path.join(row['dir'], row['filename'])
+        _, sat_bounds, tiff_crs, _, _  = read_tif(image_path)
+
+        if major_rivers.crs != tiff_crs:
+            major_rivers = major_rivers.to_crs(tiff_crs)
+
+        # plot satellite image
+        lat = row['latitude']
+        lon = row['longitude']
+        transformer = Transformer.from_crs("EPSG:4326", tiff_crs, always_xy=True)
+        raster_x, raster_y = transformer.transform(lon, lat)
+
+        image_center = Point(raster_x, raster_y)
+        # print(image_center)
+
+        flowline_coords = []
+        for geom in major_rivers.geometry:
+            if geom.geom_type == 'LineString':
+                flowline_coords.extend(list(geom.coords))
+            elif geom.geom_type == 'MultiLineString':
+                for line in geom:
+                    flowline_coords.extend(list(line.coords))
+
+        pixel_points = [Point(x, y) for x, y in reshaped_image[valid_pixels][:, :2]]
+
+        flowline_array = np.array(flowline_coords)
+        pixel_array = np.array([[pt.x, pt.y] for pt in pixel_points])
+
+        if flowline_array.shape[1] == 3:
+            pixel_array = np.hstack([pixel_array, np.zeros((pixel_array.shape[0], 1))])
+
+        neigh = NearestNeighbors(n_neighbors=1).fit(flowline_array)
+        distances_to_flowline, _ = neigh.kneighbors(pixel_array)
+
+        close_pixels_mask = distances_to_flowline.flatten() <= 10
+
+        distances[valid_pixels] = 0
+        distances[valid_pixels][close_pixels_mask] = 1 / np.maximum(distances_to_flowline.flatten()[close_pixels_mask], 1e-6)
+        # distances[valid_pixels] = 1/np.maximum(distances.flatten(), 1e-6)
+
+        # pixel_points = [Point(x, y) for x, y in reshaped_image[valid_pixels][:, :2]]
+        # nearest_points = tree.query(pixel_points, k=1)
+            
+        # for idx, nearest in enumerate(nearest_points):
+        #     min_distance = pixel_points[idx].distance(nearest)
+        #     distances[valid_pixels][idx] = 1/max(min_distance, 1e-6)
+        #     # min_distance = min(image_center.distance(Point(coord)) for coord in flowline_coords)
+        #     # distances[idx] = 1 / max(min_distance, 1e-6)  # Prevent division by zero
+
+        # close_pixel_indices = np.argsort(distances[valid_pixels])[:500]
+        # scaled_data[close_pixel_indices] *= 2
+
         # store the scaled data and valid pixel
         scaled_image_list.append(scaled_data)
         valid_pixels_list.append(valid_pixels)
+        inverse_distance_list.append(distances[valid_pixels].reshape(-1, 1))
 
     # assign the list of scaled images to the DataFrame column
     df_mod['scaled_image'] = scaled_image_list
     df_mod['valid_pixels'] = valid_pixels_list
+    df_mod['inverse_distances'] = inverse_distance_list
 
     # print the first row for inspection
     print('\nprint out the first row for inspection\n', df_mod.iloc[0])
+    print(df_mod)
 
     return df_mod
 

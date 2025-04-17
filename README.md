@@ -2,7 +2,7 @@
 
 This project focuses on developing an algorithm for automated assessment of inland flooding from satellite observations. Specifically, this algorithm collects satellite images corresponding to before-, during-, and after-flood events and applies the K-means clustering technique to identify flooded areas. The ultimate goal is to enhance flood detection capabilities, providing insights that can be applied to flood detection using drone measurements.
 
-While the project initially targeted Maine, it has been expanded to include in the New England Region with similar flood characteristics. 
+While the project initially targeted some states in New England Region, it has been expanded to include Maine. The current code base only includes the collection of Maine data.
 
 ## Primary Deliverables
 - [README.md](README.md) - An overview of the project, including step-by-step [instructions](README.md#instruction) to replicate the results;
@@ -49,7 +49,7 @@ make stn
 #### High-water levels
 [USGS National Water Information System](https://waterdata.usgs.gov/nwis) is another source for flood event data by extracting real-time gauge water levels above the moderate flood stage. In this project,  when the water level of a gauge is above the moderate flood stage, it's considered as a flood event observation. 
 
-To collect and preprocess gauge water levels above the [moderate flood stage](https://www.weather.gov/aprfc/terminology#:~:text=Moderate%20Flooding), use the following command (estimated runtime: 30-40 minutes):
+To collect and preprocess gauge water levels above the [moderate flood stage](https://www.weather.gov/aprfc/terminology#:~:text=Moderate%20Flooding), use the following command (estimated runtime: 7-10 minutes):
 ```
 make gauge
 ```
@@ -73,7 +73,7 @@ To collect Sentinel 2 imagery from [Google Earth Engine](https://developers.goog
 
 To set up your Earth Engine-enabled Cloud Project, follow the steps in the [Google Earth Engine setup guide](https://developers.google.com/earth-engine/cloud/earthengine_cloud_project_setup). Ensure you complete the `Create a Cloud Project` and `Enable the Earth Engine API` sections. A step-by-step walkthrough can be found in [GUIDE.md](GUIDE.md#google-earth-engine-setup).
 
-Before collecting Sentinel-2 imagery, make sure to update the project ID in `s2.py` by replacing `demoflood0803` with your own project ID (`ee.Initialize(project='your_project_id')`). Then, to start the collection process, run the following command (estimated runtime: 160 minutes):
+Before collecting Sentinel-2 imagery, make sure to update the project ID in `s2.py` by replacing `demoflood0803` with your own project ID (`ee.Initialize(project='your_project_id')`). Then, to start the collection process, run the following command (estimated runtime: 100 minutes):
 ```
 make s2
 ```
@@ -85,7 +85,7 @@ Before applying the KMeans clustering algorithm, necessary preprocessing steps a
 
 Meanwhile, flowlines from National Hydrography Dataset are collected to enhance the analysis of flooded areas in Sentinel-2 images and improve the K-means clustering algorithm.
 
-To run analysis and preparation on the images, use the following command (estimated runtime: 15-20 minutes):
+To run analysis and preparation on the images, use the following command (estimated runtime: 1-3 minutes):
 ```
 make eda_s2
 ```
@@ -100,10 +100,49 @@ lib/python3.9/site-packages/pyogrio/raw.py:196: UserWarning: Measured (M) geomet
 ### Step 5: Use KMeans clustering technique to assess inland flooding
 This section runs the KMeans clustering algorithm on the cleaned image dataset. 
 
-To segment images, use the following command (estimated runtime: 30-40 minutes):
+To segment images, use the following command (estimated runtime: 5-8 minutes):
 ```
 make kmeans
 ```
+
+## Extensions:
+
+## 1. Interactive Visualization with Observable
+- Goal: Create a user-friendly visualization of geospatial data.
+
+- Steps:
+    - Learned Observable basics.
+    - Rendered shapefiles including flood boundaries.
+    - Overlaid NDWI and flowlines on interactive maps.
+    - Discovered that Observable handles vector data with much better clarity than raster-heavy web stacks.
+
+- Limitations: Struggled with performance on large datasets due to browser memory constraints.
+
+## 2. Big Data Techniques & Architectural Considerations
+- Explored:
+    - Lazy loading techniques to fetch only necessary tiles/data chunks.
+    - Hosting data on a server for scalability.
+
+- Why Observable over MEAN/MERN:
+    - No login/authentication needed; public datasets used.
+    - Easier prototyping and map rendering without setting up a backend.
+    - Focus remains on analysis, not on web development.
+
+ ## 3. Maine-Specific Module
+- Focus: Collected and processed data specifically from Maine.
+- Sources: Google Earth Engine, NOAA for rainfall, NHD for flowlines.
+- Challenge: Very few flood events with satellite overlap, limiting training opportunities.
+- Outcome: Brainstormed to make good use of the data available.
+
+ ## 4. Visual Enhancements in KMeans Clustering
+- Improvement: Changed flowline overlay color to hot pink to enhance visibility in post-clustering imagery.
+- Outcome: Helped visually distinguish features, but had negligible effect on cluster accuracy.
+
+ ## 5. Distance-Augmented Clustering Model
+- Innovation: Added distance-to-flowline as a fourth feature along with RGB.
+- Method: Gave higher weight to pixels within a 100-pixel buffer of flowlines.
+- Outcome: Marginal improvement; varying the buffer size didn’t significantly boost results.
+
 
 ## Reference
 ### Data

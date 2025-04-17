@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 from shapely.geometry import Point, shape
 from utils import global_utils
 
-def run_eda(df, var, area_list):
+def run_eda(df, var, area_list=None):
     '''
     Run an Exploratory Data Analysis (EDA) on the specified flood event data
 
@@ -159,7 +159,7 @@ def map_event(df, var):
         Scale - smaller scale based on this approach (less detail)
     """
     global_utils.print_func_header(f'visualizing {var} on map using GeoPandas')
-    world = gpd.read_file("https://www2.census.gov/geo/tiger/TIGER2022/STATE/tl_2022_us_state.zip")
+    world = gpd.read_file("data/tl_2022_us_state.zip")
     unique_events = df['event'].drop_duplicates().reset_index(drop=True)
     num_unique_events = len(unique_events)
 

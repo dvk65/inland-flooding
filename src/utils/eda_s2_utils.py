@@ -230,7 +230,7 @@ def check_cloud_cover(path):
         cloud_percentage = np.mean(cloud_mask == 1) * 100
         return cloud_percentage
 
-def select_s2(df, event_selection, cloud_threshold, date_drop, flood_day_adjust_dict=None, explore=None):
+def select_s2(df, cloud_threshold, date_drop, flood_day_adjust_dict=None, explore=None):
     '''
     Select the ideal image datasets based on plots
 
@@ -253,44 +253,43 @@ def select_s2(df, event_selection, cloud_threshold, date_drop, flood_day_adjust_
         event 2024-01 - not ideal (the change not notable)
         (event 2023-07 is the best event currently - if enough time, consider other events as well)
     '''
+    global_utils.print_func_header('select the ideal event based on plots')
+    # df_mod = df[df['event'].isin(event_selection)].copy()
+    df_mod = df.drop_duplicates(subset=['id', 'date'])
+    df_mod = df_mod.reset_index(drop=True)
+    unique_ids = df_mod['id'].unique()
+    global_utils.describe_df(df_mod, 'selected image dataset')
 
-    for i in event_selection:
-        global_utils.print_func_header('select the ideal event based on plots')
-        df_mod = df[df['event'].isin(event_selection)].copy()
-        df_mod = df_mod.drop_duplicates(subset=['id', 'date'])
-        df_mod = df_mod.reset_index(drop=True)
-        unique_ids = df_mod['id'].unique()
-        global_utils.describe_df(df_mod, 'selected image dataset')
+    print(f'\nplot the selected images for further inspection')
+    global_utils.plot_helper(unique_ids, df_mod, 's2_event_selected')
 
-        print(f'\nplot the selected images for further inspection')
-        global_utils.plot_helper(unique_ids, df_mod, 's2_event_selected')
+    if explore == 'complete':
+        # df_mod['period'] = df_mod.apply(assign_period_label, axis=1, day_adjust_dict=flood_day_adjust_dict)
+        # df_mod['period'] = df_mod.apply(lambda row: assign_period_label(row, day_adjust_dict=flood_day_adjust_dict), axis=1)
+        df_ready = df_mod[~df_mod['date'].isin(date_drop)].copy()
+        drop_list = []
+        for index, row in df_ready.iterrows():
+            cloud_mask_path = os.path.join(row['dir_cloud'], row['filename_cloud'])
+            cloud_percentage = check_cloud_cover(cloud_mask_path)
+            if cloud_percentage > cloud_threshold:
+                drop_list.append(index)
+        
+        df_ready.drop(drop_list, inplace=True)
+        df_ready.reset_index(drop=True, inplace=True)
+        unique_ids = df_ready['id'].unique()
+        global_utils.describe_df(df_ready, 'ready-to-use image dataset')
 
-        if explore == 'complete':
-            df_mod['period'] = df_mod.apply(assign_period_label, axis=1, day_adjust_dict=flood_day_adjust_dict)
-            df_ready = df_mod[~df_mod['date'].isin(date_drop)].copy()
-            drop_list = []
-            for index, row in df_ready.iterrows():
-                cloud_mask_path = os.path.join(row['dir_cloud'], row['filename_cloud'])
-                cloud_percentage = check_cloud_cover(cloud_mask_path)
-                if cloud_percentage > cloud_threshold:
-                    drop_list.append(index)
-            
-            df_ready.drop(drop_list, inplace=True)
-            df_ready.reset_index(drop=True, inplace=True)
-            unique_ids = df_ready['id'].unique()
-            global_utils.describe_df(df_ready, 'ready-to-use image dataset')
+        # check the images during flood
+        df_during_flood = df_ready[df_ready['period'] == 'during flood']
+        print("\nnumber of images collected during flood:\n", df_during_flood.shape[0])
+        print("\nimages collected during flood:\n", df_during_flood['id'].tolist())
+        print(f'\nplot the ready-to-use images for verification')
+        global_utils.plot_helper(unique_ids, df_ready, 's2_cleaned')
 
-            # check the images during flood
-            df_during_flood = df_ready[df_ready['period'] == 'during flood']
-            print("\nnumber of images collected during flood:\n", df_during_flood.shape[0])
-            print("\nimages collected during flood:\n", df_during_flood['id'].tolist())
-            print(f'\nplot the ready-to-use images for verification')
-            global_utils.plot_helper(unique_ids, df_ready, 's2_cleaned')
-
-            df_ready.to_csv('data/s2_ME.csv', index=False)
-            return df_ready
-        else:
-            return df_mod
+        df_ready.to_csv('data/s2.csv', index=False)
+        return df_ready
+    else:
+        return df_mod
 
 def test_ndwi_tif(df, threshold_list):
     """
@@ -325,7 +324,7 @@ def test_ndwi_tif(df, threshold_list):
         plt.close()
         print(f"complete - {filename}")
 
-def download_nhd_shape(area_list, content_list):
+def download_nhd_shape(content_list):
     """
     Download the National Hydrography Dataset Flowline for specified states
 
@@ -334,36 +333,36 @@ def download_nhd_shape(area_list, content_list):
         content_list: The specified components of the NHD data
     """
     global_utils.print_func_header('download NHD')
-    for i in area_list:
+    # for i in area_list:
 
-        # construct URL to download NHD (e.g., https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/State/Shape/NHD_H_Vermont_State_Shape.zip)
-        url = f'https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/State/Shape/NHD_H_{i}_State_Shape.zip'
+    # construct URL to download NHD (e.g., https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/State/Shape/NHD_H_Vermont_State_Shape.zip)
+    url = f'https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/State/Shape/NHD_H_Maine_State_Shape.zip'
 
-        # download the ZIP file to the specified directory
-        dir = f'data/nhd/{i}'
-        os.makedirs(dir, exist_ok=True)
-        name = os.path.basename(url)
-        file_path = os.path.join(dir, name)
-        res = requests.get(url)
-        with open(file_path, 'wb') as f:
-            f.write(res.content)
-        print(f'download NHD for {i} - {name}')
+    # download the ZIP file to the specified directory
+    dir = f'data/nhd/Maine'
+    os.makedirs(dir, exist_ok=True)
+    name = os.path.basename(url)
+    file_path = os.path.join(dir, name)
+    res = requests.get(url)
+    with open(file_path, 'wb') as f:
+        f.write(res.content)
+    print(f'download NHD for Maine - {name}')
 
-        # extract the flowline-related files
-        with zipfile.ZipFile(file_path, 'r') as z:
-            contents = z.namelist()
-            
-            for item in content_list:
-                if item in contents:
-                    z.extract(item, dir)
-                    print(f'\nextract {i} {item}')
-            print(contents)
+    # extract the flowline-related files 
+    with zipfile.ZipFile(file_path, 'r') as z:
+        contents = z.namelist()
+        
+        for item in content_list:
+            if item in contents:
+                z.extract(item, dir)
+                print(f'\nextract Maine {item}')
 
-        # delete the ZIP file
-        os.remove(file_path)
+    # delete the ZIP file
+    os.remove(file_path)
 
-        # explore the contents within the ZIP file
-        print(f'list all contents within the ZIP file for {i}')
+    # explore the contents within the ZIP file
+    print(f'list all contents within the ZIP file for Maine')
+    print(contents)
 
 def add_nhd_layer_s2(df, area, area_abbr_list):
     '''

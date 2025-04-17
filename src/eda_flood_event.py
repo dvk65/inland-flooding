@@ -17,7 +17,7 @@ start = time.time()
 print('\nSTART - ANALYZE FLOOD EVENT OBSERVATIONS')
 
 # set variables
-area_list = ["CT", "ME", "MA", "NH", "RI", "VT"]
+area_list = ["ME"]
 
 # load STN high-water mark data
 stn = pd.read_csv('data/df_stn/df_stn_mod.csv')

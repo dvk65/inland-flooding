@@ -107,7 +107,7 @@ make kmeans
 
 ## Extensions:
 
-## 1. Interactive Visualization with Observable
+### 1. Interactive Visualization with Observable
 - Goal: Create a user-friendly visualization of geospatial data.
 
 - Steps:
@@ -118,7 +118,7 @@ make kmeans
 
 - Limitations: Struggled with performance on large datasets due to browser memory constraints.
 
-## 2. Big Data Techniques & Architectural Considerations
+### 2. Big Data Techniques & Architectural Considerations
 - Explored:
     - Lazy loading techniques to fetch only necessary tiles/data chunks.
     - Hosting data on a server for scalability.
@@ -128,17 +128,17 @@ make kmeans
     - Easier prototyping and map rendering without setting up a backend.
     - Focus remains on analysis, not on web development.
 
- ## 3. Maine-Specific Module
+ ### 3. Maine-Specific Module
 - Focus: Collected and processed data specifically from Maine.
 - Sources: Google Earth Engine, NOAA for rainfall, NHD for flowlines.
 - Challenge: Very few flood events with satellite overlap, limiting training opportunities.
 - Outcome: Brainstormed to make good use of the data available.
 
- ## 4. Visual Enhancements in KMeans Clustering
+ ### 4. Visual Enhancements in KMeans Clustering
 - Improvement: Changed flowline overlay color to hot pink to enhance visibility in post-clustering imagery.
 - Outcome: Helped visually distinguish features, but had negligible effect on cluster accuracy.
 
- ## 5. Distance-Augmented Clustering Model
+ ### 5. Distance-Augmented Clustering Model
 - Innovation: Added distance-to-flowline as a fourth feature along with RGB.
 - Method: Gave higher weight to pixels within a 100-pixel buffer of flowlines.
 - Outcome: Marginal improvement; varying the buffer size didn’t significantly boost results.

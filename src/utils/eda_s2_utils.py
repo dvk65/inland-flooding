@@ -324,7 +324,7 @@ def test_ndwi_tif(df, threshold_list):
         plt.close()
         print(f"complete - {filename}")
 
-def download_nhd_shape(content_list):
+def download_nhd_shape(content_list, area_list):
     """
     Download the National Hydrography Dataset Flowline for specified states
 
@@ -333,36 +333,36 @@ def download_nhd_shape(content_list):
         content_list: The specified components of the NHD data
     """
     global_utils.print_func_header('download NHD')
-    # for i in area_list:
+    for i in area_list:
 
     # construct URL to download NHD (e.g., https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/State/Shape/NHD_H_Vermont_State_Shape.zip)
-    url = f'https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/State/Shape/NHD_H_Maine_State_Shape.zip'
+        url = f'https://prd-tnm.s3.amazonaws.com/StagedProducts/Hydrography/NHD/State/Shape/NHD_H_{i}_State_Shape.zip'
 
-    # download the ZIP file to the specified directory
-    dir = f'data/nhd/Maine'
-    os.makedirs(dir, exist_ok=True)
-    name = os.path.basename(url)
-    file_path = os.path.join(dir, name)
-    res = requests.get(url)
-    with open(file_path, 'wb') as f:
-        f.write(res.content)
-    print(f'download NHD for Maine - {name}')
+        # download the ZIP file to the specified directory
+        dir = f'data/nhd/{i}'
+        os.makedirs(dir, exist_ok=True)
+        name = os.path.basename(url)
+        file_path = os.path.join(dir, name)
+        res = requests.get(url)
+        with open(file_path, 'wb') as f:
+            f.write(res.content)
+        print(f'download NHD for {i} - {name}')
 
-    # extract the flowline-related files 
-    with zipfile.ZipFile(file_path, 'r') as z:
-        contents = z.namelist()
-        
-        for item in content_list:
-            if item in contents:
-                z.extract(item, dir)
-                print(f'\nextract Maine {item}')
+        # extract the flowline-related files 
+        with zipfile.ZipFile(file_path, 'r') as z:
+            contents = z.namelist()
+            
+            for item in content_list:
+                if item in contents:
+                    z.extract(item, dir)
+                    print(f'\nextract {i} {item}')
 
-    # delete the ZIP file
-    os.remove(file_path)
+        # delete the ZIP file
+        os.remove(file_path)
 
-    # explore the contents within the ZIP file
-    print(f'list all contents within the ZIP file for Maine')
-    print(contents)
+        # explore the contents within the ZIP file
+        print(f'list all contents within the ZIP file for {i}')
+        print(contents)
 
 def add_nhd_layer_s2(df, area, area_abbr_list):
     '''

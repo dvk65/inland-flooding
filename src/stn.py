@@ -16,7 +16,7 @@ start = time.time()
 print('\nSTART - STN FLOOD EVENT DATA COLLECTION AND PREPROCESSING')
 
 # set variables
-area_list = ["ME"] # two-letter state abbreviation list (New England Region)
+area_list = ["ME", "VT"] # two-letter state abbreviation list (New England Region)
 attr_list = ['id', 'event', 'state', 'county', 'latitude', 'longitude', 'note'] # attributes selected for this project 
 check_list = ['event', 'latitude', 'longitude'] # list used to drop the observations sharing the same location and event name
 date_threshold = 2015 # date used to select the flood event observations (Sentinel-2 availability)

@@ -168,7 +168,7 @@ def map_event(df, var):
 
     event_color_mapping = {event: colors[idx] for idx, event in enumerate(unique_events)}
 
-    nhd_layers = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    nhd_layers = [2, 3, 4, 5, 6, 7, 11, 12]
     nhd_gdfs = collect_nhd(nhd_layers)
     
     for state, data in df.groupby('state'):

@@ -217,7 +217,7 @@ def preprocess_data(df):
         neigh = NearestNeighbors(n_neighbors=1).fit(flowline_array)
         distances_to_flowline, _ = neigh.kneighbors(pixel_array)
 
-        close_pixels_mask = distances_to_flowline.flatten() <= 10
+        close_pixels_mask = distances_to_flowline.flatten() <= 100
 
         distances[valid_pixels] = 0
         distances[valid_pixels][close_pixels_mask] = 1 / np.maximum(distances_to_flowline.flatten()[close_pixels_mask], 1e-6)

@@ -20,7 +20,7 @@ start = time.time()
 print('\nSTART - GAUGE FLOOD EVENT DATA COLLECTION AND PREPROCESSING\n')
 
 # set variables
-area_list = ["ME"] # two-letter state abbreviation list (New England Region)
+area_list = ["ME", "VT"] # two-letter state abbreviation list (New England Region)
 attr_list = ['id', 'event', 'event_day', 'state', 'county', 'latitude', 'longitude', 'note'] # attributes selected for this project 
 date_threshold = '2017-03-28' # date used to select the flood event observations (Sentinel-2 availability)
 

@@ -29,7 +29,7 @@ flowline = gpd.read_file(shp_path)
 vaa_path = f'data/nhd/{area}/Shape/NHDFlowlineVAA.dbf'
 flowline_vaa = gpd.read_file(vaa_path)
 
-flowline_combined = flowline.merge(flowline_vaa[['permanent_', 'streamorde', 'streamleve']], on='permanent_')
+flowline_combined = flowline.merge(flowline_vaa[['permanent_', 'streamorde', 'streamlevel']], on='permanent_')
 major_rivers = flowline_combined[flowline_combined['streamorde'] >= 5]
 
 # convert crs

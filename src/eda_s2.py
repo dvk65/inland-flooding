@@ -68,7 +68,7 @@ eda_s2_utils.test_ndwi_tif(df_id_with_flood, threshold_list)
 area_in_df = df_id_with_flood['state'].unique().tolist()
 area_list = [state for state, abbr in area_abbr_list.items() if abbr in area_in_df]
 content_selected = ['Shape/NHDFlowline.shp', 'Shape/NHDFlowline.shx', 'Shape/NHDFlowline.dbf', 'Shape/NHDFlowline.prj', 'Shape/NHDFlowlineVAA.dbf'] # selected flowline files
-eda_s2_utils.download_nhd_shape(content_selected) # download flowline shapefiles 
+eda_s2_utils.download_nhd_shape(content_selected, area_list) # download flowline shapefiles 
 eda_s2_utils.add_nhd_layer_s2(df_id_with_flood, area_list, area_abbr_list) # add flowline as a layer and also plot Sentinel-2 image, flowline, NDWI, and cloud
 
 # calculate the runtime

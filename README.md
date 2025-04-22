@@ -169,12 +169,6 @@ The Maine dataset exemplified the difficulty of flood detection in low-signal, l
 - [National Water Prediction Service](https://water.noaa.gov/#@=-96.401081,38.1465724,3.3479233&b=topographic&g=obsFcst,1!1!1!1!1!1!1!1!1!1!1!1!1!1!1!0!0!0!0!0,0.5,1!1!1!1!0,0,0&ab=0,0,#D94B4A,1,1,1,#cccccc,1,0,0,#B243B1,1,0,0,#98E09A,1&a=hydrologic,0.35&s=0,0,0.9,0.9&n=false,#72afe9,0.9,0,0.9,0,0.9&p=false,0.75,0,7,0,1,2024,8,15,0&d=0,0,1,1,1,1,1,1,#006EFF,1,#006EFF,1,#006EFF&q=)
 - [Sentinel-2 Level-2A](https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S2_SR_HARMONIZED)
 - [National Hydrography Dataset](https://www.usgs.gov/national-hydrography/national-hydrography-dataset)
-- https://observablehq.com/@martien/fix-circular-references
-- https://observablehq.com/@paulplew/mapping-and-filtering-data
-- https://snailbones.medium.com/styling-oceans-with-bathymetry-in-maplibre-a326e912e02f
-- https://observablehq.com/@neocartocnrs/hello-maplibre
-- https://github.com/geotiffjs/geotiff.js/
-
 
 ### Paper
 - [A multi-sensor approach for increased measurements of floods and their societal impacts from space](https://www.nature.com/articles/s43247-023-01129-1)

@@ -22,6 +22,8 @@ The initial proposal defined the following key objectives:
 - Investigate the feasibility of deploying an interactive web-based flood map.
 - Extend the model to integrate new spatial features such as proximity to flowlines.
 
+![Maine Events](figs/map/map_ME_stn_gauge.png)
+
 ---
 
 ## 3. Technical Foundations and Early Development
@@ -54,6 +56,8 @@ We favored these open-source tools over traditional web stacks (e.g., MERN/MEAN)
 - Interactive prototyping capabilities, especially critical in early-phase validation and debugging.
 
 However, while these tools proved valuable for experimentation and visualization in controlled environments, they still required additional infrastructure and integration effort for large-scale, persistent deployment.
+
+![ObservableFlowlinesFloodPtsVisualization](assets/ObservableFlowlinesFloodPtsVisualization.png)
 
 ### 3.3 Evaluation of Web Tech Stack (Mid- to Late-Feb)
 

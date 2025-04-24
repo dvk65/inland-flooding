@@ -86,6 +86,8 @@ Consequently, the web deployment phase was deferred, and focus shifted toward do
 
 This shift not only aligned better with the resource constraints of the current project phase, but also laid the foundation for future expansion through cloud-native infrastructure and containerized services.
 
+Check out [inland_flooding-observable](inland_flooding-observable).
+
 ---
 
 ## 4. Visualization and Overlay for Maine (Early March)
@@ -99,6 +101,20 @@ This step was critical in evaluating whether the segmentation pipeline and visua
 Despite a structured methodology, the adaptation process revealed several region-specific data limitations:
 - **Satellite Imagery Gaps**: Sentinel-2 imagery for Maine during actual flood events was **extremely limited or unavailable**. Most images retrieved corresponded to pre-flood or dry periods, severely limiting our ability to compare flooded vs. non-flooded states and reducing the usefulness of the K-means segmentation model.
 - **Discontinuous Flowlines**: The **National Hydrography Dataset (NHD)** shapefiles for Maine exhibited **fragmented and spatially sparse flowlines**, often failing to align with visible water features in the satellite imagery. In contrast, the Vermont datasets used in the original pipeline provided continuous and topologically sound hydrological data.
+
+<table>
+  <tr>
+    <th>Vermont Flowlines – Continuous and Aligned (July 2023)</th>
+    <th>Maine Flowlines – Fragmented and Misaligned (May 2020)</th>
+  </tr>
+  <tr>
+    <td><img src="assets/45501_20230711_s2_VT_clear_flowline.png" alt="VT Clear Flowline" width="400"/></td>
+    <td><img src="assets/MDIM1_159_20200502_s2_flowline_ME.png" alt="ME Flowline" width="400"/></td>
+  </tr>
+</table>
+
+<p style="text-align: center;"><em>Figure: Comparison of hydrological flowline continuity between Vermont and Maine NHD datasets.</em></p>
+
 - **Snow Cover Noise**: Many images captured during relevant timeframes showed **extensive snow cover**, especially in northern Maine. This introduced significant reflectance-based noise into the RGB image bands, which confused the unsupervised segmentation algorithm by mimicking water surfaces.
 
 ### 4.2 Adjustments and Partial Outcomes
@@ -111,6 +127,12 @@ Despite these limitations, we continued to test the overlay pipeline with the av
 ### 4.3 Reflection
 
 This visualization and overlay phase underscored a central lesson of the project: a one-size-fits-all approach to flood detection is limited by the quality, availability, and environmental context of regional data. While Vermont served as an effective demonstration region, Maine revealed the constraints that come with sparse flooding records, seasonal interference, and inconsistent vector data. These findings informed later decisions to pivot away from a full deployment and instead emphasize methodological extensibility and cloud-based processing frameworks.
+
+### Image 1: Flooding Cluster Detection using Default Method (Cluster 1)
+![MDIM1_159_20200502_default_floodingcluster1ME](assets/MDIM1_159_20200502_default_floodingcluster1ME.png)
+
+### Image 2: Flooding Cluster Detection using NDWI PCA Index (Cluster 2)
+![MDIM1_159_20200502_ndwi_pca_i_floodingcluster2ME](assets/MDIM1_159_20200502_ndwi_pca_i_floodingcluster2ME.png)
 
 ---
 

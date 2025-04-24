@@ -117,6 +117,8 @@ Despite a structured methodology, the adaptation process revealed several region
 
 - **Snow Cover Noise**: Many images captured during relevant timeframes showed **extensive snow cover**, especially in northern Maine. This introduced significant reflectance-based noise into the RGB image bands, which confused the unsupervised segmentation algorithm by mimicking water surfaces.
 
+![MDIM1_159_20200419_s2_ME_Snow](assets/MDIM1_159_20200419_s2_ME_Snow.png)
+
 ### 4.2 Adjustments and Partial Outcomes
 
 Despite these limitations, we continued to test the overlay pipeline with the available datasets:
@@ -128,10 +130,15 @@ Despite these limitations, we continued to test the overlay pipeline with the av
 
 This visualization and overlay phase underscored a central lesson of the project: a one-size-fits-all approach to flood detection is limited by the quality, availability, and environmental context of regional data. While Vermont served as an effective demonstration region, Maine revealed the constraints that come with sparse flooding records, seasonal interference, and inconsistent vector data. These findings informed later decisions to pivot away from a full deployment and instead emphasize methodological extensibility and cloud-based processing frameworks.
 
-### Image 1: Flooding Cluster Detection using Default Method (Cluster 1)
-![MDIM1_159_20200502_default_floodingcluster1ME](assets/MDIM1_159_20200502_default_floodingcluster1ME.png)
+**Maine – Flood Cluster Detection using Default Method (Cluster 1)**  
+![Maine Flooding Cluster - Default Method](assets/MDIM1_159_20200502_default_floodingcluster1ME.png)
 
-### Image 2: Flooding Cluster Detection using NDWI PCA Index (Cluster 2)
+**Vermont – Flood Cluster Detection using Default Method (Cluster 1)**
+![Vermont Flooding Cluster - Default Method](figs/kmeans_default/45237_20230711_default.png)
+
+*Figure: Default K-means clustering results for flood detection in Maine and Vermont. The Maine output shows diffuse and noisy clusters due to environmental and data limitations, while the Vermont result captures clearer flood boundaries aligned with ground truth.*
+
+**Maine – Flood Cluster Detection using NDWI PCA Index (Cluster 2)**
 ![MDIM1_159_20200502_ndwi_pca_i_floodingcluster2ME](assets/MDIM1_159_20200502_ndwi_pca_i_floodingcluster2ME.png)
 
 ---
@@ -168,7 +175,7 @@ This effort in spatial feature engineering enhanced both the interpretability an
 
 The original plan included deploying an interactive GIS application. However, due to computational constraints and incomplete datasets, we did not proceed with deployment.
 
-Instead, we prepared a white paper outlining:
+Instead, we prepared a [white paper](https://docs.google.com/document/d/1zeiTgkxdsBEhnq9DyQo881WCS3tXlJ3tPtyCI1jGaDs/edit?usp=sharing) outlining:
 - Cloud infrastructure recommendations for scalable flood data analysis
 - Storage and compute considerations for handling high-resolution satellite imagery
 - Integration of federated hydrological datasets

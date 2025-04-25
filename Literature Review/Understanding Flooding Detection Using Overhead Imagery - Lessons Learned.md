@@ -1,4 +1,4 @@
-# **Understanding Flooding Detection Using Overhead Imagery - Lessons Learned**
+# Understanding Flooding Detection Using Overhead Imagery - Lessons Learned
 
 [www.researchgate.net](https://www.researchgate.net/profile/Abdullah-Said-10/publication/347700942_Understanding_Flooding_Detection_Using_Overhead_Imagery_-_Lessons_Learned/links/6728eb2077b63d1220da5cd6/Understanding-Flooding-Detection-Using-Overhead-Imagery-Lessons-Learned.pdf)
 

@@ -186,7 +186,7 @@ This pivot aligned with our core learning goals and allowed us to focus on scala
 
 ## 7. Literature Review
 
-A [literature review](https://rmirza.notion.site/?pvs=4) was conducted to contextualize our methodology and understand state-of-the-art practices. Five key papers were identified covering:
+A [literature review](literature-review) was conducted to contextualize our methodology and understand state-of-the-art practices. Five key papers were identified covering:
 - Understanding Flooding Detection Using Overhead Imagery - Lessons Learned
 - Flood Detection in Urban Areas Using Satellite Imagery and Machine Learning
 - Optimized Deep Learning Model for Flood Detection Using Satellite Images
@@ -226,7 +226,7 @@ We also presented this project at the Roux Student Showcase 2025, where we share
 - [Project Proposal](https://docs.google.com/document/d/14pAnlmPhEjVojTcLnFYgJ7xc-Jl3ACxJike9pBuOEmU/edit?usp=sharing)
 - [GitHub Repository](https://github.com/dvk65/inland-flooding)
 - [White Paper on Big Data Approach](https://docs.google.com/document/d/1zeiTgkxdsBEhnq9DyQo881WCS3tXlJ3tPtyCI1jGaDs/edit?usp=sharing)
-- [Literature Review Notes](https://rmirza.notion.site/?pvs=4)
+- [Literature Review Notes](literature-review)
 
 ---
 

@@ -1,4 +1,4 @@
-# Final Report: Inland Flooding Visualization for the State of Maine
+# Final Report: Inland Flooding Visualization
 
 ### CS 8674 - Master’s Project  
 **Faculty Advisor:** [Dr. Philip Bogden](https://www.khoury.northeastern.edu/people/philip-bogden/), The Roux Institute at Northeastern University    

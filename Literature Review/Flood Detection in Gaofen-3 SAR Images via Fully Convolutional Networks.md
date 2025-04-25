@@ -1,4 +1,4 @@
-# **Flood Detection in Gaofen-3 SAR Images via Fully Convolutional Networks**
+# Flood Detection in Gaofen-3 SAR Images via Fully Convolutional Networks
 
 https://www.mdpi.com/1424-8220/18/9/2915
 

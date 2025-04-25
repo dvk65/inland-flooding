@@ -169,6 +169,8 @@ Key insights from this analysis include:
 
 This effort in spatial feature engineering enhanced both the interpretability and analytical rigor of the segmentation workflow, while also demonstrating the potential for heuristic modeling of flood-prone areas through distance-based buffering techniques.
 
+![45501_20230711_VT_dist_cluster1](assets/45501_20230711_VT_dist_cluster1.png)
+
 ---
 
 ## 6. Deployment Strategy and Strategic Pivot (April)

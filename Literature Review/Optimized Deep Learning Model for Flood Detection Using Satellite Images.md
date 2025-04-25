@@ -1,4 +1,4 @@
-# **Optimized Deep Learning Model for Flood Detection Using Satellite Images**
+# Optimized Deep Learning Model for Flood Detection Using Satellite Images
 
 https://www.mdpi.com/2072-4292/15/20/5037
 

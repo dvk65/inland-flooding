@@ -1,4 +1,4 @@
-# **Flood Detection in Urban Areas Using Satellite Imagery and Machine Learning**
+# Flood Detection in Urban Areas Using Satellite Imagery and Machine Learning
 
 https://www.mdpi.com/2073-4441/14/7/1140
 

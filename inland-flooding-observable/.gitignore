@@ -1,0 +1,10 @@
+node_modules/
+src/.observablehq
+
+dist/
+build/
+
+.env
+
+.DS_Store
+Thumbs.db
